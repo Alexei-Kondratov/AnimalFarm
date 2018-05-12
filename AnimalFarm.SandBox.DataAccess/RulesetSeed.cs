@@ -29,7 +29,7 @@ namespace AnimalFarm.Sandbox.DataAccess
                         {
                             Id = "Feed",
                             Name = "Feed",
-                            AnimalActionAttributeEffects = new Dictionary<string, double>
+                            AttributeEffects = new Dictionary<string, decimal>
                             {
                                 { _hungerAttributeId, -20 }
                             }
@@ -38,7 +38,7 @@ namespace AnimalFarm.Sandbox.DataAccess
                         {
                             Id = "Pet",
                             Name = "Pet",
-                            AnimalActionAttributeEffects = new Dictionary<string, double>
+                            AttributeEffects = new Dictionary<string, decimal>
                             {
                                 { _happinessAttributeId, 15 }
                             }

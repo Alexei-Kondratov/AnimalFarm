@@ -28,7 +28,7 @@ namespace AnimalFarm.Data
             return executionResult.Result as TEntity;
         }
 
-        public async void Upsert(TEntity entity)
+        public async Task UpsertAsync(TEntity entity)
         {
             var operation = TableOperation.InsertOrReplace(entity);
             var executionResult = await _table.ExecuteAsync(operation);
