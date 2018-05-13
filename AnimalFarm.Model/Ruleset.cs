@@ -1,17 +1,19 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
+using System;
 using System.Collections.Generic;
 
 namespace AnimalFarm.Model
 {
+    /// <summary>
+    /// Describes a set of rules.
+    /// </summary>
     public class Ruleset : TableEntity, IHaveId<string>
     {
-        public Ruleset()
-        {
-            PartitionKey = "Rules";
-        }
-
         private string _id;
 
+        /// <summary>
+        /// Gets or sets the entities identifier.
+        /// </summary>
         public string Id
         {
             get => _id;
@@ -19,6 +21,7 @@ namespace AnimalFarm.Model
             {
                 _id = value;
                 RowKey = Id;
+                PartitionKey = Id;
             }
         }
         public string Name { get; set; }

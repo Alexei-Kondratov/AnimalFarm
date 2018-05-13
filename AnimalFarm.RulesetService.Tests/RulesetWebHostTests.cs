@@ -28,7 +28,7 @@ namespace AnimalFarm.RulesetService.Tests
                 .And.Finish;
 
             transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(transactionMock.Object);
-            rulesetRepositoryMock.Setup(_ => _.ByIdAsync(transactionMock.Object, ruleset.Id)).ReturnsAsync(ruleset);
+            rulesetRepositoryMock.Setup(_ => _.ByIdAsync(transactionMock.Object, ruleset.Id, ruleset.Id)).ReturnsAsync(ruleset);
 
             var server = new TestServer(new WebHostBuilder()
                 .ConfigureServices(services => services

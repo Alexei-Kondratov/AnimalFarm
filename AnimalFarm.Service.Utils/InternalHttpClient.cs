@@ -8,26 +8,35 @@ using System.Threading.Tasks;
 
 namespace AnimalFarm.Service.Utils
 {
-    public enum InternalService
+    public enum ServiceType
     {
         Animal,
         Ruleset
     }
 
-    public class InternalHttpClient
+    public class ServiceHttpClient
     {
         const string appTypeName = "AnimalFarm.Server";
+        private readonly ServiceType _serviceType;
+        private readonly string _partitionId;
 
-        private async Task<string> GetEndpointAsync(InternalService service)
+        public ServiceHttpClient(ServiceType serviceType, string partitionId)
+        {
+            _serviceType = serviceType;
+            _partitionId = partitionId;
+        }
+
+        private async Task<string> GetEndpointAsync()
         {
             string serviceTypeName;
 
-            switch (service)
+            switch (_serviceType)
             {
-                case InternalService.Animal:
+                // TODO: Extract hardcoded service names.
+                case ServiceType.Animal:
                     serviceTypeName = "AnimalFarm.AnimalService";
                     break;
-                case InternalService.Ruleset:
+                case ServiceType.Ruleset:
                     serviceTypeName = "AnimalFarm.RulesetService";
                     break;
                 default:
@@ -36,17 +45,19 @@ namespace AnimalFarm.Service.Utils
 
             var fabricUri = $"fabric:/{appTypeName}/{serviceTypeName}";
             var resolver = ServicePartitionResolver.GetDefault();
-            var p = await resolver.ResolveAsync(new Uri(fabricUri), new ServicePartitionKey(), new System.Threading.CancellationToken());
+            var p = await resolver.ResolveAsync(new Uri(fabricUri), new ServicePartitionKey(_partitionId), new System.Threading.CancellationToken());
 
             JObject addresses = JObject.Parse(p.GetEndpoint().Address);
             return (string)addresses["Endpoints"].First();
         }
 
-        public async Task<TResult> GetAsync<TResult>(InternalService service, string path)
+        public async Task<TResult> GetAsync<TResult>(string path)
         {
-            var uri = await GetEndpointAsync(service);
+            var uri = await GetEndpointAsync();
             var client = new HttpClient();
             var response = await client.GetAsync($"{uri}{path}");
+
+            // TODO: Handled a failed response.
 
             var serializer = new JsonSerializer();
             TResult result = JsonConvert.DeserializeObject<TResult>(await response.Content.ReadAsStringAsync());

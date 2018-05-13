@@ -10,19 +10,17 @@ namespace AnimalFarm.Data
         private readonly CloudStorageAccount _storageAccount;
         private readonly CloudTableClient _tableClient;
         private readonly CloudTable _table;
-        private readonly string _partitionName;
 
-        public AzureTableRepository(string connectionString, string tableName, string partitionName)
+        public AzureTableRepository(string connectionString, string tableName)
         {
             _storageAccount = CloudStorageAccount.Parse(connectionString);
             _tableClient = _storageAccount.CreateCloudTableClient();
             _table = _tableClient.GetTableReference(tableName);
-            _partitionName = partitionName;
         }
 
-        public async Task<TEntity> ByIdAsync(ITransaction transaction, string id)
+        public async Task<TEntity> ByIdAsync(ITransaction transaction, string partitionId, string entityId)
         {
-            var operation = TableOperation.Retrieve<TEntity>(_partitionName, id);
+            var operation = TableOperation.Retrieve<TEntity>(partitionId, entityId);
             var executionResult = await _table.ExecuteAsync(operation);
             // TODO: Handle a failed execution.
             return executionResult.Result as TEntity;

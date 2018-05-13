@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using AnimalFarm.Data;
+using AnimalFarm.Model;
+using AnimalFarm.Service.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using Microsoft.ServiceFabric.Data;
-using Microsoft.ServiceFabric.Services.Client;
-using Newtonsoft.Json.Linq;
-using System.Net.Http;
-using AnimalFarm.Service.Utils;
-using AnimalFarm.Model;
+using System.Collections.Generic;
+using System.Fabric;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AnimalFarm.AnimalService
 {
@@ -24,9 +20,35 @@ namespace AnimalFarm.AnimalService
     /// </summary>
     internal sealed class AnimalService : StatefulService
     {
+        private ITransactionManager _transactionManager;
+        private IRepository<Animal> _animalRepository;
+        private IRepository<Ruleset> _rulesetRepository;
+
         public AnimalService(StatefulServiceContext context)
             : base(context)
-        { }
+        {
+            _transactionManager = new UnifiedTransactionManager(StateManager);
+            _animalRepository = BuildAnimalRepository();
+            _rulesetRepository = BuildRulesetRepository();
+        }
+
+        private IRepository<Animal> BuildAnimalRepository()
+        {
+            var sourceRepository = new AzureTableRepository<Animal>
+            (
+                "DefaultEndpointsProtocol=https;AccountName=animalfarm;AccountKey=7Lrjq5wId8TCpSx5o7vFI4nxVugkhjZcOh25RCSp318HIeXDE4o8SkaoVgeb5vKnNtrGXkJapS+Mmuf0Tnp7GA==;EndpointSuffix=core.windows.net",
+                "Animals"
+            );
+
+            var cacheRepository = new ReliableStateRepository<Animal>(StateManager);
+            return new CachedRepository<Animal>(cacheRepository, sourceRepository);
+        }
+
+        private IRepository<Ruleset> BuildRulesetRepository()
+        {
+            var sourceRepository = new ReadOnlyProxyRepository<Ruleset>(ServiceType.Ruleset, "");
+            return sourceRepository;
+        }
 
         /// <summary>
         /// Optional override to create listeners (like tcp, http) for this service instance.
@@ -46,7 +68,10 @@ namespace AnimalFarm.AnimalService
                                     .ConfigureServices(
                                         services => services
                                             .AddSingleton<StatefulServiceContext>(serviceContext)
-                                            .AddSingleton<IReliableStateManager>(this.StateManager))
+                                            .AddSingleton<IReliableStateManager>(this.StateManager)
+                                            .AddSingleton<ITransactionManager>(_transactionManager)
+                                            .AddSingleton<IRepository<Animal>>(_animalRepository)
+                                            .AddSingleton<IRepository<Ruleset>>(_rulesetRepository))
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
@@ -56,10 +81,18 @@ namespace AnimalFarm.AnimalService
             };
         }
 
+        private async Task PreloadRuleset()
+        {
+            using (var tx = _transactionManager.CreateTransaction())
+            {
+                await _rulesetRepository.ByIdAsync(tx, "", "");
+                await tx.CommitAsync();
+            }
+        }
+
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            var internalClient = new InternalHttpClient();
-            var currentRuleset = await internalClient.GetAsync<Ruleset>(InternalService.Ruleset, "");
+            await PreloadRuleset();
             cancellationToken.WaitHandle.WaitOne();
         }
     }

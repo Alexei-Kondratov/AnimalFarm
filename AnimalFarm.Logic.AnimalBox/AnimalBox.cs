@@ -18,7 +18,7 @@ namespace AnimalFarm.Logic.AnimalBox
         internal Animal Animal;
         internal Ruleset ActiveRuleset;
 
-        private Dictionary<Type, Type> _handlerTypeByEventType;
+        private readonly Dictionary<Type, Type> _handlerTypeByEventType;
 
         private IAnimalEventHandler InstantiateEventHandler(AnimalEvent e)
         {
@@ -38,12 +38,21 @@ namespace AnimalFarm.Logic.AnimalBox
         {
             _animals = animals;
             _rulesets = rulesets;
+
+            //TODO: Extract the event handlers map.
+            _handlerTypeByEventType = new Dictionary<Type, Type>
+            {
+                { typeof(CreateAnimalEvent), typeof(CreateAnimalEventHandler) },
+                { typeof(AnimalActionEvent), typeof(AnimalActionEventHandler) },
+                //{ typeof(AnimalRulesetChangeEvent), typeof(AnimalRulesetChangeEventHandler)}
+            };
         }
 
-        public async Task SetAnimalAsync(ITransaction transaction, string animalId)
+        public async Task SetAnimalAsync(ITransaction transaction, string ownerId, string animalId)
         {
             _transaction = transaction;
-            Animal = await _animals.ByIdAsync(_transaction, animalId); 
+            Animal = await _animals.ByIdAsync(_transaction, ownerId, animalId);
+            ActiveRuleset = await _rulesets.ByIdAsync(_transaction, "BaseRuleset", "BaseRuleset");
         }
 
         private void AdvanceTime(DateTime stop)

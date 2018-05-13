@@ -23,7 +23,7 @@ namespace AnimalFarm.Data
             return await _stateManager.GetOrAddAsync<IReliableDictionary<string, TEntity>>(_repositoryName);
         }
 
-        public async Task<TEntity> ByIdAsync(ITransaction transaction, string id)
+        public async Task<TEntity> ByIdAsync(ITransaction transaction, string partitionId, string entityId)
         {
             var tx = transaction as IReliableStateTransaction;
             if (tx == null)
@@ -31,7 +31,7 @@ namespace AnimalFarm.Data
 
             var reliableDictionary = await GetDictionary();
 
-            var result = await reliableDictionary.TryGetValueAsync(tx.Object, id);
+            var result = await reliableDictionary.TryGetValueAsync(tx.Object, entityId);
             return result.HasValue ? result.Value : null;
         }
 

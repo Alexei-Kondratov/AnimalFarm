@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.WindowsAzure.Storage.Table;
+using System;
 using System.Collections.Generic;
 
 namespace AnimalFarm.Model
@@ -6,12 +7,23 @@ namespace AnimalFarm.Model
     /// <summary>
     /// Describes a single animal.
     /// </summary>
-    public class Animal
+    public class Animal : TableEntity, IHaveId<string>
     {
+        private string _id;
+
         /// <summary>
-        /// Gets or sets the entity's identifier.
+        /// Gets or sets the entities identifier.
         /// </summary>
-        public string Id { get; set; }
+        public string Id
+        {
+            get => _id;
+            set
+            {
+                _id = value;
+                RowKey = Id;
+                PartitionKey = Id;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the animal's owner id.

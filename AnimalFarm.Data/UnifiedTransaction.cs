@@ -1,4 +1,5 @@
-﻿using IMsServiceFabricTransaction = Microsoft.ServiceFabric.Data.ITransaction;
+﻿using System.Threading.Tasks;
+using IMsServiceFabricTransaction = Microsoft.ServiceFabric.Data.ITransaction;
 
 namespace AnimalFarm.Data
 {
@@ -12,6 +13,11 @@ namespace AnimalFarm.Data
         }
 
         public IMsServiceFabricTransaction Object => _reliableStateTransaction;
+
+        public async Task CommitAsync()
+        {
+            await _reliableStateTransaction.CommitAsync();
+        }
 
         public void Dispose()
         {

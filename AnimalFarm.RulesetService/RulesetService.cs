@@ -9,7 +9,6 @@ using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Microsoft.ServiceFabric.Data;
-using Microsoft.ServiceFabric.Data.Collections;
 using AnimalFarm.Model;
 using AnimalFarm.Data;
 
@@ -21,7 +20,7 @@ namespace AnimalFarm.RulesetService
     internal sealed class RulesetService : StatefulService
     {
         private IRepository<Ruleset> _rulesetRepository;
-        private UnifiedTransactionManager _transactionManager;
+        private ITransactionManager _transactionManager;
 
         public RulesetService(StatefulServiceContext context)
             : base(context)
@@ -35,8 +34,7 @@ namespace AnimalFarm.RulesetService
             var sourceRepository = new AzureTableRepository<Ruleset>
             (
                 "DefaultEndpointsProtocol=https;AccountName=animalfarm;AccountKey=7Lrjq5wId8TCpSx5o7vFI4nxVugkhjZcOh25RCSp318HIeXDE4o8SkaoVgeb5vKnNtrGXkJapS+Mmuf0Tnp7GA==;EndpointSuffix=core.windows.net",
-                "Rulesets",
-                "Rules"
+                "Rulesets"
             );
 
             var cacheRepository = new ReliableStateRepository<Ruleset>(StateManager);
@@ -61,7 +59,9 @@ namespace AnimalFarm.RulesetService
                                     .ConfigureServices(
                                         services => services
                                             .AddSingleton<StatefulServiceContext>(serviceContext)
-                                            .AddSingleton<IReliableStateManager>(this.StateManager))
+                                            .AddSingleton<IReliableStateManager>(StateManager)
+                                            .AddSingleton<ITransactionManager>(_transactionManager)
+                                            .AddSingleton<IRepository<Ruleset>>(_rulesetRepository))
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
@@ -71,16 +71,11 @@ namespace AnimalFarm.RulesetService
             };
         }
 
-        private async Task<IReliableDictionary<string, Ruleset>> GetRulesetsAsync()
-        {
-            return await StateManager.GetOrAddAsync<IReliableDictionary<string, Ruleset>>("Rulesets");
-        }
-
         private async Task PreloadRulesets()
         {
             using (var tx = _transactionManager.CreateTransaction())
             {
-                var ruleset = await _rulesetRepository.ByIdAsync(tx, "BaseRuleset");
+                var ruleset = await _rulesetRepository.ByIdAsync(tx, "BaseRuleset", "BaseRuleset");
                 ServiceEventSource.Current.ServiceMessage(Context, $"Preloaded {ruleset.Id}");
             }
         }

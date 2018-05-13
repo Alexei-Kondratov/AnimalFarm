@@ -6,7 +6,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.1.269" />
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AnimalFarm.Data\AnimalFarm.Data.csproj" />
+    <ProjectReference Include="..\AnimalFarm.Model\AnimalFarm.Model.csproj" />
   </ItemGroup>
 
 </Project>

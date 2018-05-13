@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AnimalFarm.Model;
 using AnimalFarm.Service.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -15,8 +12,8 @@ namespace AnimalFarm.GatewayService.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            var internalClient = new InternalHttpClient();
-            var currentRuleset = await internalClient.GetAsync<Ruleset>(InternalService.Ruleset, "");
+            var internalClient = new ServiceHttpClient(ServiceType.Ruleset, null);
+            var currentRuleset = await internalClient.GetAsync<Ruleset>("");
             return Json(currentRuleset);
         }
     }

@@ -14,13 +14,13 @@ namespace AnimalFarm.Data
             _sourceRepository = sourceRepository;
         }
 
-        public async Task<TEntity> ByIdAsync(ITransaction transaction, string id)
+        public async Task<TEntity> ByIdAsync(ITransaction transaction, string partitionId, string entityId)
         {
-            var value = await _cacheRepository.ByIdAsync(transaction, id);
+            var value = await _cacheRepository.ByIdAsync(transaction, partitionId, entityId);
             if (value != null)
                 return value;
 
-            value = await _sourceRepository.ByIdAsync(transaction, id);
+            value = await _sourceRepository.ByIdAsync(transaction, partitionId, entityId);
             await _cacheRepository.UpsertAsync(transaction, value);
             return value;
         }
