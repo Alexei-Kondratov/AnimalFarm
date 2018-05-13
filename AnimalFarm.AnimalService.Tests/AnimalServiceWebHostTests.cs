@@ -19,15 +19,26 @@ namespace AnimalFarm.AnimalService.Tests
 {
     public class AnimalServiceWebHostTests
     {
+        private Mock<ITransaction> _transactionMock = new Mock<ITransaction>();
+        private Mock<ITransactionManager> _transactionManagerMock = new Mock<ITransactionManager>();
+        private Mock<IRepository<Animal>> _animalRepositoryMock = new Mock<IRepository<Animal>>();
+        private Mock<IRepository<Ruleset>> _rulesetRepositoryMock = new Mock<IRepository<Ruleset>>();
+
+        private HttpClient CreateTestClient()
+        {
+            var server = new TestServer(new WebHostBuilder()
+                .ConfigureServices(services => services
+                    .AddSingleton(_transactionManagerMock.Object)
+                    .AddSingleton(_animalRepositoryMock.Object)
+                    .AddSingleton(_rulesetRepositoryMock.Object))
+                .UseStartup<Startup>());
+            return server.CreateClient();
+        }
+
         [Fact]
         public void Get_animal_returns_an_animal_with_the_given_id()
         {
             // Arrange
-            var transactionMock = new Mock<ITransaction>();
-            var transactionManagerMock = new Mock<ITransactionManager>();
-            var animalRepositoryMock = new Mock<IRepository<Animal>>();
-            var rulesetRepositoryMock = new Mock<IRepository<Ruleset>>();
-
             var animal = new Animal
             {
                 Id = "AnimalId",
@@ -39,16 +50,10 @@ namespace AnimalFarm.AnimalService.Tests
                 }
             };
 
-            transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(transactionMock.Object);
-            animalRepositoryMock.Setup(_ => _.ByIdAsync(transactionMock.Object, animal.UserId, animal.Id)).ReturnsAsync(animal);
+            _transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(_transactionMock.Object);
+            _animalRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, animal.UserId, animal.Id)).ReturnsAsync(animal);
 
-            var server = new TestServer(new WebHostBuilder()
-                .ConfigureServices(services => services
-                    .AddSingleton(transactionManagerMock.Object)
-                    .AddSingleton(animalRepositoryMock.Object)
-                    .AddSingleton(rulesetRepositoryMock.Object))
-                .UseStartup<Startup>());
-            var client = server.CreateClient();
+            var client = CreateTestClient();
 
             // Act
             HttpResponseMessage response = client.GetAsync($"{animal.UserId}/{animal.Id}").GetAwaiter().GetResult();
@@ -70,11 +75,6 @@ namespace AnimalFarm.AnimalService.Tests
         public void Event_create_animal_creates_a_new_animal()
         {
             // Arrange
-            var transactionMock = new Mock<ITransaction>();
-            var transactionManagerMock = new Mock<ITransactionManager>();
-            var animalRepositoryMock = new Mock<IRepository<Animal>>();
-            var rulesetRepositoryMock = new Mock<IRepository<Ruleset>>();
-
             var ruleset = Build.Ruleset("BaseRuleset")
                 .WithAnimalType("HorseId")
                     .HavingAttribute("HappinessId", initialValue: 33)
@@ -93,21 +93,15 @@ namespace AnimalFarm.AnimalService.Tests
 
             Animal newAnimal = null;
             Action<ITransaction, Animal> setNewAnimal = (tx, a) => newAnimal = a;
-            transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(transactionMock.Object);
-            rulesetRepositoryMock.Setup(_ => _.ByIdAsync(transactionMock.Object, ruleset.Id, ruleset.Id)).ReturnsAsync(ruleset);
-            animalRepositoryMock.Setup(_ => _.ByIdAsync(transactionMock.Object, e.OwnerUserId, e.AnimalId)).ReturnsAsync((Animal)null);
-            animalRepositoryMock.Setup(_ => _.UpsertAsync(transactionMock.Object, It.IsAny<Animal>())).Callback(setNewAnimal)
+            _transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(_transactionMock.Object);
+            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, ruleset.Id, ruleset.Id)).ReturnsAsync(ruleset);
+            _animalRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, e.OwnerUserId, e.AnimalId)).ReturnsAsync((Animal)null);
+            _animalRepositoryMock.Setup(_ => _.UpsertAsync(_transactionMock.Object, It.IsAny<Animal>())).Callback(setNewAnimal)
                 .Returns(Task.CompletedTask);
 
-            var server = new TestServer(new WebHostBuilder()
-                .ConfigureServices(services => services
-                    .AddSingleton(transactionManagerMock.Object)
-                    .AddSingleton(animalRepositoryMock.Object)
-                    .AddSingleton(rulesetRepositoryMock.Object))
-                .UseStartup<Startup>());
-            var client = server.CreateClient();
-
-            var stringContent = new StringContent(JsonConvert.SerializeObject(e), Encoding.UTF8, "application/json");
+            var client = CreateTestClient();
+            var stringContent = new StringContent(JsonConvert.SerializeObject(e, typeof(AnimalEvent), Formatting.None,
+                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }), Encoding.UTF8, "application/json");
 
             // Act
             HttpResponseMessage response = client.PutAsync($"event/{e.EventId}", stringContent).GetAwaiter().GetResult();
@@ -121,6 +115,68 @@ namespace AnimalFarm.AnimalService.Tests
             var animalTypeAttribute = ruleset.AnimalTypes[e.AnimalTypeId].Attributes.First();
             Assert.Equal(animalTypeAttribute.Key, newAnimal.Attributes.First().Key);
             Assert.Equal(animalTypeAttribute.Value.InitialValue, newAnimal.Attributes.First().Value);
+        }
+
+        [Fact]
+        public void Event_animal_action_updates_the_animal()
+        {
+            // Arrange
+            const int startingAttributeValue = 27;
+            var animal = new Animal
+            {
+                Id = "AnimalId",
+                Name = "Snowball",
+                UserId = "UserId",
+                TypeId = "PigId",
+                Attributes = new Dictionary<string, decimal>
+                {
+                    { "Hunger", startingAttributeValue }
+                },
+                LastCalculated = new DateTime(2018, 5, 1)
+            };
+
+            var ruleset = Build.Ruleset("BaseRuleset")
+                .WithAnimalType(animal.TypeId)
+                    .HavingAttribute(animal.Attributes.First().Key, ratio: 10)
+                .And.WithAnimalAction("FeedId")
+                    .HavingAttributeEffect(animal.Attributes.First().Key, -20)
+                .And.Finish;
+
+            var e = new AnimalActionEvent
+            {
+                EventId = "EventId",
+                ActingUserId = animal.UserId,
+                OwnerUserId = animal.UserId,
+                AnimalId = animal.Id,
+                AnimalActionId = ruleset.AnimalActions.First().Key,
+                Time = animal.LastCalculated.AddMinutes(1)
+            };
+
+            Animal updatedAnimal = null;
+            Action<ITransaction, Animal> setNewAnimal = (tx, a) => updatedAnimal = a;
+            _transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(_transactionMock.Object);
+            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, ruleset.Id, ruleset.Id)).ReturnsAsync(ruleset);
+            _animalRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, e.OwnerUserId, e.AnimalId)).ReturnsAsync(animal);
+            _animalRepositoryMock.Setup(_ => _.UpsertAsync(_transactionMock.Object, It.IsAny<Animal>())).Callback(setNewAnimal)
+                .Returns(Task.CompletedTask);
+
+            var client = CreateTestClient();
+            var stringContent = new StringContent(JsonConvert.SerializeObject(e, typeof(AnimalEvent), Formatting.None,
+                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }), Encoding.UTF8, "application/json");
+
+            // Act
+            HttpResponseMessage response = client.PutAsync($"event/{e.EventId}", stringContent).GetAwaiter().GetResult();
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+
+            Assert.NotNull(updatedAnimal);
+            Assert.Equal(e.AnimalId, updatedAnimal.Id);
+            var expectedAttributeValue = startingAttributeValue
+                + ruleset.AnimalTypes[animal.TypeId].Attributes.First().Value.RatioPerMinute
+                + ruleset.AnimalActions[e.AnimalActionId].AttributeEffects.First().Value;
+            Assert.Equal(expectedAttributeValue, updatedAnimal.Attributes.First().Value);
+            Assert.Equal(e.Time, updatedAnimal.LastCalculated);
         }
     }
 }

@@ -5,6 +5,7 @@ using AnimalFarm.Model.Events;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,8 +39,11 @@ namespace AnimalFarm.AnimalService.Controllers
 
         [Route("event/{eventId}")]
         [HttpPut()]
-        public async Task<IActionResult> PushEvent([FromBody]CreateAnimalEvent e)
+        public async Task<IActionResult> PushEvent([FromBody]AnimalEvent e)
         {
+            Request.Body.Seek(0, System.IO.SeekOrigin.Begin);
+            var body = (new StreamReader(Request.Body)).ReadToEnd();
+
             using (var tx = _transactionManager.CreateTransaction())
             {
                 var animalBox = new AnimalBox(_rulesets, _animals);

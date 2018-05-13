@@ -66,8 +66,11 @@ namespace AnimalFarm.Logic.AnimalBox
                 return;
             
             AnimalType animalType = ActiveRuleset.AnimalTypes[Animal.TypeId];
-            foreach (string attributeId in Animal.Attributes.Keys)
+            foreach (string attributeId in animalType.Attributes.Keys)
             {
+                if (!Animal.Attributes.ContainsKey(attributeId))
+                    continue;
+
                 AnimalTypeAttribute animalTypeAttribute = animalType.Attributes[attributeId];
                 decimal minValue = animalTypeAttribute.MinValue;
                 decimal maxValue = animalTypeAttribute.MaxValue;
@@ -77,6 +80,8 @@ namespace AnimalFarm.Logic.AnimalBox
                 newValue = Math.Max(minValue, Math.Min(maxValue, newValue));
                 Animal.Attributes[attributeId] = newValue;
             }
+
+            Animal.LastCalculated = stop;
         }
 
         private bool RunEvent(AnimalEvent e, AnimalBoxEventContext context)
