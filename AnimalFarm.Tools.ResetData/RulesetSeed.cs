@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AnimalFarm.Sandbox.DataAccess
+namespace AnimalFarm.Tools.ResetData
 {
     public class RulesetSeed
     {
