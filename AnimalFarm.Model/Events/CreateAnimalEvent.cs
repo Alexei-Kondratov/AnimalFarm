@@ -7,7 +7,7 @@ namespace AnimalFarm.Model.Events
     /// <summary>
     /// Represents a creation of a new animal.
     /// </summary>
-    public class AnimalCreateEvent : AnimalEvent
+    public class CreateAnimalEvent : AnimalEvent
     {
         /// <summary>
         /// Gets or sets the name of the new animal.

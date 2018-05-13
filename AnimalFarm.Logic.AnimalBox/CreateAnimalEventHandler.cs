@@ -5,17 +5,19 @@ using System.Linq;
 
 namespace AnimalFarm.Logic.AnimalBox
 {
-
-    public class BoxAnimalCreateEventHandler : AnimalEventHandler<AnimalCreateEvent>
+    /// <summary>
+    /// Processes the CreateAnimalEvent avent.
+    /// </summary>
+    public class CreateAnimalEventHandler : AnimalEventHandler<CreateAnimalEvent>
     {
-        public override bool Validate(AnimalCreateEvent e, IAnimalEventContext context)
+        public override bool Validate(CreateAnimalEvent e, IAnimalEventContext context)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
-        public override void Apply(AnimalCreateEvent e, IAnimalEventContext context)
+        public override void Apply(CreateAnimalEvent e, IAnimalEventContext context)
         {
-            AnimalType animalType = context.ActiveRuleset.AnimalTypes[e.AnimalId];
+            AnimalType animalType = context.ActiveRuleset.AnimalTypes[e.AnimalTypeId];
 
             var animal = new Animal
             {

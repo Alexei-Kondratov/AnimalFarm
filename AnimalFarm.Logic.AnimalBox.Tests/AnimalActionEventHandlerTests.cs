@@ -49,7 +49,7 @@ namespace AnimalFarm.Logic.AnimalBox.Tests
             target.Apply(e, new MockAnimalEventContext { Animal = animal, ActiveRuleset = ruleset });
 
             // Assert
-            Assert.Equal(expectedValue, animal.Attributes[attributeId]); 
+            Assert.Equal(expectedValue, animal.Attributes[attributeId]);
         }
     }
 }
