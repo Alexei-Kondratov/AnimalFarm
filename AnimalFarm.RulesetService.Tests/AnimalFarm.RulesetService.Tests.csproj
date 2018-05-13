@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.0-rc1-final" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.0" />
+    <PackageReference Include="Moq" Version="4.8.2" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AnimalFarm.Data\AnimalFarm.Data.csproj" />
+    <ProjectReference Include="..\AnimalFarm.Model.Tests.Builders\AnimalFarm.Model.Tests.Builders.csproj" />
+    <ProjectReference Include="..\AnimalFarm.Model\AnimalFarm.Model.csproj" />
+    <ProjectReference Include="..\AnimalFarm.RulesetService\AnimalFarm.RulesetService.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -13,6 +13,7 @@ namespace AnimalFarm.Logic.AnimalBox
     {
         private readonly IRepository<Animal> _animals;
         private readonly IRepository<Ruleset> _rulesets;
+        private ITransaction _transaction;
 
         internal Animal Animal;
         internal Ruleset ActiveRuleset;
@@ -21,8 +22,7 @@ namespace AnimalFarm.Logic.AnimalBox
 
         private IAnimalEventHandler InstantiateEventHandler(AnimalEvent e)
         {
-            Type handlerType;
-            if (!_handlerTypeByEventType.TryGetValue(e.GetType(), out handlerType))
+            if (!_handlerTypeByEventType.TryGetValue(e.GetType(), out Type handlerType))
                 return null;
 
             ConstructorInfo emptyConstructor = handlerType.GetConstructor(new Type[] { });
@@ -40,9 +40,10 @@ namespace AnimalFarm.Logic.AnimalBox
             _rulesets = rulesets;
         }
 
-        public async Task SetAnimalAsync(string animalId)
+        public async Task SetAnimalAsync(ITransaction transaction, string animalId)
         {
-            Animal = await _animals.ByIdAsync(animalId); 
+            _transaction = transaction;
+            Animal = await _animals.ByIdAsync(_transaction, animalId); 
         }
 
         private void AdvanceTime(DateTime stop)
@@ -102,7 +103,7 @@ namespace AnimalFarm.Logic.AnimalBox
             if (Animal == null)
                 return;
 
-            await _animals.UpsertAsync(Animal);
+            await _animals.UpsertAsync(_transaction, Animal);
         }
     }
 }

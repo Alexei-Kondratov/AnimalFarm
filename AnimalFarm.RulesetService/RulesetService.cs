@@ -21,11 +21,26 @@ namespace AnimalFarm.RulesetService
     internal sealed class RulesetService : StatefulService
     {
         private IRepository<Ruleset> _rulesetRepository;
+        private UnifiedTransactionManager _transactionManager;
 
-        public RulesetService(StatefulServiceContext context, IRepository<Ruleset> rulesetRepository)
+        public RulesetService(StatefulServiceContext context)
             : base(context)
         {
-            _rulesetRepository = rulesetRepository;
+            _rulesetRepository = BuildRulesetRepository();
+            _transactionManager = new UnifiedTransactionManager(StateManager);
+        }
+
+        private IRepository<Ruleset> BuildRulesetRepository()
+        {
+            var sourceRepository = new AzureTableRepository<Ruleset>
+            (
+                "DefaultEndpointsProtocol=https;AccountName=animalfarm;AccountKey=7Lrjq5wId8TCpSx5o7vFI4nxVugkhjZcOh25RCSp318HIeXDE4o8SkaoVgeb5vKnNtrGXkJapS+Mmuf0Tnp7GA==;EndpointSuffix=core.windows.net",
+                "Rulesets",
+                "Rules"
+            );
+
+            var cacheRepository = new ReliableStateRepository<Ruleset>(StateManager);
+            return new CachedRepository<Ruleset>(cacheRepository, sourceRepository);
         }
 
         /// <summary>
@@ -61,35 +76,18 @@ namespace AnimalFarm.RulesetService
             return await StateManager.GetOrAddAsync<IReliableDictionary<string, Ruleset>>("Rulesets");
         }
 
-        private async Task<Ruleset> GetRulesetAsync(string rulesetId)
+        private async Task PreloadRulesets()
         {
-            var rulesets = await GetRulesetsAsync();
-
-            using (var tx = StateManager.CreateTransaction())
+            using (var tx = _transactionManager.CreateTransaction())
             {
-                ServiceEventSource.Current.ServiceMessage(Context, $"Requesting ruleset {rulesetId}");
-                var currentValue = await rulesets.TryGetValueAsync(tx, rulesetId);
-                if (currentValue.HasValue)
-                {
-                    ServiceEventSource.Current.ServiceMessage(Context, $"Retrieved ruleset {rulesetId} from cache");
-                    return currentValue.Value;
-                }
-
-                Ruleset ruleset = await _rulesetRepository.ByIdAsync(rulesetId);
-
-                await rulesets.AddAsync(tx, ruleset.Id, ruleset);
-                await tx.CommitAsync();
-                ServiceEventSource.Current.ServiceMessage(Context, $"Loaded ruleset {rulesetId}");
-                return ruleset;
+                var ruleset = await _rulesetRepository.ByIdAsync(tx, "BaseRuleset");
+                ServiceEventSource.Current.ServiceMessage(Context, $"Preloaded {ruleset.Id}");
             }
         }
 
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            var ruleset = await GetRulesetAsync("BaseRuleset");
-            ruleset = await GetRulesetAsync("BaseRuleset");
-            ruleset = await GetRulesetAsync("BaseRuleset");
-            ServiceEventSource.Current.ServiceMessage(Context, $"Loaded {ruleset.Id}");
+            await PreloadRulesets();
             cancellationToken.WaitHandle.WaitOne();
         }
     }

@@ -4,7 +4,7 @@ namespace AnimalFarm.Data
 {
     public interface IRepository<TEntity>
     {
-        Task<TEntity> ByIdAsync(string id);
-        Task UpsertAsync(TEntity entity);
+        Task<TEntity> ByIdAsync(ITransaction transaction, string id);
+        Task UpsertAsync(ITransaction transaction, TEntity entity);
     }
 }

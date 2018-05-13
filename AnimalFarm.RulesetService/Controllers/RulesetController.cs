@@ -1,32 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AnimalFarm.Data;
 using AnimalFarm.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.ServiceFabric.Data;
-using Microsoft.ServiceFabric.Data.Collections;
+using System.Threading.Tasks;
 
 namespace AnimalFarm.RulesetService.Controllers
 {
     [Route("")]
     public class RulesetController : Controller
     {
-        private IReliableStateManager _stateManager;
+        private ITransactionManager _transactionManager;
+        private IRepository<Ruleset> _rulesets;
 
-        public RulesetController(IReliableStateManager stateManager)
+        public RulesetController(ITransactionManager transactionManager, IRepository<Ruleset> rulesets)
         {
-            _stateManager = stateManager;
+            _transactionManager = transactionManager;
+            _rulesets = rulesets;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetCurrentRuleset()
         {
-            using (var tx = _stateManager.CreateTransaction())
+            using (var tx = _transactionManager.CreateTransaction())
             {
-                var rulesetDictionary = await _stateManager.GetOrAddAsync<IReliableDictionary<string, Ruleset>>("Rulesets");
-                var ruleset = await rulesetDictionary.TryGetValueAsync(tx, "BaseRuleset");
-                return Json(ruleset.Value);
+                var ruleset = await _rulesets.ByIdAsync(tx, "BaseRuleset");
+                return Json(ruleset);
             }
         }
     }

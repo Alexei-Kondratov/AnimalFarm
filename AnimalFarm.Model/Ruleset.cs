@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace AnimalFarm.Model
 {
-    public class Ruleset : TableEntity
+    public class Ruleset : TableEntity, IHaveId<string>
     {
         public Ruleset()
         {

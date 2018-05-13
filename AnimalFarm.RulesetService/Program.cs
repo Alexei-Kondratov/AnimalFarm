@@ -4,20 +4,11 @@ using Microsoft.ServiceFabric.Services.Runtime;
 using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AnimalFarm.RulesetService
 {
     internal static class Program
     {
-        private static IRepository<Ruleset> BuildRulesetRepository()
-        {
-            return new AzureTableRepository<Ruleset>(
-                       "DefaultEndpointsProtocol=https;AccountName=animalfarm;AccountKey=7Lrjq5wId8TCpSx5o7vFI4nxVugkhjZcOh25RCSp318HIeXDE4o8SkaoVgeb5vKnNtrGXkJapS+Mmuf0Tnp7GA==;EndpointSuffix=core.windows.net",
-                       "Rulesets",
-                       "Rules");
-        }
-
         /// <summary>
         /// This is the entry point of the service host process.
         /// </summary>
@@ -31,7 +22,7 @@ namespace AnimalFarm.RulesetService
                 // an instance of the class is created in this host process.
 
                 ServiceRuntime.RegisterServiceAsync("AnimalFarm.RulesetServiceType",
-                    context => new RulesetService(context, BuildRulesetRepository())).GetAwaiter().GetResult();
+                    context => new RulesetService(context)).GetAwaiter().GetResult();
 
                 ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(RulesetService).Name);
 

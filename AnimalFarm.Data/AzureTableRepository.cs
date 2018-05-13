@@ -20,19 +20,19 @@ namespace AnimalFarm.Data
             _partitionName = partitionName;
         }
 
-        public async Task<TEntity> ByIdAsync(string id)
+        public async Task<TEntity> ByIdAsync(ITransaction transaction, string id)
         {
             var operation = TableOperation.Retrieve<TEntity>(_partitionName, id);
             var executionResult = await _table.ExecuteAsync(operation);
-            // TODO: Handle failed execution.
+            // TODO: Handle a failed execution.
             return executionResult.Result as TEntity;
         }
 
-        public async Task UpsertAsync(TEntity entity)
+        public async Task UpsertAsync(ITransaction transaction, TEntity entity)
         {
             var operation = TableOperation.InsertOrReplace(entity);
             var executionResult = await _table.ExecuteAsync(operation);
-            // TODO: Handle failed execution.
+            // TODO: Handle a failed execution.
         }
     }
 }
