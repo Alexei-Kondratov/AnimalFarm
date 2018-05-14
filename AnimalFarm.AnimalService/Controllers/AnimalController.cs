@@ -3,10 +3,7 @@ using AnimalFarm.Logic.AnimalBox;
 using AnimalFarm.Model;
 using AnimalFarm.Model.Events;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AnimalFarm.AnimalService.Controllers

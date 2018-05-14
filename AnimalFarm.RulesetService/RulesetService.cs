@@ -11,6 +11,7 @@ using Microsoft.ServiceFabric.Services.Runtime;
 using Microsoft.ServiceFabric.Data;
 using AnimalFarm.Model;
 using AnimalFarm.Data;
+using AnimalFarm.Service.Utils;
 
 namespace AnimalFarm.RulesetService
 {
@@ -25,20 +26,9 @@ namespace AnimalFarm.RulesetService
         public RulesetService(StatefulServiceContext context)
             : base(context)
         {
-            _rulesetRepository = BuildRulesetRepository();
             _transactionManager = new UnifiedTransactionManager(StateManager);
-        }
-
-        private IRepository<Ruleset> BuildRulesetRepository()
-        {
-            var sourceRepository = new AzureTableRepository<Ruleset>
-            (
-                "DefaultEndpointsProtocol=https;AccountName=animalfarm;AccountKey=7Lrjq5wId8TCpSx5o7vFI4nxVugkhjZcOh25RCSp318HIeXDE4o8SkaoVgeb5vKnNtrGXkJapS+Mmuf0Tnp7GA==;EndpointSuffix=core.windows.net",
-                "Rulesets"
-            );
-
-            var cacheRepository = new ReliableStateRepository<Ruleset>(StateManager);
-            return new CachedRepository<Ruleset>(cacheRepository, sourceRepository);
+            var repositoryBuilder = new RepositoryBuilder(context, StateManager);
+            _rulesetRepository = repositoryBuilder.BuildRepository<Ruleset>();
         }
 
         /// <summary>

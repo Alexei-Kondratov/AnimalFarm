@@ -19,6 +19,7 @@ namespace AnimalFarm.Tools.ResetData
                 Console.WriteLine($"Deleting table {table.Name}");
                 await table.DeleteIfExistsAsync();
                 Console.WriteLine($"Deleted table {table.Name}");
+                Thread.Sleep(1000);
             }
 
             while (await table.ExistsAsync())

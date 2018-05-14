@@ -7,6 +7,7 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
@@ -28,26 +29,10 @@ namespace AnimalFarm.AnimalService
             : base(context)
         {
             _transactionManager = new UnifiedTransactionManager(StateManager);
-            _animalRepository = BuildAnimalRepository();
-            _rulesetRepository = BuildRulesetRepository();
-        }
 
-        private IRepository<Animal> BuildAnimalRepository()
-        {
-            var sourceRepository = new AzureTableRepository<Animal>
-            (
-                "DefaultEndpointsProtocol=https;AccountName=animalfarm;AccountKey=7Lrjq5wId8TCpSx5o7vFI4nxVugkhjZcOh25RCSp318HIeXDE4o8SkaoVgeb5vKnNtrGXkJapS+Mmuf0Tnp7GA==;EndpointSuffix=core.windows.net",
-                "Animals"
-            );
-
-            var cacheRepository = new ReliableStateRepository<Animal>(StateManager);
-            return new CachedRepository<Animal>(cacheRepository, sourceRepository);
-        }
-
-        private IRepository<Ruleset> BuildRulesetRepository()
-        {
-            var sourceRepository = new ReadOnlyProxyRepository<Ruleset>(ServiceType.Ruleset, "");
-            return sourceRepository;
+            var repositoryBuilder = new RepositoryBuilder(context, StateManager);
+            _animalRepository = repositoryBuilder.BuildRepository<Animal>();
+            _rulesetRepository = repositoryBuilder.BuildRepository<Ruleset>();
         }
 
         /// <summary>
@@ -85,7 +70,7 @@ namespace AnimalFarm.AnimalService
         {
             using (var tx = _transactionManager.CreateTransaction())
             {
-                await _rulesetRepository.ByIdAsync(tx, "", "");
+                await _rulesetRepository.ByIdAsync(tx, "BaseRuleset", "BaseRuleset");
                 await tx.CommitAsync();
             }
         }

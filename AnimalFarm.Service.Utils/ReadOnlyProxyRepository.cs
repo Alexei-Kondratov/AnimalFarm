@@ -1,13 +1,10 @@
-﻿using AnimalFarm.Model;
-using System;
-using Microsoft.ServiceFabric.Data.Collections;
+﻿using System;
 using System.Threading.Tasks;
 using AnimalFarm.Data;
 
 namespace AnimalFarm.Service.Utils
 {
     public class ReadOnlyProxyRepository<TEntity> : IRepository<TEntity>
-        where TEntity : class, IHaveId<string>
     {
         private readonly ServiceType _serviceType; 
         private readonly string _endpointPath;
@@ -15,7 +12,7 @@ namespace AnimalFarm.Service.Utils
         public ReadOnlyProxyRepository(ServiceType serviceType, string endpointPath)
         {
             _serviceType = serviceType;
-            _endpointPath = endpointPath;
+            _endpointPath = endpointPath ?? String.Empty;
         }
 
         public async Task<TEntity> ByIdAsync(ITransaction transaction, string partitionId, string entityId)

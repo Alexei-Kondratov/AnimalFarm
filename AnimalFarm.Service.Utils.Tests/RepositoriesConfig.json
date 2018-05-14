@@ -1,0 +1,14 @@
+﻿[
+  {
+    "$type": "AnimalFarm.Service.Utils.AzureTableRepositoryConfiguration, AnimalFarm.Service.Utils",
+    "entityType": "AnimalFarm.Model.Animal",
+    "tableName": "Animals",
+  },
+  {
+    "$type": "AnimalFarm.Service.Utils.ReadOnlyProxyRepositoryConfiguration, AnimalFarm.Service.Utils",
+    "entityType": "AnimalFarm.Model.Ruleset",
+    "sourceService": "Ruleset",
+    "localCacheName":  "Rulesets"
+  }
+]
+

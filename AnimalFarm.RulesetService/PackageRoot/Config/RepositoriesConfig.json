@@ -1,0 +1,9 @@
+﻿[
+  {
+    "$type": "AnimalFarm.Service.Utils.AzureTableRepositoryConfiguration, AnimalFarm.Service.Utils",
+    "entityType": "AnimalFarm.Model.Ruleset",
+    "tableName": "Rulesets",
+    "localCacheName": "Rulesets"
+  }
+]
+
