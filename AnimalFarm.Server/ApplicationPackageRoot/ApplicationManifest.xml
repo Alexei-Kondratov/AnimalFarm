@@ -42,7 +42,7 @@
     </Service>
     <Service Name="AnimalFarm.RulesetService" ServicePackageActivationMode="ExclusiveProcess">
       <StatefulService ServiceTypeName="AnimalFarm.RulesetServiceType" TargetReplicaSetSize="[AnimalFarm.RulesetService_TargetReplicaSetSize]" MinReplicaSetSize="[AnimalFarm.RulesetService_MinReplicaSetSize]">
-        <SingletonPartition />
+        <UniformInt64Partition PartitionCount="[AnimalFarm.AnimalService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>
     </Service>
   </DefaultServices>

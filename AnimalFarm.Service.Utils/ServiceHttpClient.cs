@@ -18,12 +18,12 @@ namespace AnimalFarm.Service.Utils
     {
         const string appTypeName = "AnimalFarm.Server";
         private readonly ServiceType _serviceType;
-        private readonly string _partitionId;
+        private readonly long _partitionKeyHash;
 
-        public ServiceHttpClient(ServiceType serviceType, string partitionId)
+        public ServiceHttpClient(ServiceType serviceType, string partitionKey)
         {
             _serviceType = serviceType;
-            _partitionId = partitionId;
+            _partitionKeyHash = partitionKey.GetHashCode();
         }
 
         private async Task<string> GetEndpointAsync()
@@ -45,7 +45,7 @@ namespace AnimalFarm.Service.Utils
 
             var fabricUri = $"fabric:/{appTypeName}/{serviceTypeName}";
             var resolver = ServicePartitionResolver.GetDefault();
-            var p = await resolver.ResolveAsync(new Uri(fabricUri), new ServicePartitionKey(_partitionId), new System.Threading.CancellationToken());
+            var p = await resolver.ResolveAsync(new Uri(fabricUri), new ServicePartitionKey(_partitionKeyHash), new System.Threading.CancellationToken());
 
             JObject addresses = JObject.Parse(p.GetEndpoint().Address);
             return (string)addresses["Endpoints"].First();

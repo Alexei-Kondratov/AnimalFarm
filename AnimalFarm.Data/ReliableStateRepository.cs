@@ -43,7 +43,7 @@ namespace AnimalFarm.Data
 
             var reliableDictionary = await GetDictionary();
 
-            await reliableDictionary.SetAsync(tx.Object, entity.Id, entity);
+            await reliableDictionary.AddOrUpdateAsync(tx.Object, entity.Id, entity, (key, oldValue) => entity);
         }
     }
 }

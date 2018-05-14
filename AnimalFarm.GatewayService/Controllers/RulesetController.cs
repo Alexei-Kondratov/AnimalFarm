@@ -12,7 +12,7 @@ namespace AnimalFarm.GatewayService.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            var internalClient = new ServiceHttpClient(ServiceType.Ruleset, null);
+            var internalClient = new ServiceHttpClient(ServiceType.Ruleset, "");
             var currentRuleset = await internalClient.GetAsync<Ruleset>("");
             return Json(currentRuleset);
         }
