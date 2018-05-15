@@ -1,0 +1,8 @@
+﻿[
+  {
+    "$type": "AnimalFarm.Service.Utils.AzureTableRepositoryConfiguration, AnimalFarm.Service.Utils",
+    "entityType": "AnimalFarm.Model.UserAuthenticationInfo",
+    "tableName": "UserAuthenticationInfos"
+  }
+]
+

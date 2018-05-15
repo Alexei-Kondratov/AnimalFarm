@@ -28,7 +28,7 @@ namespace AnimalFarm.AnimalService
         public AnimalService(StatefulServiceContext context)
             : base(context)
         {
-            _transactionManager = new UnifiedTransactionManager(StateManager);
+            _transactionManager = new StatefulServiceTransactionManager(StateManager);
 
             var repositoryBuilder = new RepositoryBuilder(context, StateManager);
             _animalRepository = repositoryBuilder.BuildRepository<Animal>();

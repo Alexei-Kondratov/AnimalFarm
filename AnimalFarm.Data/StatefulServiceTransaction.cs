@@ -3,11 +3,14 @@ using IMsServiceFabricTransaction = Microsoft.ServiceFabric.Data.ITransaction;
 
 namespace AnimalFarm.Data
 {
-    public class UnifiedTransaction : IAzureTableTransaction, IReliableStateTransaction
+    /// <summary>
+    /// ITransaction implementation suitable for stateful services.
+    /// </summary>
+    public class StatefulServiceTransaction : IAzureTableTransaction, IReliableStateTransaction
     {
         private readonly IMsServiceFabricTransaction _reliableStateTransaction;
 
-        public UnifiedTransaction(IMsServiceFabricTransaction reliableStateTransaction)
+        public StatefulServiceTransaction(IMsServiceFabricTransaction reliableStateTransaction)
         {
             _reliableStateTransaction = reliableStateTransaction;
         }

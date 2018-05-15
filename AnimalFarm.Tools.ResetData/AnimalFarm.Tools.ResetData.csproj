@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AnimalFarm.Model\AnimalFarm.Model.csproj" />
+    <ProjectReference Include="..\AnimalFarm.Service.Utils\AnimalFarm.Service.Utils.csproj" />
   </ItemGroup>
 
 </Project>

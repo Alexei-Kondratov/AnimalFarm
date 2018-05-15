@@ -2,6 +2,7 @@
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,32 +17,40 @@ namespace AnimalFarm.Tools.ResetData
 
             if (await table.ExistsAsync())
             {
-                Console.WriteLine($"Deleting table {table.Name}");
+                Console.WriteLine($"Deleting table {table.Name} ...");
                 await table.DeleteIfExistsAsync();
                 Console.WriteLine($"Deleted table {table.Name}");
-                Thread.Sleep(1000);
             }
-
-            while (await table.ExistsAsync())
-                Thread.Sleep(100);
 
             table = tableClient.GetTableReference(tableName);
 
-            Console.WriteLine($"Creating table {table.Name}");
-            await table.CreateIfNotExistsAsync();
-            Console.WriteLine($"Created table {table.Name}");
+            var created = false;
+            Console.WriteLine($"Creating table {table.Name} ...");
+            while (!created)
+            {
+                try
+                {
+                    await table.CreateIfNotExistsAsync();
+                    Console.WriteLine($"Created table {table.Name}");
+                    created = true;
+                }
+                catch (StorageException)
+                {
+                    Thread.Sleep(1000);
+                    Console.WriteLine($"Waiting ...");
+                }
+            }
         }
 
-        private static async Task Seed(CloudTableClient tableClient)
+        private static async Task Seed(CloudTableClient client, string tableName, IEnumerable<ITableEntity> entities)
         {
-            CloudTable table = tableClient.GetTableReference("Rulesets");
+            CloudTable table = client.GetTableReference(tableName);
 
-            var rulesets = new RulesetSeed().GetRulesets();
-            Console.WriteLine($"Seeding rulesets");
-            foreach (Ruleset ruleset in rulesets)
-                await table.ExecuteAsync(TableOperation.Insert(ruleset));
+            Console.WriteLine($"Seeding {tableName}");
+            foreach (ITableEntity entity in entities)
+                await table.ExecuteAsync(TableOperation.Insert(entity));
 
-            Console.WriteLine($"Seeded {rulesets.Count()} rulesets");
+            Console.WriteLine($"Seeded {entities.Count()} entities in {tableName}");
         }
 
         private const string connectionString =
@@ -53,7 +62,11 @@ namespace AnimalFarm.Tools.ResetData
 
             ClearTable(tableClient, "Rulesets").GetAwaiter().GetResult();
             ClearTable(tableClient, "Animals").GetAwaiter().GetResult();
-            Seed(tableClient).GetAwaiter().GetResult();
+            ClearTable(tableClient, "UserAuthenticationInfos").GetAwaiter().GetResult();
+
+            var seedData = new SeedData();
+            Seed(tableClient, "Rulesets", seedData.GetRulesets()).GetAwaiter().GetResult();
+            Seed(tableClient, "UserAuthenticationInfos", seedData.GetUserAuthenticationInfos()).GetAwaiter().GetResult();
         }
     }
 }

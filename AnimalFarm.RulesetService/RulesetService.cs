@@ -26,7 +26,7 @@ namespace AnimalFarm.RulesetService
         public RulesetService(StatefulServiceContext context)
             : base(context)
         {
-            _transactionManager = new UnifiedTransactionManager(StateManager);
+            _transactionManager = new StatefulServiceTransactionManager(StateManager);
             var repositoryBuilder = new RepositoryBuilder(context, StateManager);
             _rulesetRepository = repositoryBuilder.BuildRepository<Ruleset>();
         }

@@ -30,6 +30,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AnimalFarm.AnimalService\AnimalFarm.AnimalService.csproj" />
+    <ProjectReference Include="..\AnimalFarm.AuthenticationService\AnimalFarm.AuthenticationService.csproj" />
     <ProjectReference Include="..\AnimalFarm.GatewayService\AnimalFarm.GatewayService.csproj" />
     <ProjectReference Include="..\AnimalFarm.RulesetService\AnimalFarm.RulesetService.csproj" />
   </ItemGroup>

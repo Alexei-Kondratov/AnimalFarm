@@ -1,10 +1,11 @@
 ﻿using AnimalFarm.Model;
+using AnimalFarm.Service.Utils.Security;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace AnimalFarm.Tools.ResetData
 {
-    public class RulesetSeed
+    public class SeedData
     {
         private const string _pigId = "Pig";
         private const string _horseId = "Horse";
@@ -15,6 +16,29 @@ namespace AnimalFarm.Tools.ResetData
         private const string _firstVersionId = "0.1";
         private const string _firstRulesetVersionId = "BaseRuleset";
         private const string _secondRulesetVersionId = "TigerUpdate";
+
+        public IEnumerable<UserAuthenticationInfo> GetUserAuthenticationInfos()
+        {
+            var hasher = new PasswordHasher();
+
+            return new[]
+            {
+                new UserAuthenticationInfo
+                {
+                    Id = "FirstUserId",
+                    Login = "FirstUser",
+                    PasswordSalt = "SaltySalt",
+                    PasswordHash = hasher.GetHash("SaltySalt", "FirstPassword")
+                },
+                new UserAuthenticationInfo
+                {
+                    Id = "SecondUserId",
+                    Login = "SecondUser",
+                    PasswordSalt = "Sugar",
+                    PasswordHash = hasher.GetHash("Sugar", "SecondPassword")
+                },
+            };
+        }
 
         public IEnumerable<Ruleset> GetRulesets()
         {

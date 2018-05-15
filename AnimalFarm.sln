@@ -33,13 +33,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{064347E4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimalFarm.RulesetService.Tests", "AnimalFarm.RulesetService.Tests\AnimalFarm.RulesetService.Tests.csproj", "{0B2190C2-E57D-47BA-8051-13CD13C4D76C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalFarm.AnimalService.Tests", "AnimalFarm.AnimalService.Tests\AnimalFarm.AnimalService.Tests.csproj", "{3B45349A-AB8F-442F-9D75-6F2CB63232A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimalFarm.AnimalService.Tests", "AnimalFarm.AnimalService.Tests\AnimalFarm.AnimalService.Tests.csproj", "{3B45349A-AB8F-442F-9D75-6F2CB63232A7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{76744219-C33B-414B-B7F1-6036CFA7894D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalFarm.Tools.ResetData", "AnimalFarm.Tools.ResetData\AnimalFarm.Tools.ResetData.csproj", "{A39783CA-A383-4B03-B731-9454A1542B72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimalFarm.Tools.ResetData", "AnimalFarm.Tools.ResetData\AnimalFarm.Tools.ResetData.csproj", "{A39783CA-A383-4B03-B731-9454A1542B72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalFarm.Service.Utils.Tests", "AnimalFarm.Service.Utils.Tests\AnimalFarm.Service.Utils.Tests.csproj", "{1CA80181-5744-4C61-AC5F-4056663952A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimalFarm.Service.Utils.Tests", "AnimalFarm.Service.Utils.Tests\AnimalFarm.Service.Utils.Tests.csproj", "{1CA80181-5744-4C61-AC5F-4056663952A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalFarm.AuthenticationService", "AnimalFarm.AuthenticationService\AnimalFarm.AuthenticationService.csproj", "{A2130E60-FE3E-43E5-A295-9104088ABC65}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -169,6 +171,14 @@ Global
 		{1CA80181-5744-4C61-AC5F-4056663952A6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1CA80181-5744-4C61-AC5F-4056663952A6}.Release|x64.ActiveCfg = Release|Any CPU
 		{1CA80181-5744-4C61-AC5F-4056663952A6}.Release|x64.Build.0 = Release|Any CPU
+		{A2130E60-FE3E-43E5-A295-9104088ABC65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2130E60-FE3E-43E5-A295-9104088ABC65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2130E60-FE3E-43E5-A295-9104088ABC65}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A2130E60-FE3E-43E5-A295-9104088ABC65}.Debug|x64.Build.0 = Debug|Any CPU
+		{A2130E60-FE3E-43E5-A295-9104088ABC65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2130E60-FE3E-43E5-A295-9104088ABC65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2130E60-FE3E-43E5-A295-9104088ABC65}.Release|x64.ActiveCfg = Release|Any CPU
+		{A2130E60-FE3E-43E5-A295-9104088ABC65}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -184,6 +194,7 @@ Global
 		{3B45349A-AB8F-442F-9D75-6F2CB63232A7} = {064347E4-87F8-46CD-90C2-674E738CED2E}
 		{A39783CA-A383-4B03-B731-9454A1542B72} = {76744219-C33B-414B-B7F1-6036CFA7894D}
 		{1CA80181-5744-4C61-AC5F-4056663952A6} = {064347E4-87F8-46CD-90C2-674E738CED2E}
+		{A2130E60-FE3E-43E5-A295-9104088ABC65} = {49F093F3-3C14-405D-83F1-6E617288C49B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7F54309B-744A-4BC9-AB90-564F7D84BA71}
