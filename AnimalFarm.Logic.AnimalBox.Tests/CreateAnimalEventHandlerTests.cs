@@ -37,7 +37,7 @@ namespace AnimalFarm.Logic.AnimalBox.Tests
                 Time = time
             };
 
-            var context = new MockAnimalEventContext { Animal = null, ActiveRuleset = ruleset };
+            var context = new MockAnimalEventContext(null, ruleset);
 
             // Act
             target.Apply(e, context);

@@ -46,7 +46,7 @@ namespace AnimalFarm.Logic.AnimalBox.Tests
             AnimalActionEvent e = new AnimalActionEvent { AnimalId = animalId, AnimalActionId = animalActionId };
 
             // Act
-            target.Apply(e, new MockAnimalEventContext { Animal = animal, ActiveRuleset = ruleset });
+            target.Apply(e, new MockAnimalEventContext(animal, ruleset));
 
             // Assert
             Assert.Equal(expectedValue, animal.Attributes[attributeId]);

@@ -104,7 +104,7 @@ namespace AnimalFarm.AnimalService.Tests
                 new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }), Encoding.UTF8, "application/json");
 
             // Act
-            HttpResponseMessage response = client.PutAsync($"event/{e.EventId}", stringContent).GetAwaiter().GetResult();
+            HttpResponseMessage response = client.PutAsync($"event", stringContent).GetAwaiter().GetResult();
 
             // Assert
             response.EnsureSuccessStatusCode();
@@ -165,7 +165,7 @@ namespace AnimalFarm.AnimalService.Tests
                 new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }), Encoding.UTF8, "application/json");
 
             // Act
-            HttpResponseMessage response = client.PutAsync($"event/{e.EventId}", stringContent).GetAwaiter().GetResult();
+            HttpResponseMessage response = client.PutAsync($"event", stringContent).GetAwaiter().GetResult();
 
             // Assert
             response.EnsureSuccessStatusCode();

@@ -22,5 +22,10 @@ namespace AnimalFarm.Logic.AnimalBox
         {
             _box = box;
         }
+
+        public Ruleset GetRuleset(string rulesetVersionId)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

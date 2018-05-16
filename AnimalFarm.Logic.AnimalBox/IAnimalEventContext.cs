@@ -1,7 +1,4 @@
 ﻿using AnimalFarm.Model;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AnimalFarm.Logic.AnimalBox
 {
@@ -19,5 +16,10 @@ namespace AnimalFarm.Logic.AnimalBox
         /// Gets or sets the currently active ruleset.
         /// </summary>
         Ruleset ActiveRuleset { get; set; }
+
+        /// <summary>
+        /// Gets a ruleset by a specific version.
+        /// </summary>
+        Ruleset GetRuleset(string rulesetVersionId);
     }
 }
