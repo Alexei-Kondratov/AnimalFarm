@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 
 namespace AnimalFarm.Service.Utils.AspNet
 {
-    public class ForwarderResponseResult : ContentResult
+    public class ForwardedResponseResult : ContentResult
     {
-        public ForwarderResponseResult(HttpResponseMessage response)
+        public ForwardedResponseResult(HttpResponseMessage response)
             : base() 
         {
             StatusCode = (int)response.StatusCode;

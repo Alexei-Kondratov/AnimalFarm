@@ -16,7 +16,7 @@ namespace AnimalFarm.GatewayService.Controllers
         {
             var internalClient = new ServiceHttpClient(ServiceType.Authentication, "");
             var response =  await internalClient.ForwardAsync(Request, "login");
-            return new ForwarderResponseResult(response);
+            return new ForwardedResponseResult(response);
         }
     }
 }

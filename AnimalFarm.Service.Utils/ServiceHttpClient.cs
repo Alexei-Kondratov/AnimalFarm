@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AnimalFarm.Service.Utils
@@ -60,11 +61,36 @@ namespace AnimalFarm.Service.Utils
             return (string)addresses["Endpoints"].First();
         }
 
+        private async Task<Uri> GetUriAsync(ServiceType serviceType, string path)
+        {
+            var serviceUri = await GetEndpointAsync();
+            return new Uri($"{serviceUri}/{path}");
+        }
+
+        public async Task<HttpResponseMessage> SendAsync(HttpMethod method, string path, object payload, Type payloadType = null)
+        {
+            var uri = await GetUriAsync(_serviceType, path);
+            var client = new HttpClient();
+
+            payloadType = payloadType ?? payload.GetType();
+            var stringContent = new StringContent(JsonConvert.SerializeObject(payload, payloadType, Formatting.None,
+                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }), Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage
+            {
+                RequestUri = uri,
+                Method = method,
+                Content = stringContent
+            };
+
+            return await client.SendAsync(request);
+        }
+
         public async Task<TResult> GetAsync<TResult>(string path)
         {
             var uri = await GetEndpointAsync();
             var client = new HttpClient();
-            var response = await client.GetAsync($"{uri}{path}");
+            var response = await client.GetAsync($"{uri}/{path}");
 
             // TODO: Handle a failed response.
 
@@ -75,11 +101,12 @@ namespace AnimalFarm.Service.Utils
 
         public async Task<HttpResponseMessage> ForwardAsync(string path, HttpRequestMessage request)
         {
-            var uri = await GetEndpointAsync();
+            var uri = await GetUriAsync(_serviceType, path);
             var client = new HttpClient();
+
             var fwRequest = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{uri}/{path}"),
+                RequestUri = uri,
                 Method = request.Method,
                 Content = request.Content
             };
@@ -89,11 +116,12 @@ namespace AnimalFarm.Service.Utils
 
         public async Task<HttpResponseMessage> ForwardAsync(HttpRequest request, string path)
         {
-            var uri = await GetEndpointAsync();
+            var uri = await GetUriAsync(_serviceType, path);
             var client = new HttpClient();
+
             var fwRequest = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{uri}/{path}"),
+                RequestUri = uri,
                 Method = new HttpMethod(request.Method),
                 Content = new StreamContent(request.Body)
             };

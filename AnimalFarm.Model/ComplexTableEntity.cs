@@ -21,6 +21,13 @@ namespace AnimalFarm.Model
                 !entityProperties.ContainsKey(p.Name) && !ignoreList.Contains(p.Name));
         }
 
+        private IEnumerable<PropertyInfo> GetNotReadProperties(IDictionary<string, EntityProperty> entityProperties)
+        {
+            var properties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.SetProperty);
+            return properties.Where(p =>
+                entityProperties.ContainsKey(p.Name) && p.GetValue(this) == null);
+        }
+
         public override IDictionary<string, EntityProperty> WriteEntity(OperationContext operationContext)
         {
             var results = base.WriteEntity(operationContext);
@@ -38,7 +45,7 @@ namespace AnimalFarm.Model
         {
             base.ReadEntity(properties, operationContext);
 
-            foreach (PropertyInfo property in GetExcludedProperties(properties))
+            foreach (PropertyInfo property in GetNotReadProperties(properties))
             {
                 var serializedValue = properties[property.Name].StringValue;
                 var value = JsonConvert.DeserializeObject(serializedValue, property.PropertyType);

@@ -8,13 +8,12 @@ namespace AnimalFarm.GatewayService.Controllers
     [Route("ruleset")]
     public class RulesetController : Controller
     {
-        // GET api/values
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
             var internalClient = new ServiceHttpClient(ServiceType.Ruleset, "");
             var currentRuleset = await internalClient.GetAsync<Ruleset>("");
-            return Json(currentRuleset);
+            return Json(new { Data = currentRuleset });
         }
     }
 }

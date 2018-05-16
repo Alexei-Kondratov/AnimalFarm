@@ -21,7 +21,10 @@ namespace AnimalFarm.Data
                 return value;
 
             value = await _sourceRepository.ByIdAsync(transaction, partitionId, entityId);
-            await _cacheRepository.UpsertAsync(transaction, value);
+
+            if (value != null)
+                await _cacheRepository.UpsertAsync(transaction, value);
+
             return value;
         }
 

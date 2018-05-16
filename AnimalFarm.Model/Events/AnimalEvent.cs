@@ -15,6 +15,11 @@ namespace AnimalFarm.Model.Events
         public string EventId { get; set; }
 
         /// <summary>
+        /// Gets or sets the identifier of the last event executed for the animal.
+        /// </summary>
+        public string PreviousEventId { get; set; }
+
+        /// <summary>
         /// Gets or sets the time of the event.
         /// </summary>
         public DateTime Time { get; set; }
