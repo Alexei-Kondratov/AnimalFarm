@@ -11,7 +11,7 @@ namespace AnimalFarm.Model
             get => _login;
             set
             {
-                Id = value;
+                _login = value;
                 PartitionKey = value;
                 RowKey = value;
             }

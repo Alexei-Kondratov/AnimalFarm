@@ -12,6 +12,8 @@ using Microsoft.ServiceFabric.Data;
 using AnimalFarm.Model;
 using AnimalFarm.Data;
 using AnimalFarm.Service.Utils;
+using System;
+using AnimalFarm.Service.Utils.Tasks;
 
 namespace AnimalFarm.RulesetService
 {
@@ -72,7 +74,7 @@ namespace AnimalFarm.RulesetService
 
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            await PreloadRulesets();
+            await RunTask.WithRetries(PreloadRulesets, 4, cancellationToken);
             cancellationToken.WaitHandle.WaitOne();
         }
     }

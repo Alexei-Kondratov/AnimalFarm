@@ -1,13 +1,11 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace AnimalFarm.Model
 {
     /// <summary>
     /// Describes a set of rules.
     /// </summary>
-    public class Ruleset : TableEntity, IHaveId<string>
+    public class Ruleset : ComplexTableEntity, IHaveId<string>
     {
         private string _id;
 

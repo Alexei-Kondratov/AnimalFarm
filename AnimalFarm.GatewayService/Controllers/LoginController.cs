@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
 using AnimalFarm.Service.Utils;
+using AnimalFarm.Service.Utils.AspNet;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -15,7 +16,7 @@ namespace AnimalFarm.GatewayService.Controllers
         {
             var internalClient = new ServiceHttpClient(ServiceType.Authentication, "");
             var response =  await internalClient.ForwardAsync(Request, "login");
-            return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+            return new ForwarderResponseResult(response);
         }
     }
 }

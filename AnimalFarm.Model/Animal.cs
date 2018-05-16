@@ -7,7 +7,7 @@ namespace AnimalFarm.Model
     /// <summary>
     /// Describes a single animal.
     /// </summary>
-    public class Animal : TableEntity, IHaveId<string>
+    public class Animal : ComplexTableEntity, IHaveId<string>
     {
         private string _id;
 
