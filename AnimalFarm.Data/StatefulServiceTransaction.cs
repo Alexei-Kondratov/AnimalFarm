@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using IMsServiceFabricTransaction = Microsoft.ServiceFabric.Data.ITransaction;
 
 namespace AnimalFarm.Data
@@ -6,24 +7,27 @@ namespace AnimalFarm.Data
     /// <summary>
     /// ITransaction implementation suitable for stateful services.
     /// </summary>
-    public class StatefulServiceTransaction : IAzureTableTransaction, IReliableStateTransaction
+    public class StatefulServiceTransaction : StatelessServiceTransaction, IReliableStateTransaction
     {
         private readonly IMsServiceFabricTransaction _reliableStateTransaction;
 
-        public StatefulServiceTransaction(IMsServiceFabricTransaction reliableStateTransaction)
+        public StatefulServiceTransaction(CloudStorageConnector azureConnector, IMsServiceFabricTransaction reliableStateTransaction)
+            : base(azureConnector)
         {
             _reliableStateTransaction = reliableStateTransaction;
         }
 
         public IMsServiceFabricTransaction Object => _reliableStateTransaction;
 
-        public async Task CommitAsync()
+        public override async Task CommitAsync()
         {
-            await _reliableStateTransaction.CommitAsync();
+            Action<Task> commitReliableState = async (t) => await _reliableStateTransaction.CommitAsync();
+            await base.CommitAsync().ContinueWith(commitReliableState);
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
+            base.Dispose();
             _reliableStateTransaction.Dispose();
         }
     }

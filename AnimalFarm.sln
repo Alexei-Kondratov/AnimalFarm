@@ -41,7 +41,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimalFarm.Tools.ResetData"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimalFarm.Service.Utils.Tests", "AnimalFarm.Service.Utils.Tests\AnimalFarm.Service.Utils.Tests.csproj", "{1CA80181-5744-4C61-AC5F-4056663952A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalFarm.AuthenticationService", "AnimalFarm.AuthenticationService\AnimalFarm.AuthenticationService.csproj", "{A2130E60-FE3E-43E5-A295-9104088ABC65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimalFarm.AuthenticationService", "AnimalFarm.AuthenticationService\AnimalFarm.AuthenticationService.csproj", "{A2130E60-FE3E-43E5-A295-9104088ABC65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalFarm.Utils", "AnimalFarm.Utils\AnimalFarm.Utils.csproj", "{C1046FED-0E74-4714-AF67-F4B1382D8FD3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -179,6 +181,14 @@ Global
 		{A2130E60-FE3E-43E5-A295-9104088ABC65}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A2130E60-FE3E-43E5-A295-9104088ABC65}.Release|x64.ActiveCfg = Release|Any CPU
 		{A2130E60-FE3E-43E5-A295-9104088ABC65}.Release|x64.Build.0 = Release|Any CPU
+		{C1046FED-0E74-4714-AF67-F4B1382D8FD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1046FED-0E74-4714-AF67-F4B1382D8FD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1046FED-0E74-4714-AF67-F4B1382D8FD3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C1046FED-0E74-4714-AF67-F4B1382D8FD3}.Debug|x64.Build.0 = Debug|Any CPU
+		{C1046FED-0E74-4714-AF67-F4B1382D8FD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1046FED-0E74-4714-AF67-F4B1382D8FD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1046FED-0E74-4714-AF67-F4B1382D8FD3}.Release|x64.ActiveCfg = Release|Any CPU
+		{C1046FED-0E74-4714-AF67-F4B1382D8FD3}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,8 +17,10 @@ namespace AnimalFarm.Service.Utils
     /// </summary>
     public class RepositoryBuilder
     {
-        private readonly IReliableStateManager _reliableStateManager;
+        private readonly CloudStorageConnector _azureConnector;
         private readonly string _configurationFilePath;
+        private readonly IReliableStateManager _reliableStateManager;
+
 
         public RepositoryBuilder(string configurationFilePath, IReliableStateManager reliableStateManager)
         {
@@ -26,8 +28,9 @@ namespace AnimalFarm.Service.Utils
             _reliableStateManager = reliableStateManager;
         }
 
-        public RepositoryBuilder(ServiceContext context, IReliableStateManager reliableStateManager)
+        public RepositoryBuilder(ServiceContext context, IReliableStateManager reliableStateManager, CloudStorageConnector azureConnector)
         {
+            _azureConnector = azureConnector;
             _configurationFilePath = GetDefaultConfigurationFilePath(context);
             _reliableStateManager = reliableStateManager;
         }
@@ -51,8 +54,7 @@ namespace AnimalFarm.Service.Utils
         private IRepository<TEntity> BuildAzureTableRepository<TEntity>(AzureTableRepositoryConfiguration config)
             where TEntity : TableEntity
         {
-            return new AzureTableRepository<TEntity>("DefaultEndpointsProtocol=https;AccountName=animalfarm;AccountKey=7Lrjq5wId8TCpSx5o7vFI4nxVugkhjZcOh25RCSp318HIeXDE4o8SkaoVgeb5vKnNtrGXkJapS+Mmuf0Tnp7GA==;EndpointSuffix=core.windows.net",
-                config.TableName);
+            return new AzureTableRepository<TEntity>(_azureConnector, config.TableName);
         }
 
         private IRepository<TEntity> BuildReadOnlyProxyRepository<TEntity>(ReadOnlyProxyRepositoryConfiguration config)

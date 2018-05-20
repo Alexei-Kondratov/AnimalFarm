@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AnimalFarm.Service.Utils.Security;
+﻿using AnimalFarm.Utils.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using System.Collections.Generic;
+using System.Fabric;
+using System.IO;
 
 namespace AnimalFarm.GatewayService
 {

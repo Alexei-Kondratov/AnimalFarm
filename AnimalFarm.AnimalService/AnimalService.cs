@@ -1,13 +1,13 @@
 ﻿using AnimalFarm.Data;
 using AnimalFarm.Model;
 using AnimalFarm.Service.Utils;
+using AnimalFarm.Service.Utils.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
@@ -28,9 +28,10 @@ namespace AnimalFarm.AnimalService
         public AnimalService(StatefulServiceContext context)
             : base(context)
         {
-            _transactionManager = new StatefulServiceTransactionManager(StateManager);
-
-            var repositoryBuilder = new RepositoryBuilder(context, StateManager);
+            var configProvider = new ServiceConfigurationProvider(context);
+            var azureConnector = new CloudStorageConnector(configProvider.GetConnectionString());
+            _transactionManager = new StatefulServiceTransactionManager(azureConnector, StateManager);
+            var repositoryBuilder = new RepositoryBuilder(context, StateManager, azureConnector);
             _animalRepository = repositoryBuilder.BuildRepository<Animal>();
             _rulesetRepository = repositoryBuilder.BuildRepository<Ruleset>();
         }

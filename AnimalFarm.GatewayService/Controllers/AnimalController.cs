@@ -1,14 +1,14 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using AnimalFarm.Model;
+﻿using AnimalFarm.Model;
 using AnimalFarm.Model.Events;
 using AnimalFarm.Service.Utils;
 using AnimalFarm.Service.Utils.AspNet;
-using AnimalFarm.Service.Utils.Security;
+using AnimalFarm.Utils.Security;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace AnimalFarm.GatewayService.Controllers
 {

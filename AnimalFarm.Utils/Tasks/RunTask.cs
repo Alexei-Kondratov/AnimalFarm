@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AnimalFarm.Service.Utils.Tasks
+namespace AnimalFarm.Utils.Tasks
 {
     /// <summary>
     /// Contains helper methods for running asynchronous tasks.

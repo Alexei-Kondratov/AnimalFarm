@@ -2,7 +2,7 @@
 using System;
 using System.Text;
 
-namespace AnimalFarm.Service.Utils.Security
+namespace AnimalFarm.Utils.Security
 {
     public class PasswordHasher
     {

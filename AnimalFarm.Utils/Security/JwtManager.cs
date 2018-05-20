@@ -3,7 +3,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace AnimalFarm.Service.Utils.Security
+namespace AnimalFarm.Utils.Security
 {
     public class JwtManager
     {

@@ -1,5 +1,5 @@
 ﻿using AnimalFarm.Model;
-using AnimalFarm.Service.Utils.Security;
+using AnimalFarm.Utils.Security;
 using System.Collections.Generic;
 using System.Linq;
 

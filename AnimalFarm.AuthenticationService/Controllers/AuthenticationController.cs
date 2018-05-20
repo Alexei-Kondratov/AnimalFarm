@@ -2,7 +2,7 @@
 using AnimalFarm.AuthenticationService.Messages;
 using AnimalFarm.Data;
 using AnimalFarm.Model;
-using AnimalFarm.Service.Utils.Security;
+using AnimalFarm.Utils.Security;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;

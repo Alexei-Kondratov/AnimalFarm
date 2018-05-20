@@ -1,19 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using AnimalFarm.Data;
+using AnimalFarm.Model;
+using AnimalFarm.Service.Utils;
+using AnimalFarm.Service.Utils.Configuration;
+using AnimalFarm.Utils.Configuration;
+using AnimalFarm.Utils.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
+using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Runtime;
+using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
-using Microsoft.ServiceFabric.Services.Communication.Runtime;
-using Microsoft.ServiceFabric.Services.Runtime;
-using Microsoft.ServiceFabric.Data;
-using AnimalFarm.Model;
-using AnimalFarm.Data;
-using AnimalFarm.Service.Utils;
-using System;
-using AnimalFarm.Service.Utils.Tasks;
 
 namespace AnimalFarm.RulesetService
 {
@@ -28,8 +29,10 @@ namespace AnimalFarm.RulesetService
         public RulesetService(StatefulServiceContext context)
             : base(context)
         {
-            _transactionManager = new StatefulServiceTransactionManager(StateManager);
-            var repositoryBuilder = new RepositoryBuilder(context, StateManager);
+            var configProvider = new ServiceConfigurationProvider(context);
+            var azureConnector = new CloudStorageConnector(configProvider.GetConnectionString());
+            _transactionManager = new StatefulServiceTransactionManager(azureConnector, StateManager);
+            var repositoryBuilder = new RepositoryBuilder(context, StateManager, azureConnector);
             _rulesetRepository = repositoryBuilder.BuildRepository<Ruleset>();
         }
 

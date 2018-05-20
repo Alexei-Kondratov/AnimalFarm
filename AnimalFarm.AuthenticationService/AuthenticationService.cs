@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Fabric;
-using System.IO;
-using AnimalFarm.Data;
+﻿using AnimalFarm.Data;
 using AnimalFarm.Model;
 using AnimalFarm.Service.Utils;
-using AnimalFarm.Service.Utils.Security;
+using AnimalFarm.Service.Utils.Configuration;
+using AnimalFarm.Utils.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using System.Collections.Generic;
+using System.Fabric;
+using System.IO;
 
 namespace AnimalFarm.AuthenticationService
 {
@@ -24,8 +25,10 @@ namespace AnimalFarm.AuthenticationService
         public AuthenticationService(StatelessServiceContext context)
             : base(context)
         {
-            _transactionManager = new StatelessServiceTransactionManager();
-            var repositoryBuilder = new RepositoryBuilder(context, null);
+            var configProvider = new ServiceConfigurationProvider(context);
+            var azureConnector = new CloudStorageConnector(configProvider.GetConnectionString());
+            _transactionManager = new StatelessServiceTransactionManager(azureConnector);
+            var repositoryBuilder = new RepositoryBuilder(context, null, azureConnector);
             _userRepository = repositoryBuilder.BuildRepository<UserAuthenticationInfo>();
         }
 

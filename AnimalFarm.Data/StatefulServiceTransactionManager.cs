@@ -5,18 +5,19 @@ namespace AnimalFarm.Data
     /// <summary>
     /// ITransactionManager implementation suitable for stateful services.
     /// </summary>
-    public class StatefulServiceTransactionManager : ITransactionManager
+    public class StatefulServiceTransactionManager : StatelessServiceTransactionManager, ITransactionManager
     {
         private readonly IReliableStateManager _stateManager;
 
-        public StatefulServiceTransactionManager(IReliableStateManager stateManager)
+        public StatefulServiceTransactionManager(CloudStorageConnector azureConnector, IReliableStateManager stateManager)
+            : base(azureConnector)
         {
             _stateManager = stateManager;
         }
 
-        public ITransaction CreateTransaction()
+        public override ITransaction CreateTransaction()
         {
-            return new StatefulServiceTransaction(_stateManager.CreateTransaction());
+            return new StatefulServiceTransaction(_azureConnector, _stateManager.CreateTransaction());
         }
     }
 }
