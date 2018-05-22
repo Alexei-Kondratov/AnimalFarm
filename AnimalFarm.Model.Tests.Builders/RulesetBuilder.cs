@@ -24,6 +24,12 @@ namespace AnimalFarm.Model.Tests.Builders
             return new AnimalActionBuilder(newAnimalAction, this);
         }
 
+        public RulesetBuilder Inheriting(string baseId)
+        {
+            _ruleset.InheritedRulesetId = baseId;
+            return this;
+        }
+
         public AnimalTypeBuilder WithAnimalType(string id)
         {
             var newAnimalType = new AnimalType { Id = id };
