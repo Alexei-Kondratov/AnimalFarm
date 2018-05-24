@@ -9,6 +9,7 @@ using AnimalFarm.Model;
 using Newtonsoft.Json;
 using AnimalFarm.Model.Tests.Builders;
 using System.Linq;
+using System;
 
 namespace AnimalFarm.RulesetService.Tests
 {
@@ -50,6 +51,6 @@ namespace AnimalFarm.RulesetService.Tests
             Assert.Equal(ruleset.AnimalActions.First().Key, returnedRuleset.AnimalActions.First().Key);
             Assert.Equal(ruleset.AnimalTypes.Count(), returnedRuleset.AnimalTypes.Count());
             Assert.Equal(ruleset.AnimalTypes.First().Key, returnedRuleset.AnimalTypes.First().Key);
-        }
+        }      
     }
 }

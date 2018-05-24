@@ -1,8 +1,9 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
+﻿using AnimalFarm.Data.Transactions;
+using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Threading.Tasks;
 
-namespace AnimalFarm.Data
+namespace AnimalFarm.Data.Repositories
 {
     /// <summary>
     /// Implements IRepository as a wrapper around an Azure Storage Table. 

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.WindowsAzure.Storage.Table;
+﻿using Microsoft.WindowsAzure.Storage.Table;
 
-namespace AnimalFarm.Data
+namespace AnimalFarm.Data.Transactions
 {
     public interface IAzureTableTransaction : ITransaction
     {

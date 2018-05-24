@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace AnimalFarm.Data
+namespace AnimalFarm.Data.Repositories
 {
     public class CachedRepository<TEntity> : IRepository<TEntity>
     {

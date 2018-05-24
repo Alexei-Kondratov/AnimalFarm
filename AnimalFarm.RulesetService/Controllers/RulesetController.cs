@@ -17,12 +17,14 @@ namespace AnimalFarm.RulesetService.Controllers
             _rulesets = rulesets;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetCurrentRuleset()
+        [HttpGet("{rulesetId}")]
+        public async Task<IActionResult> GetRuleset(string rulesetId = null)
         {
+            rulesetId = rulesetId ?? "BaseRuleset";
+
             using (var tx = _transactionManager.CreateTransaction())
             {
-                var ruleset = await _rulesets.ByIdAsync(tx, "BaseRuleset", "BaseRuleset");
+                var ruleset = await _rulesets.ByIdAsync(tx, rulesetId, rulesetId);
                 await tx.CommitAsync();
                 return Json(ruleset);
             }

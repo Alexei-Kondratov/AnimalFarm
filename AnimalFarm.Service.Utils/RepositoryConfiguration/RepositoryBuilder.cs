@@ -1,4 +1,5 @@
 ﻿using AnimalFarm.Data;
+using AnimalFarm.Data.Repositories;
 using AnimalFarm.Model;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -100,7 +101,7 @@ namespace AnimalFarm.Service.Utils
         /// <summary>
         /// Creates a repository for the TEntity type based on the configuration.
         /// </summary>
-        public IRepository<TEntity> BuildRepository<TEntity>()
+        public IRepository<TEntity> BuildRepository<TEntity>(IEntityTransformation<TEntity> transformation = null)
         {
             RepositoryConfiguration config = GetRepositoryConfiguration<TEntity>();
             if (config == null)
@@ -108,12 +109,14 @@ namespace AnimalFarm.Service.Utils
 
             string builderMethod = GetBuilderMethodNameForConfig(config);
             IRepository<TEntity> result = BuildRepository<TEntity>(builderMethod, config);
+
+            if (transformation != null)
+                result = new TransformingRepositoryDecorator<TEntity>(result, transformation);
+
             if (!String.IsNullOrEmpty(config.LocalCacheName))
                 result = AddReliableCache(result, config);
 
             return result;
         }
-
-
     }
 }

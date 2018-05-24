@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace AnimalFarm.Data
+namespace AnimalFarm.Data.Transactions
 {
     /// <summary>
     /// ITransaction implementation suitable for stateless services.

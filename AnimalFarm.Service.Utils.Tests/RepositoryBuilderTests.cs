@@ -1,6 +1,5 @@
-using AnimalFarm.Data;
+using AnimalFarm.Data.Repositories;
 using AnimalFarm.Model;
-using System;
 using Xunit;
 
 namespace AnimalFarm.Service.Utils.Tests

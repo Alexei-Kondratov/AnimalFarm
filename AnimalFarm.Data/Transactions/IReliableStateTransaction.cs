@@ -1,7 +1,5 @@
-﻿using Microsoft.ServiceFabric.Data;
-using System;
-
-namespace AnimalFarm.Data
+﻿
+namespace AnimalFarm.Data.Transactions
 {
     public interface IReliableStateTransaction : ITransaction
     {

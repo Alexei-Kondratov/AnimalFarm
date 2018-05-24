@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using IMsServiceFabricTransaction = Microsoft.ServiceFabric.Data.ITransaction;
 
-namespace AnimalFarm.Data
+namespace AnimalFarm.Data.Transactions
 {
     /// <summary>
     /// ITransaction implementation suitable for stateful services.

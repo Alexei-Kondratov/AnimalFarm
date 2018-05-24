@@ -1,4 +1,7 @@
 ﻿using AnimalFarm.Data;
+using AnimalFarm.Data.Repositories;
+using AnimalFarm.Data.Transactions;
+using AnimalFarm.Logic.RulesetManagement;
 using AnimalFarm.Model;
 using AnimalFarm.Service.Utils;
 using AnimalFarm.Service.Utils.Configuration;
@@ -33,7 +36,12 @@ namespace AnimalFarm.RulesetService
             var azureConnector = new CloudStorageConnector(configProvider.GetConnectionString());
             _transactionManager = new StatefulServiceTransactionManager(azureConnector, StateManager);
             var repositoryBuilder = new RepositoryBuilder(context, StateManager, azureConnector);
-            _rulesetRepository = repositoryBuilder.BuildRepository<Ruleset>();
+            var rawRulesetRepository = repositoryBuilder.BuildRepository<Ruleset>();
+            var rulesetUnpacker = new RulesetUnpacker(rawRulesetRepository);
+            var rulesetUnpackingTransformation = new RulesetUnpackingTransformation(rulesetUnpacker);
+            var rulesetUnpackingRepository = new TransformingRepositoryDecorator<Ruleset>(rawRulesetRepository, rulesetUnpackingTransformation);
+            var rulesetCache = new ReliableStateRepository<Ruleset>(StateManager);
+            _rulesetRepository = new CachedRepository<Ruleset>(rulesetCache, rulesetUnpackingRepository);
         }
 
         /// <summary>

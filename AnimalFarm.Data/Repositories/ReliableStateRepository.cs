@@ -3,8 +3,9 @@ using System;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using System.Threading.Tasks;
+using AnimalFarm.Data.Transactions;
 
-namespace AnimalFarm.Data
+namespace AnimalFarm.Data.Repositories
 {
     /// <summary>
     /// Implements IRepository<TEntity> as a wrapper around IReliableStateManager.

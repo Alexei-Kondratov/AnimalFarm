@@ -1,6 +1,6 @@
 ﻿using Microsoft.ServiceFabric.Data;
 
-namespace AnimalFarm.Data
+namespace AnimalFarm.Data.Transactions
 {
     /// <summary>
     /// ITransactionManager implementation suitable for stateful services.
