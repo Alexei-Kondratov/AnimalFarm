@@ -1,8 +1,9 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 
 namespace AnimalFarm.Model
 {
-    public class UserAuthenticationInfo : TableEntity
+    public class UserAuthenticationInfo : TableEntity, IHaveId<string>
     {
         private string _login;
 
@@ -17,6 +18,7 @@ namespace AnimalFarm.Model
             }
         }
 
+        [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
         public string PasswordSalt { get; set; }
         public string PasswordHash { get; set; }

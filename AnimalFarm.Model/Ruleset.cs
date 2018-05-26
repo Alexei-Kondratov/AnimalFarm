@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace AnimalFarm.Model
 {
@@ -12,6 +13,7 @@ namespace AnimalFarm.Model
         /// <summary>
         /// Gets or sets the entities identifier.
         /// </summary>
+        [JsonProperty(PropertyName = "id")]
         public string Id
         {
             get => _id;
