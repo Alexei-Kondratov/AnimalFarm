@@ -1,4 +1,6 @@
 ﻿using AnimalFarm.Data;
+using AnimalFarm.Data.DataSources;
+using AnimalFarm.Data.Repositories;
 using AnimalFarm.Data.Transactions;
 using AnimalFarm.Model;
 using AnimalFarm.Service.Utils;
@@ -26,11 +28,11 @@ namespace AnimalFarm.AuthenticationService
         public AuthenticationService(StatelessServiceContext context)
             : base(context)
         {
+            _transactionManager = new TransactionManager();
             var configProvider = new ServiceConfigurationProvider(context);
-            var azureConnector = new CloudStorageConnector(configProvider.GetConnectionString());
-            _transactionManager = new StatelessServiceTransactionManager(azureConnector);
-            var repositoryBuilder = new RepositoryBuilder(context, null, azureConnector);
-            _userRepository = repositoryBuilder.BuildRepository<UserAuthenticationInfo>();
+            var dbDataSource = new DocumentDbDataSource("Database");
+            _userRepository = new DataSourceRepository<UserAuthenticationInfo, DocumentDbDataSource, DocumentDbTransactionContext>
+                (dbDataSource, "UserAuthenticationInfos");
         }
 
         private void ConfigureServices(StatelessServiceContext context, IServiceCollection services)

@@ -1,4 +1,5 @@
 ﻿using AnimalFarm.Data;
+using AnimalFarm.Data.DataSources;
 using AnimalFarm.Data.Repositories;
 using AnimalFarm.Data.Transactions;
 using AnimalFarm.Logic.RulesetManagement;
@@ -32,16 +33,20 @@ namespace AnimalFarm.RulesetService
         public RulesetService(StatefulServiceContext context)
             : base(context)
         {
+            _transactionManager = new TransactionManager();
             var configProvider = new ServiceConfigurationProvider(context);
-            var azureConnector = new CloudStorageConnector(configProvider.GetConnectionString());
-            _transactionManager = new StatefulServiceTransactionManager(azureConnector, StateManager);
-            var repositoryBuilder = new RepositoryBuilder(context, StateManager, azureConnector);
-            var rawRulesetRepository = repositoryBuilder.BuildRepository<Ruleset>();
+            var dbDataSource = new DocumentDbDataSource("Database");
+            var reliableStateDataSource = new ReliableStateDataSource("ReliableState", StateManager);
+            var rawRulesetRepository = new DataSourceRepository<Ruleset, DocumentDbDataSource, DocumentDbTransactionContext>
+                            (dbDataSource, "Rulesets");
             var rulesetUnpacker = new RulesetUnpacker(rawRulesetRepository);
             var rulesetUnpackingTransformation = new RulesetUnpackingTransformation(rulesetUnpacker);
             var rulesetUnpackingRepository = new TransformingRepositoryDecorator<Ruleset>(rawRulesetRepository, rulesetUnpackingTransformation);
-            var rulesetCache = new ReliableStateRepository<Ruleset>(StateManager);
-            _rulesetRepository = new CachedRepository<Ruleset>(rulesetCache, rulesetUnpackingRepository);
+            _rulesetRepository =
+                    new CachedRepository<Ruleset>(
+                        new DataSourceRepository<Ruleset, ReliableStateDataSource, ReliableStateTransactionContext>
+                            (reliableStateDataSource, "Rulesets"),
+                        rulesetUnpackingRepository);
         }
 
         /// <summary>

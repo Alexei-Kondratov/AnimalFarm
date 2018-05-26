@@ -1,4 +1,6 @@
 ﻿using AnimalFarm.Data;
+using AnimalFarm.Data.DataSources;
+using AnimalFarm.Data.Repositories;
 using AnimalFarm.Data.Transactions;
 using AnimalFarm.Model;
 using AnimalFarm.Service.Utils;
@@ -29,12 +31,25 @@ namespace AnimalFarm.AnimalService
         public AnimalService(StatefulServiceContext context)
             : base(context)
         {
+            _transactionManager = new TransactionManager();
             var configProvider = new ServiceConfigurationProvider(context);
-            var azureConnector = new CloudStorageConnector(configProvider.GetConnectionString());
-            _transactionManager = new StatefulServiceTransactionManager(azureConnector, StateManager);
-            var repositoryBuilder = new RepositoryBuilder(context, StateManager, azureConnector);
-            _animalRepository = repositoryBuilder.BuildRepository<Animal>();
-            _rulesetRepository = repositoryBuilder.BuildRepository<Ruleset>();
+            var dbDataSource = new DocumentDbDataSource("Database");
+            var rulesetServiceProxyDataSource = new ServiceProxyDataSource("RulesetService", ServiceType.Ruleset);
+            var reliableStateDataSource = new ReliableStateDataSource("ReliableState", StateManager);
+            _animalRepository =
+                new CachedRepository<Animal>(
+                    new DataSourceRepository<Animal, ReliableStateDataSource, ReliableStateTransactionContext>
+                        (reliableStateDataSource, "Animals"),                
+                    new DataSourceRepository<Animal, DocumentDbDataSource, DocumentDbTransactionContext>
+                        (dbDataSource, "Animals")
+                        );
+            _rulesetRepository =
+                    new CachedRepository<Ruleset>(
+                        new DataSourceRepository<Ruleset, ReliableStateDataSource, ReliableStateTransactionContext>
+                            (reliableStateDataSource, "Rulesets"),
+                        new DataSourceRepository<Ruleset, ServiceProxyDataSource, TransactionContext>
+                            (rulesetServiceProxyDataSource, "Rulesets")
+            );
         }
 
         /// <summary>

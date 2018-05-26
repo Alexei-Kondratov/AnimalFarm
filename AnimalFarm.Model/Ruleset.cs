@@ -6,7 +6,7 @@ namespace AnimalFarm.Model
     /// <summary>
     /// Describes a set of rules.
     /// </summary>
-    public class Ruleset : ComplexTableEntity, IHaveId<string>
+    public class Ruleset : ComplexTableEntity, IHavePartition<string, string>
     {
         private string _id;
 

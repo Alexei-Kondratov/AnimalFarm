@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace AnimalFarm.Model
 {
-    public class UserAuthenticationInfo : TableEntity, IHaveId<string>
+    public class UserAuthenticationInfo : TableEntity, IHavePartition<string, string>
     {
         private string _login;
 

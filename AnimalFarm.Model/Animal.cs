@@ -8,7 +8,7 @@ namespace AnimalFarm.Model
     /// <summary>
     /// Describes a single animal.
     /// </summary>
-    public class Animal : ComplexTableEntity, IHaveId<string>
+    public class Animal : ComplexTableEntity, IHavePartition<string, string>
     {
         private string _id;
 

@@ -1,14 +1,33 @@
-﻿[
-  {
-    "$type": "AnimalFarm.Service.Utils.AzureTableRepositoryConfiguration, AnimalFarm.Service.Utils",
-    "entityType": "AnimalFarm.Model.Animal",
-    "tableName": "Animals",
-    "localCacheName": "Animals"
-  },
-  {
-    "$type": "AnimalFarm.Service.Utils.ReadOnlyProxyRepositoryConfiguration, AnimalFarm.Service.Utils",
-    "entityType": "AnimalFarm.Model.Ruleset",
-    "sourceService": "Ruleset"
-  }
-]
+﻿{
+  "dataSources": [
+    {
+      "type": "AzureTable",
+      "name": "AzureTable",
+      "connectionString": "AzureTables"
+    },
+    {
+      "type": "ReliableStore",
+      "name": "ReliableStore"
+    },
+    {
+      "type": "ReadOnlyProxy",
+      "name": "RulesetServiceProxy",
+      "service": "Ruleset"
+    }
+  ],
+  "repositories": [
+    {
+      "entityType": "AnimalFarm.Model.Animal",
+      "storeName": "Animals",
+      "dataSource": "AzureTable",
+      "cache": "ReliableStore"
+    },
+    {
+      "entityType": "AnimalFarm.Model.Ruleset",
+      "storeName": "Rulesets",
+      "dataSource": "RulesetServiceProxy",
+      "cache": "ReliableStore"
+    }
+  ]
+}
 
