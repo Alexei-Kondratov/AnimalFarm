@@ -22,7 +22,7 @@ namespace AnimalFarm.Tools.ResetData
             try
             {
                 Console.WriteLine($"Deleting table {tableName} ...");
-                ////await client.DeleteDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(databaseId, tableName));
+                await client.DeleteDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(databaseId, tableName));
                 Console.WriteLine($"Deleted table {tableName}");
             }
             catch
@@ -54,10 +54,12 @@ namespace AnimalFarm.Tools.ResetData
             await ClearTableAsync(client, database.Id, "Rulesets", "/id");
             await ClearTableAsync(client, database.Id, "Animals", "/UserId");
             await ClearTableAsync(client, database.Id, "UserAuthenticationInfos", "/Login");
+            await ClearTableAsync(client, database.Id, "VersionSchedules", "/id");
 
             var seedData = new SeedData();
             await SeedAsync(client, database.Id, "Rulesets", seedData.GetRulesets());
             await SeedAsync(client, database.Id, "UserAuthenticationInfos", seedData.GetUserAuthenticationInfos());
+            await SeedAsync(client, database.Id, "VersionSchedules", seedData.GetVersionSchedules());
         }
     }
 }

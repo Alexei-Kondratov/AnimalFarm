@@ -65,6 +65,7 @@ namespace AnimalFarm.Tools.ResetData
             var seedData = new SeedData();
             Seed(tableClient, "Rulesets", seedData.GetRulesets()).GetAwaiter().GetResult();
             Seed(tableClient, "UserAuthenticationInfos", seedData.GetUserAuthenticationInfos()).GetAwaiter().GetResult();
+            //Seed(tableClient, "VersionSchedules", seedData.GetVersionSchedules()).GetAwaiter().GetResult();
         }
     }
 }

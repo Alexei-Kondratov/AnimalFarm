@@ -8,8 +8,9 @@ namespace AnimalFarm.GatewayService.Controllers
     [Route("ruleset")]
     public class RulesetController : Controller
     {
+        [HttpGet("")]
         [HttpGet("{rulesetId}")]
-        public async Task<IActionResult> GetAsync(string rulesetId)
+        public async Task<IActionResult> GetAsync(string rulesetId = "")
         {
             var internalClient = new ServiceHttpClient(ServiceType.Ruleset, "");
             var currentRuleset = await internalClient.GetAsync<Ruleset>($"{rulesetId}");

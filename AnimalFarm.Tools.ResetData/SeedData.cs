@@ -1,5 +1,6 @@
 ﻿using AnimalFarm.Model;
 using AnimalFarm.Utils.Security;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -164,6 +165,21 @@ namespace AnimalFarm.Tools.ResetData
                         }
                     }.ToDictionary(a => a.Id),
                     AnimalActions = new Dictionary<string, AnimalAction>()
+                }
+            };
+        }
+
+        public IEnumerable<VersionSchedule> GetVersionSchedules()
+        {
+            return new[]
+            {
+                new VersionSchedule
+                {
+                    BranchId = "Default",
+                    Records = new []
+                    {
+                        new VersionScheduleRecord { VersionId = _firstVersionId, RulesetId = _firstRulesetVersionId, Start = new DateTime(2018, 5, 1)}
+                    }
                 }
             };
         }

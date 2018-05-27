@@ -28,6 +28,7 @@ namespace AnimalFarm.RulesetService
     internal sealed class RulesetService : StatefulService
     {
         private IRepository<Ruleset> _rulesetRepository;
+        private IRepository<VersionSchedule> _scheduleRepository;
         private ITransactionManager _transactionManager;
 
         public RulesetService(StatefulServiceContext context)
@@ -47,6 +48,13 @@ namespace AnimalFarm.RulesetService
                         new DataSourceRepository<Ruleset, ReliableStateDataSource, ReliableStateTransactionContext>
                             (reliableStateDataSource, "Rulesets"),
                         rulesetUnpackingRepository);
+
+            _scheduleRepository =
+                new CachedRepository<VersionSchedule>(
+                    new DataSourceRepository<VersionSchedule, ReliableStateDataSource, ReliableStateTransactionContext>
+                        (reliableStateDataSource, "VersionSchedules"),
+                    new DataSourceRepository<VersionSchedule, DocumentDbDataSource, DocumentDbTransactionContext>
+                        (dbDataSource, "VersionSchedules"));
         }
 
         /// <summary>
@@ -69,7 +77,8 @@ namespace AnimalFarm.RulesetService
                                             .AddSingleton<StatefulServiceContext>(serviceContext)
                                             .AddSingleton<IReliableStateManager>(StateManager)
                                             .AddSingleton<ITransactionManager>(_transactionManager)
-                                            .AddSingleton<IRepository<Ruleset>>(_rulesetRepository))
+                                            .AddSingleton<IRepository<Ruleset>>(_rulesetRepository)
+                                            .AddSingleton(new RulesetScheduleProvider("Default", _scheduleRepository)))
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
