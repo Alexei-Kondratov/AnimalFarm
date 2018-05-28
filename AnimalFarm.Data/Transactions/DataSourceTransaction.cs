@@ -7,28 +7,23 @@ namespace AnimalFarm.Data.Transactions
 {
     public class DataSourceTransaction : ITransaction
     {
-        private Dictionary<object, TransactionContext> _contexts = new Dictionary<object, TransactionContext>();
+        private Dictionary<IDataSource, TransactionContext> _contexts = new Dictionary<IDataSource, TransactionContext>();
 
-        public TReturnedTransactionContext GetContext<TReturnedTransactionContext>(IDataSource<TReturnedTransactionContext> dataSource)
-            where TReturnedTransactionContext : TransactionContext
+        public TransactionContext GetContext(IDataSource dataSource)
         {
             if (_contexts.TryGetValue(dataSource, out TransactionContext context))
-                return (TReturnedTransactionContext)context;
+                return context;
 
-            TReturnedTransactionContext newContext = dataSource.CreateTransactionContext();
+            TransactionContext newContext = dataSource.CreateTransactionContext();
             _contexts.Add(dataSource, newContext);
             return newContext;
         }
 
         public async Task CommitAsync()
         {
-            foreach (KeyValuePair<object, TransactionContext> contextRecord in _contexts)
+            foreach (IDataSource dataSource in _contexts.Keys)
             {
-                object dataSource = contextRecord.Key;
-                TransactionContext context = contextRecord.Value;
-                MethodInfo commitMethodInfo = dataSource.GetType().GetMethod(nameof(IDataSource<TransactionContext>.ComitAsync));
-                var commitResult = (Task)commitMethodInfo.Invoke(dataSource, new[] { context });
-                await commitResult;
+                await dataSource.ComitAsync(this);
             }
         }
 

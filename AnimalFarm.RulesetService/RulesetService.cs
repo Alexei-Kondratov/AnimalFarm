@@ -1,10 +1,9 @@
 ﻿using AnimalFarm.Data;
-using AnimalFarm.Data.DataSources;
-using AnimalFarm.Data.Repositories;
+using AnimalFarm.Data.DataSources.Configuration;
+using AnimalFarm.Data.Repositories.Configuration;
 using AnimalFarm.Data.Transactions;
 using AnimalFarm.Logic.RulesetManagement;
 using AnimalFarm.Model;
-using AnimalFarm.Service.Utils;
 using AnimalFarm.Service.Utils.Configuration;
 using AnimalFarm.Utils.Configuration;
 using AnimalFarm.Utils.Tasks;
@@ -14,6 +13,7 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
@@ -27,34 +27,58 @@ namespace AnimalFarm.RulesetService
     /// </summary>
     internal sealed class RulesetService : StatefulService
     {
-        private IRepository<Ruleset> _rulesetRepository;
-        private IRepository<VersionSchedule> _scheduleRepository;
-        private ITransactionManager _transactionManager;
+        private IServiceProvider _serviceProvider;
 
         public RulesetService(StatefulServiceContext context)
             : base(context)
         {
-            _transactionManager = new TransactionManager();
-            var configProvider = new ServiceConfigurationProvider(context);
-            var dbDataSource = new DocumentDbDataSource("Database");
-            var reliableStateDataSource = new ReliableStateDataSource("ReliableState", StateManager);
-            var rawRulesetRepository = new DataSourceRepository<Ruleset, DocumentDbDataSource, DocumentDbTransactionContext>
-                            (dbDataSource, "Rulesets");
-            var rulesetUnpacker = new RulesetUnpacker(rawRulesetRepository);
-            var rulesetUnpackingTransformation = new RulesetUnpackingTransformation(rulesetUnpacker);
-            var rulesetUnpackingRepository = new TransformingRepositoryDecorator<Ruleset>(rawRulesetRepository, rulesetUnpackingTransformation);
-            _rulesetRepository =
-                    new CachedRepository<Ruleset>(
-                        new DataSourceRepository<Ruleset, ReliableStateDataSource, ReliableStateTransactionContext>
-                            (reliableStateDataSource, "Rulesets"),
-                        rulesetUnpackingRepository);
+        }
 
-            _scheduleRepository =
-                new CachedRepository<VersionSchedule>(
-                    new DataSourceRepository<VersionSchedule, ReliableStateDataSource, ReliableStateTransactionContext>
-                        (reliableStateDataSource, "VersionSchedules"),
-                    new DataSourceRepository<VersionSchedule, DocumentDbDataSource, DocumentDbTransactionContext>
-                        (dbDataSource, "VersionSchedules"));
+        private DataSourceFactory CreateDataSourceFactory(IServiceProvider serviceProvider)
+        {
+            var result = new DataSourceFactory(_serviceProvider, new IConfigurableComponentBuilder<IDataSource, string>[] { new ReliableStateDataSourceBuilder(), new DocumentDbDataSourceBuilder() });
+            result.SetConfigurations(new DataSourceConfiguration[]
+            {
+                new ReliableStateDataSourceConfiguration { Key = "ReliableStateDataSource" },
+                new DocumentDbDataSourceConfiguration
+                    { Key = "DatabaseDataSource", Decorators = new [] { typeof(RulesetUnpackingDecorator) } }
+            });
+            return result;
+        }
+
+        private RepositoryFactory CreateRepositoryFactory(IServiceProvider serviceProvider)
+        {
+            var result = new RepositoryFactory(_serviceProvider, new IConfigurableComponentBuilder<object, Type>[] { new DataSourceRepositoryBuilder() });
+
+            result.SetConfigurations(new RepositoryConfiguration[]
+            {
+                new DataSourceRepositoryConfiguration
+                    { Key = typeof(VersionSchedule), StoreName = "VersionSchedules", DataSourceName = "DatabaseDataSource", CacheDataSourceName = "ReliableStateDataSource" },
+                new DataSourceRepositoryConfiguration
+                    { Key = typeof(Ruleset), StoreName = "Rulesets", DataSourceName = "DatabaseDataSource", CacheDataSourceName = "ReliableStateDataSource" }
+            });
+            return result;
+        }
+
+        private IRepository<TEntity> GetRepository<TEntity>(IServiceProvider provider)
+        {
+            return (IRepository<TEntity>)provider.GetRequiredService<RepositoryFactory>().Get(typeof(TEntity));
+        }
+
+        private void RegisterServices(IServiceCollection serviceCollection)
+        {
+            serviceCollection
+                .AddSingleton<ServiceContext>(Context)
+                .AddSingleton<IReliableStateManager>(StateManager)
+                .AddSingleton<IConfigurationProvider, ServiceConfigurationProvider>()
+                .AddSingleton<ITransactionManager, TransactionManager>()
+                .AddSingleton<RulesetScheduleProvider>()
+                .AddSingleton<RulesetUnpacker>()
+                .AddSingleton<RulesetUnpackingDecorator>()
+                .AddSingleton<DataSourceFactory>(CreateDataSourceFactory)
+                .AddSingleton<RepositoryFactory>(CreateRepositoryFactory)
+                .AddTransient(GetRepository<Ruleset>)
+                .AddTransient(GetRepository<VersionSchedule>);
         }
 
         /// <summary>
@@ -70,29 +94,31 @@ namespace AnimalFarm.RulesetService
                     {
                         ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
 
-                        return new WebHostBuilder()
+                        IWebHost host = new WebHostBuilder()
                                     .UseKestrel()
-                                    .ConfigureServices(
-                                        services => services
-                                            .AddSingleton<StatefulServiceContext>(serviceContext)
-                                            .AddSingleton<IReliableStateManager>(StateManager)
-                                            .AddSingleton<ITransactionManager>(_transactionManager)
-                                            .AddSingleton<IRepository<Ruleset>>(_rulesetRepository)
-                                            .AddSingleton(new RulesetScheduleProvider("Default", _scheduleRepository)))
+                                    .ConfigureServices(RegisterServices)
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
                                     .UseUrls(url)
                                     .Build();
+
+                        _serviceProvider = host.Services;
+                        return host;
                     }))
             };
         }
 
         private async Task PreloadRulesets()
         {
-            using (var tx = _transactionManager.CreateTransaction())
+            var transactionManager = _serviceProvider.GetRequiredService<ITransactionManager>();
+            var scheduleProvider = _serviceProvider.GetRequiredService<RulesetScheduleProvider>();
+            var rulesetRepository = _serviceProvider.GetRequiredService<IRepository<Ruleset>>();
+
+            using (var tx = transactionManager.CreateTransaction())
             {
-                var ruleset = await _rulesetRepository.ByIdAsync(tx, "BaseRuleset", "BaseRuleset");
+                var rulesetId = await scheduleProvider.GetActiveRulesetIdAsync(tx, DateTime.UtcNow);
+                var ruleset = await rulesetRepository.ByIdAsync(tx, rulesetId, rulesetId);
                 ServiceEventSource.Current.ServiceMessage(Context, $"Preloaded {ruleset.Id}");
             }
         }

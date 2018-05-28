@@ -1,22 +1,20 @@
 ﻿using AnimalFarm.Data.Transactions;
 using AnimalFarm.Model;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AnimalFarm.Data
 {
-    public interface IDataSource<TTransactionContext>
-        where TTransactionContext : TransactionContext
+    public interface IDataSource
     {
         string Name { get; }
 
-        TTransactionContext CreateTransactionContext();
+        TransactionContext CreateTransactionContext();
 
-        Task<TEntity> ByIdAsync<TEntity>(TTransactionContext context, string storeName, string partitionKey, string entityId);
+        Task<TEntity> ByIdAsync<TEntity>(ITransaction transaction, string storeName, string partitionKey, string entityId);
 
-        Task AddOperationAsync<TEntity>(TTransactionContext context, DataOperationType upsert, string storeName, TEntity entity)
+        Task AddOperationAsync<TEntity>(ITransaction transaction, DataOperationType operationType, string storeName, TEntity entity)
             where TEntity : IHavePartition<string, string>;
 
-        Task ComitAsync(TTransactionContext context);
+        Task ComitAsync(ITransaction transaction);
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using AnimalFarm.Data.Transactions;
@@ -10,7 +8,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace AnimalFarm.Data.DataSources
 {
-    public class AzureTableDataSource : IDataSource<TransactionContext>
+    public class AzureTableDataSource : IDataSource
     {
         private readonly CloudStorageAccount _storageAccount;
         private readonly CloudTableClient _tableClient;
@@ -51,7 +49,7 @@ namespace AnimalFarm.Data.DataSources
             return new TransactionContext();
         }
 
-        public async Task<TEntity> ByIdAsync<TEntity>(TransactionContext context, string storeName, string partitionKey, string entityId)
+        public async Task<TEntity> ByIdAsync<TEntity>(ITransaction transaction, string storeName, string partitionKey, string entityId)
         {
             MethodInfo retrieveMethod = typeof(TableOperation).GetMethods(BindingFlags.Static | BindingFlags.Public).First(m => m.IsGenericMethod);
             retrieveMethod = retrieveMethod.MakeGenericMethod(typeof(TEntity));
@@ -63,15 +61,15 @@ namespace AnimalFarm.Data.DataSources
             return (TEntity)(executionResult.Result);
         }
 
-        public async Task AddOperationAsync<TEntity>(TransactionContext context, DataOperationType operationType, string storeName, TEntity entity)
+        public async Task AddOperationAsync<TEntity>(ITransaction transaction, DataOperationType operationType, string storeName, TEntity entity)
             where TEntity : IHavePartition<string, string>
         {
-            context.AddOperation(operationType, storeName, entity);
+            transaction.GetContext(this).AddOperation(operationType, storeName, entity);
         }
 
-        public async Task ComitAsync(TransactionContext context)
+        public async Task ComitAsync(ITransaction transaction)
         {
-            foreach (DataOperation operation in context.Operations)
+            foreach (DataOperation operation in transaction.GetContext(this).Operations)
                 await ApplyOperationAsync(operation);
         }
     }

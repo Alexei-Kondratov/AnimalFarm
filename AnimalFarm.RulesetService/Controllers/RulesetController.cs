@@ -19,7 +19,7 @@ namespace AnimalFarm.RulesetService.Controllers
             _rulesets = rulesets;
             _scheduleProvider = scheduleProvider;
             _transactionManager = transactionManager;
-            
+             
         }
 
         [HttpGet("")]

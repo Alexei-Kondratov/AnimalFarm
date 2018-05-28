@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AnimalFarm.Data.Transactions;
 using AnimalFarm.Model;
 using Microsoft.ServiceFabric.Data;
@@ -7,7 +6,7 @@ using Microsoft.ServiceFabric.Data.Collections;
 
 namespace AnimalFarm.Data.DataSources
 {
-    public class ReliableStateDataSource : IDataSource<ReliableStateTransactionContext>
+    public class ReliableStateDataSource : IDataSource
     {
         private IReliableStateManager _stateManager;
 
@@ -25,38 +24,42 @@ namespace AnimalFarm.Data.DataSources
             return await _stateManager.GetOrAddAsync<IReliableDictionary<string, TEntity>>(storeName);
         }
 
-        public async Task<TEntity> ByIdAsync<TEntity>(ReliableStateTransactionContext context, string storeName, string partitionKey, string entityId)
+        public async Task<TEntity> ByIdAsync<TEntity>(ITransaction transaction, string storeName, string partitionKey, string entityId)
         {
+            var typedContext = (ReliableStateTransactionContext)transaction.GetContext(this);
             IReliableDictionary<string, TEntity> reliableDictionary = await GetDictionaryAsync<TEntity>(storeName);
-            ConditionalValue<TEntity> result = await reliableDictionary.TryGetValueAsync(context.ReliableTransaction, entityId);
+            ConditionalValue<TEntity> result = await reliableDictionary.TryGetValueAsync(typedContext.ReliableTransaction, entityId);
             return result.HasValue ? result.Value : default(TEntity);
         }
 
-        public ReliableStateTransactionContext CreateTransactionContext()
+        public TransactionContext CreateTransactionContext()
         {
             return new ReliableStateTransactionContext(_stateManager.CreateTransaction());
         }
 
-        public async Task ComitAsync(ReliableStateTransactionContext context)
+        public async Task ComitAsync(ITransaction transaction)
         {
-            await context.ReliableTransaction.CommitAsync();
+            var typedContext = (ReliableStateTransactionContext)transaction.GetContext(this);
+            await typedContext.ReliableTransaction.CommitAsync();
         }
 
-        public async Task AddOperationAsync<TEntity>(ReliableStateTransactionContext context, DataOperationType operationType, string storeName, TEntity entity)
+        public async Task AddOperationAsync<TEntity>(ITransaction transaction, DataOperationType operationType, string storeName, TEntity entity)
             where TEntity : IHavePartition<string, string>
         {
+            var typedContext = (ReliableStateTransactionContext)transaction.GetContext(this);
+
             IReliableDictionary<string, TEntity> reliableDictionary = await GetDictionaryAsync<TEntity>(storeName);
             switch (operationType)
             {
                 case DataOperationType.Upsert:
-                    await reliableDictionary.AddOrUpdateAsync(context.ReliableTransaction, entity.Id, entity, (key, oldValue) => entity);
+                    await reliableDictionary.AddOrUpdateAsync(typedContext.ReliableTransaction, entity.Id, entity, (key, oldValue) => entity);
                     break;
                 case DataOperationType.Remove:
-                    await reliableDictionary.TryRemoveAsync(context.ReliableTransaction, entity.Id);
+                    await reliableDictionary.TryRemoveAsync(typedContext.ReliableTransaction, entity.Id);
                     break;
             }
 
-            context.AddOperation(operationType, storeName, entity);
+            typedContext.AddOperation(operationType, storeName, entity);
         }
     }
 }

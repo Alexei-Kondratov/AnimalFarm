@@ -6,7 +6,7 @@ using AnimalFarm.Model;
 
 namespace AnimalFarm.Service.Utils
 {
-    public class ServiceProxyDataSource : IDataSource<TransactionContext>
+    public class ServiceProxyDataSource : IDataSource
     {
         private readonly ServiceType _serviceType;
 
@@ -18,19 +18,19 @@ namespace AnimalFarm.Service.Utils
             _serviceType = serviceType;
         }
 
-        public Task AddOperationAsync<TEntity>(TransactionContext context, DataOperationType upsert, string storeName, TEntity entity) where TEntity : IHavePartition<string, string>
+        public Task AddOperationAsync<TEntity>(ITransaction context, DataOperationType upsert, string storeName, TEntity entity) where TEntity : IHavePartition<string, string>
         {
             throw new NotImplementedException();
         }
 
-        public async Task<TEntity> ByIdAsync<TEntity>(TransactionContext context, string storeName, string partitionKey, string entityId)
+        public async Task<TEntity> ByIdAsync<TEntity>(ITransaction context, string storeName, string partitionKey, string entityId)
         {
             var client = new ServiceHttpClient(_serviceType, partitionKey);
             var formattedPath = $"{storeName}/{entityId}";
             return await client.GetAsync<TEntity>(formattedPath);
         }
 
-        public async Task ComitAsync(TransactionContext context)
+        public async Task ComitAsync(ITransaction context)
         {
         }
 

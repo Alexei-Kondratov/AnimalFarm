@@ -1,5 +1,6 @@
 ﻿using AnimalFarm.Data;
 using AnimalFarm.Model;
+using AnimalFarm.Utils.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,11 @@ namespace AnimalFarm.Logic.RulesetManagement
     {
         private readonly string _branchId;
         private readonly IRepository<VersionSchedule> _scheduleRepository;
+
+        public RulesetScheduleProvider(IConfigurationProvider configurationProvider, IRepository<VersionSchedule> scheduleRepository)
+            : this(configurationProvider.GetConfiguration<BranchConfiguration>().ActiveBranchId, scheduleRepository)
+        {
+        }
 
         public RulesetScheduleProvider(string branchId, IRepository<VersionSchedule> scheduleRepository)
         {

@@ -1,4 +1,5 @@
-﻿using AnimalFarm.Utils.Configuration;
+﻿using AnimalFarm.Logic.RulesetManagement;
+using AnimalFarm.Utils.Configuration;
 using System.Fabric;
 
 namespace AnimalFarm.Service.Utils.Configuration
@@ -14,6 +15,9 @@ namespace AnimalFarm.Service.Utils.Configuration
 
         public TConfiguration GetConfiguration<TConfiguration>(string configurationName = null)
         {
+            if (typeof(TConfiguration) == typeof(BranchConfiguration))
+                return (TConfiguration)(object)(new BranchConfiguration { ActiveBranchId = "Default" });
+
             throw new System.NotImplementedException();
         }
 

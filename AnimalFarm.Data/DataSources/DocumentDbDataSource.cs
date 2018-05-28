@@ -3,12 +3,11 @@ using AnimalFarm.Model;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AnimalFarm.Data.DataSources
 {
-    public class DocumentDbDataSource : IDataSource<DocumentDbTransactionContext>
+    public class DocumentDbDataSource : IDataSource
     {
         private readonly string _databaseId;
         private readonly string _key;
@@ -30,16 +29,17 @@ namespace AnimalFarm.Data.DataSources
             return new DocumentClient(new Uri(_uriString), _key, new ConnectionPolicy { EnableEndpointDiscovery = false });
         }
 
-        public DocumentDbTransactionContext CreateTransactionContext()
+        public TransactionContext CreateTransactionContext()
         {
             return new DocumentDbTransactionContext(CreateClient);
         }
 
-        public async Task<TEntity> ByIdAsync<TEntity>(DocumentDbTransactionContext context, string storeName, string partitionKey, string entityId)
+        public async Task<TEntity> ByIdAsync<TEntity>(ITransaction transaction, string storeName, string partitionKey, string entityId)
         {
+            var typedContext = (DocumentDbTransactionContext)transaction.GetContext(this);
             Uri documentUri = GetDocumentUri(storeName, entityId);
             var partitionKeyObj = new PartitionKey(partitionKey);
-            var result = await context.Client.ReadDocumentAsync<TEntity>(documentUri, new RequestOptions { PartitionKey = partitionKeyObj });
+            var result = await typedContext.Client.ReadDocumentAsync<TEntity>(documentUri, new RequestOptions { PartitionKey = partitionKeyObj });
             return result.Document;
         }
 
@@ -62,16 +62,18 @@ namespace AnimalFarm.Data.DataSources
             }
         }
 
-        public async Task AddOperationAsync<TEntity>(DocumentDbTransactionContext context, DataOperationType operationType, string storeName, TEntity entity)
+        public async Task AddOperationAsync<TEntity>(ITransaction transaction, DataOperationType operationType, string storeName, TEntity entity)
             where TEntity : IHavePartition<string, string>
         {
-            context.AddOperation(operationType, storeName, entity);
+            transaction.GetContext(this).AddOperation(operationType, storeName, entity);
         }
 
-        public async Task ComitAsync(DocumentDbTransactionContext context)
+        public async Task ComitAsync(ITransaction transaction)
         {
-            foreach (DataOperation operation in context.Operations)
-                await ApplyOperationAsync(context.Client, operation);
+            var typedContext = (DocumentDbTransactionContext)transaction.GetContext(this);
+            DocumentClient client = ((DocumentDbTransactionContext)typedContext).Client;
+            foreach (DataOperation operation in typedContext.Operations)
+                await ApplyOperationAsync(client, operation);
         }
 
         private Uri GetCollectionUri(string storeName)

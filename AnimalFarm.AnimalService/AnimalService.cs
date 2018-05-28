@@ -38,16 +38,16 @@ namespace AnimalFarm.AnimalService
             var reliableStateDataSource = new ReliableStateDataSource("ReliableState", StateManager);
             _animalRepository =
                 new CachedRepository<Animal>(
-                    new DataSourceRepository<Animal, ReliableStateDataSource, ReliableStateTransactionContext>
+                    new DataSourceRepository<Animal>
                         (reliableStateDataSource, "Animals"),                
-                    new DataSourceRepository<Animal, DocumentDbDataSource, DocumentDbTransactionContext>
+                    new DataSourceRepository<Animal>
                         (dbDataSource, "Animals")
                         );
             _rulesetRepository =
                     new CachedRepository<Ruleset>(
-                        new DataSourceRepository<Ruleset, ReliableStateDataSource, ReliableStateTransactionContext>
+                        new DataSourceRepository<Ruleset>
                             (reliableStateDataSource, "Rulesets"),
-                        new DataSourceRepository<Ruleset, ServiceProxyDataSource, TransactionContext>
+                        new DataSourceRepository<Ruleset>
                             (rulesetServiceProxyDataSource, "Rulesets")
             );
         }

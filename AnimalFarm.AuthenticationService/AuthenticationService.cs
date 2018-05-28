@@ -31,7 +31,7 @@ namespace AnimalFarm.AuthenticationService
             _transactionManager = new TransactionManager();
             var configProvider = new ServiceConfigurationProvider(context);
             var dbDataSource = new DocumentDbDataSource("Database");
-            _userRepository = new DataSourceRepository<UserAuthenticationInfo, DocumentDbDataSource, DocumentDbTransactionContext>
+            _userRepository = new DataSourceRepository<UserAuthenticationInfo>
                 (dbDataSource, "UserAuthenticationInfos");
         }
 

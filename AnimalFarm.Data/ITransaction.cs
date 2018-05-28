@@ -6,10 +6,7 @@ namespace AnimalFarm.Data
 {
     public interface ITransaction : IDisposable
     {
-        TTransactionContext GetContext<TTransactionContext>(IDataSource<TTransactionContext> dataSource)
-            where TTransactionContext : TransactionContext;
-
+        TransactionContext GetContext(IDataSource dataSource);
         Task CommitAsync();
     }
-
 }
