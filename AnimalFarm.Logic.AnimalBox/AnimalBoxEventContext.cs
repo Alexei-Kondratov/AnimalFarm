@@ -1,10 +1,13 @@
 using AnimalFarm.Model;
+using System;
+using System.Threading.Tasks;
 
 namespace AnimalFarm.Logic.AnimalBox
 {
     public class AnimalBoxEventContext : IAnimalEventContext
     {
         private readonly AnimalBox _box;
+        private readonly Func<string, Task<Ruleset>> _rulesetGetter;
 
         public Animal Animal
         {
@@ -18,14 +21,15 @@ namespace AnimalFarm.Logic.AnimalBox
             set => _box.ActiveRuleset = value;
         }
 
-        public AnimalBoxEventContext(AnimalBox box)
+        public AnimalBoxEventContext(AnimalBox box, Func<string, Task<Ruleset>> rulesetGetter)
         {
             _box = box;
+            _rulesetGetter = rulesetGetter;
         }
 
-        public Ruleset GetRuleset(string rulesetVersionId)
+        public async Task<Ruleset> GetRulesetAsync(string rulesetId)
         {
-            throw new System.NotImplementedException();
+            return await _rulesetGetter(rulesetId);
         }
     }
 }

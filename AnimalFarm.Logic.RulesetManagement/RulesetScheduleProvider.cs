@@ -30,12 +30,10 @@ namespace AnimalFarm.Logic.RulesetManagement
             return schedule.Records.OrderByDescending(r => r.Start);
         }
 
-        public async Task<string> GetActiveRulesetIdAsync(ITransaction transaction, DateTime time)
+        public async Task<VersionScheduleRecord> GetActiveRulesetRecordAsync(ITransaction transaction, DateTime time)
         {
             IEnumerable<VersionScheduleRecord> records = await GetRecords(transaction);
-
-            VersionScheduleRecord versionRecord = records.First(r => r.Start <= time);
-            return versionRecord.RulesetId;
+            return records.First(r => r.Start <= time);
         }
 
         public async Task<IDictionary<DateTime, string>> GetActiveRulesetRecordsAsync(ITransaction transaction, DateTime start, DateTime end)
@@ -43,7 +41,6 @@ namespace AnimalFarm.Logic.RulesetManagement
             IEnumerable<VersionScheduleRecord> records = await GetRecords(transaction);
 
             var result = records.SkipWhile(r => r.Start > end).TakeWhile(r => r.Start > start);
-            result = result.Concat(new[] { records.First(r => r.Start <= start) });
             return result.ToDictionary(r => r.Start, r => r.RulesetId);
         }
     }

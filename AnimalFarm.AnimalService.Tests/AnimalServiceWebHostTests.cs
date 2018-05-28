@@ -1,4 +1,5 @@
 using AnimalFarm.Data;
+using AnimalFarm.Logic.RulesetManagement;
 using AnimalFarm.Model;
 using AnimalFarm.Model.Events;
 using AnimalFarm.Model.Tests.Builders;
@@ -23,6 +24,7 @@ namespace AnimalFarm.AnimalService.Tests
         private Mock<ITransactionManager> _transactionManagerMock = new Mock<ITransactionManager>();
         private Mock<IRepository<Animal>> _animalRepositoryMock = new Mock<IRepository<Animal>>();
         private Mock<IRepository<Ruleset>> _rulesetRepositoryMock = new Mock<IRepository<Ruleset>>();
+        private Mock<IRepository<VersionSchedule>> _scheduleRepositoryMock = new Mock<IRepository<VersionSchedule>>();
 
         private HttpClient CreateTestClient()
         {
@@ -30,7 +32,9 @@ namespace AnimalFarm.AnimalService.Tests
                 .ConfigureServices(services => services
                     .AddSingleton(_transactionManagerMock.Object)
                     .AddSingleton(_animalRepositoryMock.Object)
-                    .AddSingleton(_rulesetRepositoryMock.Object))
+                    .AddSingleton(_rulesetRepositoryMock.Object)
+                    .AddSingleton(_scheduleRepositoryMock)
+                    .AddSingleton<RulesetScheduleProvider>((s) => new RulesetScheduleProvider("Default", _scheduleRepositoryMock.Object)))
                 .UseStartup<Startup>());
             return server.CreateClient();
         }
@@ -69,6 +73,66 @@ namespace AnimalFarm.AnimalService.Tests
             Assert.Equal(animal.Attributes.Count, returnedAnimal.Attributes.Count);
             Assert.Equal(animal.Attributes.First().Key, returnedAnimal.Attributes.First().Key);
             Assert.Equal(animal.Attributes.First().Value, returnedAnimal.Attributes.First().Value);
+        }
+
+        [Fact]
+        public void Get_animal_updates_animal_to_the_latest_ruleset()
+        {
+            // Arrange
+            var timestamp = new DateTime(2018, 5, 28);
+            var animal = new Animal
+            {
+                Id = "AnimalId",
+                Name = "Boxer",
+                TypeId = "HorseId",
+                UserId = "UserId",
+                Attributes = new Dictionary<string, decimal>
+                {
+                    { "HappinessId", 10 }
+                },
+                LastCalculated = timestamp
+            };
+
+            Ruleset oldRuleset = Build.Ruleset("OldRuleset")
+                .WithAnimalType("HorseId")
+                    .HavingAttribute("HappinessId", initialValue: 33, ratio: 5)
+                .And.Finish;
+
+            Ruleset newRuleset = Build.Ruleset("NewRuleset")
+                .WithAnimalType("HorseId")
+                    .HavingAttribute("HappinessId", initialValue: 33, ratio: 5)
+                    .HavingAttribute("EqualityId", initialValue: 40)
+                .And.Finish;
+
+            var rulesetSchedule = new VersionSchedule
+            {
+                BranchId = "Default",
+                Records = new[]
+               {
+                    new VersionScheduleRecord { VersionId = "1", RulesetId = "OldRuleset", Start = timestamp + TimeSpan.FromMinutes(-10) },
+                    new VersionScheduleRecord { VersionId = "2", RulesetId = "NewRuleset", Start = timestamp + TimeSpan.FromMinutes(1) },
+                }
+            };
+
+            _transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(_transactionMock.Object);
+            _animalRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, animal.UserId, animal.Id)).ReturnsAsync(animal);
+            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, oldRuleset.Id, oldRuleset.Id)).ReturnsAsync(oldRuleset);
+            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, newRuleset.Id, newRuleset.Id)).ReturnsAsync(newRuleset);
+            _scheduleRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, rulesetSchedule.BranchId, rulesetSchedule.BranchId)).ReturnsAsync(rulesetSchedule);
+            
+            var client = CreateTestClient();
+
+            // Act
+            HttpResponseMessage response = client.GetAsync($"{animal.UserId}/{animal.Id}").GetAwaiter().GetResult();
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+            var responseContentString = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            var returnedAnimal = JsonConvert.DeserializeObject<Animal>(responseContentString);
+
+            Assert.NotNull(returnedAnimal);
+            Assert.Equal(15, returnedAnimal.Attributes["HappinessId"]);
+            Assert.Equal(40, returnedAnimal.Attributes["EqualityId"]);
         }
 
         [Fact]

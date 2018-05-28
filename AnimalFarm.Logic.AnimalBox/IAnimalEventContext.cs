@@ -1,4 +1,5 @@
 ﻿using AnimalFarm.Model;
+using System.Threading.Tasks;
 
 namespace AnimalFarm.Logic.AnimalBox
 {
@@ -20,6 +21,6 @@ namespace AnimalFarm.Logic.AnimalBox
         /// <summary>
         /// Gets a ruleset by a specific version.
         /// </summary>
-        Ruleset GetRuleset(string rulesetVersionId);
+        Task<Ruleset> GetRulesetAsync(string rulesetId);
     }
 }

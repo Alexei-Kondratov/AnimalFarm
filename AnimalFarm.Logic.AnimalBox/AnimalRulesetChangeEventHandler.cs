@@ -14,7 +14,7 @@ namespace AnimalFarm.Logic.AnimalBox
         public override void Apply(AnimalRulesetChangeEvent e, IAnimalEventContext context)
         {
             Animal animal = context.Animal;
-            context.ActiveRuleset = context.GetRuleset(e.NewVersionId);
+            context.ActiveRuleset = context.GetRulesetAsync(e.NewVersionId).GetAwaiter().GetResult();
 
             AnimalType animalType = context.ActiveRuleset.AnimalTypes[animal.TypeId];
             var newAttributes = animalType.Attributes.Keys.Except(animal.Attributes.Keys);

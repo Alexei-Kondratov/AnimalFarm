@@ -28,7 +28,7 @@ namespace AnimalFarm.RulesetService.Controllers
         {
             using (var tx = _transactionManager.CreateTransaction())
             {
-                rulesetId = rulesetId ?? await _scheduleProvider.GetActiveRulesetIdAsync(tx, DateTime.UtcNow);
+                rulesetId = rulesetId ?? (await _scheduleProvider.GetActiveRulesetRecordAsync(tx, DateTime.UtcNow)).RulesetId;
                 var ruleset = await _rulesets.ByIdAsync(tx, rulesetId, rulesetId);
                 await tx.CommitAsync();
                 return Json(ruleset);

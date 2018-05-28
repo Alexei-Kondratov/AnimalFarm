@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using AnimalFarm.Model;
+using System.Threading.Tasks;
 
 namespace AnimalFarm.Logic.AnimalBox.Tests
 {
@@ -9,12 +10,11 @@ namespace AnimalFarm.Logic.AnimalBox.Tests
     /// </summary>
     public class MockAnimalEventContext : IAnimalEventContext
     {
-
         public Animal Animal { get ; set; }
         public Ruleset ActiveRuleset { get; set; }
         public Dictionary<string, Ruleset> Rulesets { get; set; }
 
-        public Ruleset GetRuleset(string rulesetVersionId)
+        public async Task<Ruleset> GetRulesetAsync(string rulesetVersionId)
         {
             return Rulesets[rulesetVersionId];
         }

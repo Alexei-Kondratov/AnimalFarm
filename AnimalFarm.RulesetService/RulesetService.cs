@@ -78,7 +78,7 @@ namespace AnimalFarm.RulesetService
 
             using (var tx = transactionManager.CreateTransaction())
             {
-                var rulesetId = await scheduleProvider.GetActiveRulesetIdAsync(tx, DateTime.UtcNow);
+                var rulesetId = (await scheduleProvider.GetActiveRulesetRecordAsync(tx, DateTime.UtcNow)).RulesetId;
                 var ruleset = await rulesetRepository.ByIdAsync(tx, rulesetId, rulesetId);
                 ServiceEventSource.Current.ServiceMessage(Context, $"Preloaded {ruleset.Id}");
             }

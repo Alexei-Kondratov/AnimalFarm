@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AnimalFarm.Data\AnimalFarm.Data.csproj" />
+    <ProjectReference Include="..\AnimalFarm.Logic.RulesetManagement\AnimalFarm.Logic.RulesetManagement.csproj" />
     <ProjectReference Include="..\AnimalFarm.Model\AnimalFarm.Model.csproj" />
   </ItemGroup>
 

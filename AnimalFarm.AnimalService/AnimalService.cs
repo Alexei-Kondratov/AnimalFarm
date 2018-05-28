@@ -1,5 +1,6 @@
 ﻿using AnimalFarm.Data.DataSources.Configuration;
 using AnimalFarm.Data.Repositories.Configuration;
+using AnimalFarm.Logic.RulesetManagement;
 using AnimalFarm.Model;
 using AnimalFarm.Service;
 using AnimalFarm.Service.Utils;
@@ -43,6 +44,8 @@ namespace AnimalFarm.AnimalService
                 new DataSourceRepositoryConfiguration
                     { Key = typeof(Animal), StoreName = "Animals", DataSourceName = "DatabaseDataSource", CacheDataSourceName = "ReliableStateDataSource" },
                 new DataSourceRepositoryConfiguration
+                    { Key = typeof(VersionSchedule), StoreName = "VersionSchedules", DataSourceName = "DatabaseDataSource", CacheDataSourceName = "ReliableStateDataSource" },
+                new DataSourceRepositoryConfiguration
                     { Key = typeof(Ruleset), StoreName = "Rulesets", DataSourceName = "RulesetProxyDataSource", CacheDataSourceName = "ReliableStateDataSource" }
             };
         }
@@ -58,8 +61,10 @@ namespace AnimalFarm.AnimalService
             base.RegisterServices(serviceCollection);
 
             serviceCollection
+                .AddSingleton<RulesetScheduleProvider>()
                 .AddRepository<Animal>()
-                .AddRepository<Ruleset>();
+                .AddRepository<Ruleset>()
+                .AddRepository<VersionSchedule>();
         }
 
         protected override async Task RunAsync(CancellationToken cancellationToken)

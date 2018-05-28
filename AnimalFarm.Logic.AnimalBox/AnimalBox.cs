@@ -1,4 +1,5 @@
 ﻿using AnimalFarm.Data;
+using AnimalFarm.Logic.RulesetManagement;
 using AnimalFarm.Model;
 using AnimalFarm.Model.Events;
 using System;
@@ -13,6 +14,7 @@ namespace AnimalFarm.Logic.AnimalBox
     {
         private readonly IRepository<Animal> _animals;
         private readonly IRepository<Ruleset> _rulesets;
+        private readonly RulesetScheduleProvider _scheduleProvider;
         private ITransaction _transaction;
 
         internal Animal Animal;
@@ -31,20 +33,21 @@ namespace AnimalFarm.Logic.AnimalBox
 
         private AnimalBoxEventContext InstantiateBoxContext()
         {
-            return new AnimalBoxEventContext(this);
+            return new AnimalBoxEventContext(this, (rulesetId) => _rulesets.ByIdAsync(_transaction, rulesetId, rulesetId));
         }
 
-        public AnimalBox(IRepository<Ruleset> rulesets, IRepository<Animal> animals)
+        public AnimalBox(IRepository<Ruleset> rulesets, IRepository<Animal> animals, RulesetScheduleProvider scheduleProvider)
         {
             _animals = animals;
             _rulesets = rulesets;
+            _scheduleProvider = scheduleProvider;
 
-            //TODO: Extract the event handlers map.
-            _handlerTypeByEventType = new Dictionary<Type, Type>
+             //TODO: Extract the event handlers map.
+             _handlerTypeByEventType = new Dictionary<Type, Type>
             {
                 { typeof(CreateAnimalEvent), typeof(CreateAnimalEventHandler) },
                 { typeof(AnimalActionEvent), typeof(AnimalActionEventHandler) },
-                //{ typeof(AnimalRulesetChangeEvent), typeof(AnimalRulesetChangeEventHandler)}
+                { typeof(AnimalRulesetChangeEvent), typeof(AnimalRulesetChangeEventHandler)}
             };
         }
 
@@ -52,7 +55,8 @@ namespace AnimalFarm.Logic.AnimalBox
         {
             _transaction = transaction;
             Animal = await _animals.ByIdAsync(_transaction, ownerId, animalId);
-            ActiveRuleset = await _rulesets.ByIdAsync(_transaction, "BaseRuleset", "BaseRuleset");
+            VersionScheduleRecord activeRulesetRecord = await _scheduleProvider.GetActiveRulesetRecordAsync(_transaction, Animal.LastCalculated);
+            ActiveRuleset = await _rulesets.ByIdAsync(_transaction, activeRulesetRecord.RulesetId, activeRulesetRecord.RulesetId);
         }
 
         private void AdvanceTime(DateTime stop)
