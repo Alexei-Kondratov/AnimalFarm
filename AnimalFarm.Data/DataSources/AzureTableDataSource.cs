@@ -53,7 +53,7 @@ namespace AnimalFarm.Data.DataSources
         {
             MethodInfo retrieveMethod = typeof(TableOperation).GetMethods(BindingFlags.Static | BindingFlags.Public).First(m => m.IsGenericMethod);
             retrieveMethod = retrieveMethod.MakeGenericMethod(typeof(TEntity));
-            TableOperation operation = (TableOperation)retrieveMethod.Invoke(null, new[] { partitionKey, entityId, null });
+            var operation = (TableOperation)retrieveMethod.Invoke(null, new[] { partitionKey, entityId, null });
 
             CloudTable table = _tableClient.GetTableReference(storeName);            
             TableResult executionResult = await table.ExecuteAsync(operation);

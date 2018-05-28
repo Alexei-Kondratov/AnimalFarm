@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Fabric;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace AnimalFarm.RulesetService
+namespace AnimalFarm.Service
 {
-    [EventSource(Name = "MyCompany-DeleteMe-AnimalFarm.RulesetService")]
-    internal sealed class ServiceEventSource : EventSource
+    public class ServiceEventSource : EventSource
     {
-        public static readonly ServiceEventSource Current = new ServiceEventSource();
-
         static ServiceEventSource()
         {
             // A workaround for the problem where ETW activities do not get tracked until Tasks infrastructure is initialized.
@@ -21,8 +14,18 @@ namespace AnimalFarm.RulesetService
             Task.Run(() => { });
         }
 
-        // Instance constructor is private to enforce singleton semantics
-        private ServiceEventSource() : base() { }
+        private static string _name;
+
+        public static void SetName(string name)
+        {
+            _name = name;
+        }
+
+        private static readonly Lazy<ServiceEventSource> _current = new Lazy<ServiceEventSource>(() => new ServiceEventSource(), true);
+
+        public static ServiceEventSource Current => _current.Value;
+
+        private ServiceEventSource() : base(_name) { }
 
         #region Keywords
         // Event keywords can be used to categorize events. 

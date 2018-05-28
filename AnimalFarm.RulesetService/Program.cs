@@ -1,5 +1,4 @@
-﻿using AnimalFarm.Data;
-using AnimalFarm.Model;
+﻿using AnimalFarm.Service;
 using Microsoft.ServiceFabric.Services.Runtime;
 using System;
 using System.Diagnostics;
@@ -20,6 +19,8 @@ namespace AnimalFarm.RulesetService
                 // Registering a service maps a service type name to a .NET type.
                 // When Service Fabric creates an instance of this service type,
                 // an instance of the class is created in this host process.
+
+                ServiceEventSource.SetName("AnimalFarm.Server-AnimalFarm.RulesetServiceType");
 
                 ServiceRuntime.RegisterServiceAsync("AnimalFarm.RulesetServiceType",
                     context => new RulesetService(context)).GetAwaiter().GetResult();
