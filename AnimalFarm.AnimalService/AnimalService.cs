@@ -20,7 +20,6 @@ namespace AnimalFarm.AnimalService
     /// </summary>
     internal sealed class AnimalService : BaseStatefulService
     {
-
         public AnimalService(StatefulServiceContext context)
             : base(context)
         {

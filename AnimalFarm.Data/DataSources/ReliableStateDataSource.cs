@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using AnimalFarm.Data.Cache;
 using AnimalFarm.Data.Transactions;
 using AnimalFarm.Model;
 using Microsoft.ServiceFabric.Data;
@@ -6,7 +7,7 @@ using Microsoft.ServiceFabric.Data.Collections;
 
 namespace AnimalFarm.Data.DataSources
 {
-    public class ReliableStateDataSource : IDataSource
+    public class ReliableStateDataSource : IDataSource, IClearable
     {
         private IReliableStateManager _stateManager;
 
@@ -15,7 +16,6 @@ namespace AnimalFarm.Data.DataSources
         public ReliableStateDataSource(string name, IReliableStateManager stateManager)
         {
             _stateManager = stateManager;
-
             Name = name;
         }
 
@@ -60,6 +60,11 @@ namespace AnimalFarm.Data.DataSources
             }
 
             typedContext.AddOperation(operationType, storeName, entity);
+        }
+
+        public async Task ClearAsync(string storeName)
+        {
+            await _stateManager.RemoveAsync(storeName);
         }
     }
 }

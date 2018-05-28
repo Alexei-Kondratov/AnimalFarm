@@ -1,4 +1,5 @@
 ﻿using AnimalFarm.Data;
+using AnimalFarm.Data.Cache;
 using AnimalFarm.Data.DataSources.Configuration;
 using AnimalFarm.Data.Repositories.Configuration;
 using AnimalFarm.Data.Transactions;
@@ -76,7 +77,8 @@ namespace AnimalFarm.Service
                 .AddSingleton<IConfigurationProvider, ServiceConfigurationProvider>()
                 .AddSingleton<ITransactionManager, TransactionManager>()
                 .AddSingleton<DataSourceFactory>(CreateDataSourceFactory)
-                .AddSingleton<RepositoryFactory>(CreateRepositoryFactory);
+                .AddSingleton<RepositoryFactory>(CreateRepositoryFactory)
+                .AddSingleton<CacheManager>();
         }
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()

@@ -23,6 +23,8 @@ namespace AnimalFarm.Utils.Configuration
             _configurations = configurations;
         }
 
+        public IEnumerable<IComponentConfiguration<TKey>> Configurations => _configurations;
+
         public TComponent Get(TKey key)
         {
             lock (_syncObj)

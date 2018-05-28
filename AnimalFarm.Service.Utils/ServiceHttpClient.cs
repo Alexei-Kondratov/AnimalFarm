@@ -67,21 +67,25 @@ namespace AnimalFarm.Service.Utils
             return new Uri($"{serviceUri}/{path}");
         }
 
-        public async Task<HttpResponseMessage> SendAsync(HttpMethod method, string path, object payload, Type payloadType = null)
+        public async Task<HttpResponseMessage> SendAsync(HttpMethod method, string path, object payload = null, Type payloadType = null)
         {
             var uri = await GetUriAsync(_serviceType, path);
             var client = new HttpClient();
 
-            payloadType = payloadType ?? payload.GetType();
-            var stringContent = new StringContent(JsonConvert.SerializeObject(payload, payloadType, Formatting.None,
-                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }), Encoding.UTF8, "application/json");
-
             var request = new HttpRequestMessage
             {
                 RequestUri = uri,
-                Method = method,
-                Content = stringContent
+                Method = method
             };
+
+            if (payload != null)
+            {
+                payloadType = payloadType ?? payload.GetType();
+                var stringContent = new StringContent(JsonConvert.SerializeObject(payload, payloadType, Formatting.None,
+                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }), Encoding.UTF8, "application/json");
+
+                request.Content = stringContent;
+            }
 
             return await client.SendAsync(request);
         }
