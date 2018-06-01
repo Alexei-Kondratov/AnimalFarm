@@ -11,17 +11,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.8" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="6.2.283" />
     <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="3.1.283" />
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.1.283" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AnimalFarm.Data\AnimalFarm.Data.csproj" />
-    <ProjectReference Include="..\AnimalFarm.Logic.AnimalBox\AnimalFarm.Logic.AnimalBox.csproj" />
     <ProjectReference Include="..\AnimalFarm.Model\AnimalFarm.Model.csproj" />
     <ProjectReference Include="..\AnimalFarm.Service.Utils\AnimalFarm.Service.Utils.csproj" />
-    <ProjectReference Include="..\AnimalFarm.Service\AnimalFarm.Service.csproj" />
+    <ProjectReference Include="..\AnimalFarm.Utils\AnimalFarm.Utils.csproj" />
   </ItemGroup>
 
 </Project>

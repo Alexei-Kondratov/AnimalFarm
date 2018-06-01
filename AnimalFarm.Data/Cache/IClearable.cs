@@ -5,6 +5,6 @@ namespace AnimalFarm.Data.Cache
 {
     public interface IClearable
     {
-        Task ClearAsync(string storeName);
+        Task ClearAsync(params string[] storeName);
     }
 }

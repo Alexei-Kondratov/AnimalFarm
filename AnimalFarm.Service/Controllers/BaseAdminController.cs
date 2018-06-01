@@ -2,14 +2,14 @@
 using AnimalFarm.Data.Cache;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AnimalFarm.RulesetService.Controllers
+namespace AnimalFarm.Service.Controllers
 {
     [Route("admin")]
-    public class AdminController : Controller
+    public class BaseAdminController : Controller
     {
         private CacheManager _cacheManager;
 
-        public AdminController(CacheManager cacheManager)
+        public BaseAdminController(CacheManager cacheManager)
         {
             _cacheManager = cacheManager;
         }

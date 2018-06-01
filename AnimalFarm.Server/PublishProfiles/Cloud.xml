@@ -20,7 +20,10 @@
                                     AzureActiveDirectory="true"
                                     ServerCertThumbprint="0123456789012345678901234567890123456789" />
   -->
-  <ClusterConnectionParameters ConnectionEndpoint="" />
+  <ClusterConnectionParameters ConnectionEndpoint="animalfarm-server.westeurope.cloudapp.azure.com:19000" X509Credential="true" ServerCertThumbprint="8DBFBE4BE5D94F6570192354EAE9B2FE1FEB720B" FindType="FindByThumbprint" FindValue="8DBFBE4BE5D94F6570192354EAE9B2FE1FEB720B" StoreLocation="CurrentUser" StoreName="My" />
   <ApplicationParameterFile Path="..\ApplicationParameters\Cloud.xml" />
   <CopyPackageParameters CompressPackage="true" />
+  <UpgradeDeployment Mode="Monitored" Enabled="false">
+    <Parameters FailureAction="Rollback" Force="True" />
+  </UpgradeDeployment>
 </PublishProfile>

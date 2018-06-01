@@ -29,6 +29,7 @@
     <None Include="Scripts\Deploy-FabricApplication.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AnimalFarm.AdminSerivce\AnimalFarm.AdminService.csproj" />
     <ProjectReference Include="..\AnimalFarm.AnimalService\AnimalFarm.AnimalService.csproj" />
     <ProjectReference Include="..\AnimalFarm.AuthenticationService\AnimalFarm.AuthenticationService.csproj" />
     <ProjectReference Include="..\AnimalFarm.GatewayService\AnimalFarm.GatewayService.csproj" />

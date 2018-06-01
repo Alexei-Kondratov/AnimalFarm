@@ -3,7 +3,9 @@ using Microsoft.ServiceFabric.Services.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Fabric;
+using System.Fabric.Query;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -16,12 +18,13 @@ namespace AnimalFarm.Service.Utils
     {
         Animal,
         Ruleset,
-        Authentication
+        Authentication,
+        Admin
     }
 
     public class ServiceHttpClient
     {
-        const string appTypeName = "AnimalFarm.Server";
+        const string _appTypeName = "AnimalFarm.Server";
         private readonly ServiceType _serviceType;
         private readonly long _partitionKeyHash;
 
@@ -31,29 +34,33 @@ namespace AnimalFarm.Service.Utils
             _partitionKeyHash = partitionKey.GetHashCode();
         }
 
-        private async Task<string> GetEndpointAsync()
+        private static string GetServiceName(ServiceType serviceType)
         {
-            string serviceTypeName;
-            var partitionKey = new ServicePartitionKey(_partitionKeyHash);
-
-            switch (_serviceType)
+            switch (serviceType)
             {
                 // TODO: Extract hardcoded service names.
+                case ServiceType.Admin:
+                    return "AnimalFarm.AdminService";
                 case ServiceType.Animal:
-                    serviceTypeName = "AnimalFarm.AnimalService";
-                    break;
+                    return "AnimalFarm.AnimalService";
                 case ServiceType.Authentication:
-                    partitionKey = new ServicePartitionKey();
-                    serviceTypeName = "AnimalFarm.AuthenticationService";
-                    break;
+                    return "AnimalFarm.AuthenticationService";
                 case ServiceType.Ruleset:
-                    serviceTypeName = "AnimalFarm.RulesetService";
-                    break;
+                    return "AnimalFarm.RulesetService";
                 default:
                     throw new NotSupportedException();
             }
+        }
 
-            var fabricUri = $"fabric:/{appTypeName}/{serviceTypeName}";
+        private async Task<string> GetEndpointAsync()
+        {
+            string serviceTypeName = GetServiceName(_serviceType);
+            var partitionKey = new ServicePartitionKey(_partitionKeyHash);
+
+            if (_serviceType == ServiceType.Admin || _serviceType == ServiceType.Authentication)
+                partitionKey = new ServicePartitionKey();
+
+            var fabricUri = $"fabric:/{_appTypeName}/{serviceTypeName}";
             var resolver = ServicePartitionResolver.GetDefault();
             var p = await resolver.ResolveAsync(new Uri(fabricUri), partitionKey, new System.Threading.CancellationToken());
 
@@ -134,6 +141,43 @@ namespace AnimalFarm.Service.Utils
                 fwRequest.Content.Headers.ContentType = new MediaTypeHeaderValue(request.ContentType);
 
             return await client.SendAsync(fwRequest);
+        }
+
+        public async Task BroadcastAsync(IEnumerable<ServiceType> serviceTypes, HttpMethod method, string path, object payload = null, Type payloadType = null)
+        {
+            var resolver = ServicePartitionResolver.GetDefault();
+            var fabricClient = new FabricClient();
+
+            foreach (ServiceType serviceType in serviceTypes)
+            {
+                string serviceTypeName = GetServiceName(serviceType);
+
+                var partitions = await fabricClient.QueryManager.GetPartitionListAsync(new Uri($"fabric:/{_appTypeName}/{serviceTypeName}"));
+                foreach (Partition partition in partitions)
+                {
+                    ServicePartitionKey key;
+                    switch (partition.PartitionInformation.Kind)
+                    {
+                        case ServicePartitionKind.Singleton:
+                            key = ServicePartitionKey.Singleton;
+                            break;
+                        case ServicePartitionKind.Int64Range:
+                            var longKey = (Int64RangePartitionInformation)partition.PartitionInformation;
+                            key = new ServicePartitionKey(longKey.LowKey);
+                            break;
+                        case ServicePartitionKind.Named:
+                            var namedKey = (NamedPartitionInformation)partition.PartitionInformation;
+                            key = new ServicePartitionKey(namedKey.Name);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException("partition.PartitionInformation.Kind");
+                    }
+
+                    var client = new ServiceHttpClient(serviceType, key.ToString());
+
+                    await client.SendAsync(method, path, payload, payloadType);
+                }
+            }
         }
     }
 }

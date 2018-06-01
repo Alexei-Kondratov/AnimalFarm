@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AnimalFarm.Data.Cache;
 using AnimalFarm.Data.Transactions;
 using AnimalFarm.Model;
@@ -62,9 +64,15 @@ namespace AnimalFarm.Data.DataSources
             typedContext.AddOperation(operationType, storeName, entity);
         }
 
-        public async Task ClearAsync(string storeName)
+        public async Task ClearAsync(params string[] storeNames)
         {
-            await _stateManager.RemoveAsync(storeName);
+            var enumerator = _stateManager.GetAsyncEnumerator();
+
+            while (await enumerator.MoveNextAsync(CancellationToken.None))
+            {
+                if (storeNames.Contains(enumerator.Current.Name.LocalPath))
+                    await _stateManager.RemoveAsync(enumerator.Current.Name.LocalPath);
+            }
         }
     }
 }
