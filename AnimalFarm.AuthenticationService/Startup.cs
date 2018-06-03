@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AnimalFarm.Service.Utils.AspNet;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+
 
 namespace AnimalFarm.AuthenticationService
 {
@@ -34,6 +30,7 @@ namespace AnimalFarm.AuthenticationService
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<RequestTracingMiddleware>();
             app.UseMvc();
         }
     }

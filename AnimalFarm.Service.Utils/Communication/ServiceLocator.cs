@@ -39,6 +39,10 @@ namespace AnimalFarm.Service.Utils.Communication
         public async Task<Uri> LocateServiceAsync(ServiceType serviceType, string partitionKey, CancellationToken cancellationToken)
         {
             string serviceTypeName = GetServiceName(serviceType);
+
+            if (serviceType == ServiceType.Ruleset)
+                partitionKey = "";
+
             var partitionKeyObj = partitionKey != null ?
                 new ServicePartitionKey(partitionKey.GetHashCode())
                 : new ServicePartitionKey();

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AnimalFarm.Service.Utils.AspNet;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,7 @@ namespace AnimalFarm.AnimalService
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<RequestTracingMiddleware>();
             app.UseMvc();
         }
     }

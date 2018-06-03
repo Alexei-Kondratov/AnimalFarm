@@ -3,6 +3,7 @@ using AnimalFarm.Logic.RulesetManagement;
 using AnimalFarm.Model;
 using AnimalFarm.Model.Events;
 using AnimalFarm.Model.Tests.Builders;
+using AnimalFarm.Service.Utils.Tracing;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +31,7 @@ namespace AnimalFarm.AnimalService.Tests
         {
             var server = new TestServer(new WebHostBuilder()
                 .ConfigureServices(services => services
+                    .AddSingleton(ServiceEventSource.Current)
                     .AddSingleton(_transactionManagerMock.Object)
                     .AddSingleton(_animalRepositoryMock.Object)
                     .AddSingleton(_rulesetRepositoryMock.Object)

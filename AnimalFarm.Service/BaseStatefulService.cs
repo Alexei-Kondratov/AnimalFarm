@@ -4,6 +4,7 @@ using AnimalFarm.Data.DataSources.Configuration;
 using AnimalFarm.Data.Repositories.Configuration;
 using AnimalFarm.Data.Transactions;
 using AnimalFarm.Service.Utils.Configuration;
+using AnimalFarm.Service.Utils.Tracing;
 using AnimalFarm.Utils.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +23,6 @@ namespace AnimalFarm.Service
     public abstract class BaseStatefulService : StatefulService
     {
         protected IServiceProvider ServiceProvider { get; set; }
-        protected ServiceEventSource EventSource { get; set; }
 
         protected BaseStatefulService(StatefulServiceContext serviceContext)
             : base(serviceContext)
@@ -46,7 +46,6 @@ namespace AnimalFarm.Service
 
         protected virtual void SetupWebHost(IWebHostBuilder builder)
         {
-
         }
 
         private DataSourceFactory CreateDataSourceFactory(IServiceProvider serviceProvider)
@@ -72,6 +71,7 @@ namespace AnimalFarm.Service
         protected virtual void RegisterServices(IServiceCollection serviceCollection)
         {
             serviceCollection
+                .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
                 .AddSingleton<ServiceContext>(Context)
                 .AddSingleton<IReliableStateManager>(StateManager)
                 .AddSingleton<IConfigurationProvider, ServiceConfigurationProvider>()
@@ -88,7 +88,7 @@ namespace AnimalFarm.Service
                 new ServiceReplicaListener(serviceContext =>
                     new KestrelCommunicationListener(serviceContext, (url, listener) =>
                     {
-                        EventSource.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
+                        ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
 
                         var builder =  new WebHostBuilder()
                                     .UseKestrel()

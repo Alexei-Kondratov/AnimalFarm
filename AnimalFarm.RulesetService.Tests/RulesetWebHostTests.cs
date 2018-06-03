@@ -11,6 +11,7 @@ using AnimalFarm.Model.Tests.Builders;
 using System;
 using System.Threading.Tasks;
 using AnimalFarm.Logic.RulesetManagement;
+using AnimalFarm.Service.Utils.Tracing;
 
 namespace AnimalFarm.RulesetService.Tests
 {
@@ -50,6 +51,7 @@ namespace AnimalFarm.RulesetService.Tests
 
             var server = new TestServer(new WebHostBuilder()
                 .ConfigureServices(services => services
+                    .AddSingleton(ServiceEventSource.Current)
                     .AddSingleton(transactionManagerMock.Object)
                     .AddSingleton(rulesetRepositoryMock.Object)
                     .AddSingleton(scheduleRepositoryMock.Object)

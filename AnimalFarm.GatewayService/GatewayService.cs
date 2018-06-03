@@ -1,4 +1,5 @@
 ﻿using AnimalFarm.Service.Utils.Communication;
+using AnimalFarm.Service.Utils.Tracing;
 using AnimalFarm.Utils.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +38,7 @@ namespace AnimalFarm.GatewayService
                                     .UseKestrel()
                                     .ConfigureServices(
                                         services => services
+                                            .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
                                             .AddSingleton<StatelessServiceContext>(serviceContext)
                                             .AddSingleton<JwtManager>()
                                             .AddSingleton<IServiceHttpClientFactory, ServiceHttpClientFactory>()

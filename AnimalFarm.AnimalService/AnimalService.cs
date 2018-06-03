@@ -23,7 +23,6 @@ namespace AnimalFarm.AnimalService
         public AnimalService(StatefulServiceContext context)
             : base(context)
         {
-            EventSource = ServiceEventSource.Current;
         }
 
         protected override IEnumerable<DataSourceConfiguration> GetDataSourceConfigurations()

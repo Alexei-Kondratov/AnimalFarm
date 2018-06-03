@@ -10,6 +10,7 @@ using AnimalFarm.Service.Utils.Communication;
 using Moq;
 using AnimalFarm.Service.Utils;
 using System.Threading;
+using AnimalFarm.Service.Utils.Tracing;
 
 namespace AnimalFarm.GatewayService.Tests
 {
@@ -29,6 +30,7 @@ namespace AnimalFarm.GatewayService.Tests
             var server = new TestServer(new WebHostBuilder()
                 .ConfigureServices(services => services
                     .AddSingleton<JwtManager>()
+                    .AddSingleton(ServiceEventSource.Current)
                     .AddSingleton<IServiceHttpClientFactory>(serviceHttpClientFactoryMock.Object)
                     .AddRouting())
                .UseStartup<Startup>());
@@ -56,6 +58,7 @@ namespace AnimalFarm.GatewayService.Tests
 
             var server = new TestServer(new WebHostBuilder()
                 .ConfigureServices(services => services
+                    .AddSingleton(ServiceEventSource.Current)
                     .AddSingleton<JwtManager>()
                     .AddSingleton<IServiceHttpClientFactory>(serviceHttpClientFactoryMock.Object)
                     .AddRouting())
@@ -77,9 +80,9 @@ namespace AnimalFarm.GatewayService.Tests
             serviceHttpClientFactoryMock.Setup(_ => _.CreateAsync(ServiceType.Ruleset, null, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(serviceHttpClientMock.Object);
 
-
             var server = new TestServer(new WebHostBuilder()
                 .ConfigureServices(services => services
+                    .AddSingleton(ServiceEventSource.Current)
                     .AddSingleton<JwtManager>()
                     .AddSingleton<IServiceHttpClientFactory>(serviceHttpClientFactoryMock.Object)
                     .AddRouting())

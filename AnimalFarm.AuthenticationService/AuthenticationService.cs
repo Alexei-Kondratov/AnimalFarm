@@ -5,6 +5,7 @@ using AnimalFarm.Data.Transactions;
 using AnimalFarm.Model;
 using AnimalFarm.Service.Utils;
 using AnimalFarm.Service.Utils.Configuration;
+using AnimalFarm.Service.Utils.Tracing;
 using AnimalFarm.Utils.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +39,7 @@ namespace AnimalFarm.AuthenticationService
         private void ConfigureServices(StatelessServiceContext context, IServiceCollection services)
         {
             services
+                .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
                 .AddSingleton<StatelessServiceContext>(context)
                 .AddSingleton<ITransactionManager>(_transactionManager)
                 .AddSingleton<IRepository<UserAuthenticationInfo>>(_userRepository)

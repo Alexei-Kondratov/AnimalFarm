@@ -1,4 +1,5 @@
 ﻿using AnimalFarm.Service;
+using AnimalFarm.Service.Utils.Tracing;
 using Microsoft.ServiceFabric.Services.Runtime;
 using System;
 using System.Diagnostics;

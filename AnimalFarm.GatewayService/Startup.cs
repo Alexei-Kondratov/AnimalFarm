@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using AnimalFarm.Service.Utils;
+using AnimalFarm.Service.Utils.AspNet;
 using AnimalFarm.Service.Utils.Communication;
 using AnimalFarm.Utils.Security;
 using Microsoft.AspNetCore.Builder;
@@ -62,11 +63,19 @@ namespace AnimalFarm.GatewayService
             {
                 RequestUri = new Uri(path, UriKind.Relative),
                 Method = new HttpMethod(context.Request.Method),
-                Content = new StreamContent(context.Request.Body)
             };
+
+            if (fwRequest.Method == HttpMethod.Post || fwRequest.Method == HttpMethod.Put)
+                fwRequest.Content = new StreamContent(context.Request.Body);
 
             if (context.Request.ContentType != null)
                 fwRequest.Content.Headers.ContentType = new MediaTypeHeaderValue(context.Request.ContentType.Split(';')[0]);
+
+            if (context.Request.Headers.ContainsKey("Request-Id"))
+                fwRequest.Headers.Add("Request-Id", context.Request.Headers["Request-Id"][0]);
+
+            if (userId != null)
+                fwRequest.Headers.Add("User-Id", userId);
 
             HttpResponseMessage response = await client.SendAsync(fwRequest, CancellationToken.None);
 
@@ -82,7 +91,7 @@ namespace AnimalFarm.GatewayService
                .MapGet("animal/{id:guid}", (context) => ForwardToAsync(context, ServiceType.Animal, "{id}"))
                .MapPut("animal/event", (context) => ForwardToAsync(context, ServiceType.Animal, "event"))
                .MapPost("login", (context) => ForwardToAsync(context, ServiceType.Authentication, "login"))
-               .MapGet("ruleset/{id:guid?}", (context) => ForwardToAsync(context, ServiceType.Ruleset, "ruleset/{id}"));
+               .MapGet("ruleset/{id:guid?}", (context) => ForwardToAsync(context, ServiceType.Ruleset, "{id}"));
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -98,6 +107,9 @@ namespace AnimalFarm.GatewayService
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseMiddleware<GenerateRequestIdMiddleware>()
+                .UseMiddleware<RequestTracingMiddleware>();
 
             app.UseRouter(BuildRoutes);
         }

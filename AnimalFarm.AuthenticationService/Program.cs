@@ -1,8 +1,8 @@
-﻿using Microsoft.ServiceFabric.Services.Runtime;
+﻿using AnimalFarm.Service.Utils.Tracing;
+using Microsoft.ServiceFabric.Services.Runtime;
 using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AnimalFarm.AuthenticationService
 {
@@ -15,6 +15,8 @@ namespace AnimalFarm.AuthenticationService
         {
             try
             {
+                ServiceEventSource.SetName("AnimalFarm.Server-AnimalFarm.AuthenticationServiceType");
+
                 ServiceRuntime.RegisterServiceAsync("AnimalFarm.AuthenticationServiceType",
                     context => new AuthenticationService(context)).GetAwaiter().GetResult();
 

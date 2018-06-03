@@ -4,6 +4,7 @@ using AnimalFarm.Data.Repositories.Configuration;
 using AnimalFarm.Logic.RulesetManagement;
 using AnimalFarm.Model;
 using AnimalFarm.Service;
+using AnimalFarm.Service.Utils.Tracing;
 using AnimalFarm.Services.Utils.DependencyInjection;
 using AnimalFarm.Utils.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -24,7 +25,6 @@ namespace AnimalFarm.RulesetService
         public RulesetService(StatefulServiceContext context)
             : base(context)
         {
-            EventSource = ServiceEventSource.Current;
         }
 
         protected override IEnumerable<DataSourceConfiguration> GetDataSourceConfigurations()
