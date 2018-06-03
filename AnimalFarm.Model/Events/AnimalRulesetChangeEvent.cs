@@ -10,5 +10,7 @@ namespace AnimalFarm.Model.Events
         /// Gets or sets the id of the version associated with the new ruleset.
         /// </summary>
         public string NewVersionId { get; set; }
+
+        public override string EventType => "RulesetChange";
     }
 }

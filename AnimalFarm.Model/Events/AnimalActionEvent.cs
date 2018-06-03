@@ -13,5 +13,7 @@ namespace AnimalFarm.Model.Events
         /// Gets or sets the id of the type of the action.
         /// </summary>
         public string AnimalActionId { get; set; }
+
+        public override string EventType => "Interact";
     }
 }

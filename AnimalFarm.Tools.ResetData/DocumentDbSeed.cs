@@ -53,7 +53,7 @@ namespace AnimalFarm.Tools.ResetData
 
             await ClearTableAsync(client, database.Id, "Rulesets", "/id");
             await ClearTableAsync(client, database.Id, "Animals", "/UserId");
-            await ClearTableAsync(client, database.Id, "UserAuthenticationInfos", "/Login");
+            await ClearTableAsync(client, database.Id, "UserAuthenticationInfos", "/id");
             await ClearTableAsync(client, database.Id, "VersionSchedules", "/id");
 
             var seedData = new SeedData();

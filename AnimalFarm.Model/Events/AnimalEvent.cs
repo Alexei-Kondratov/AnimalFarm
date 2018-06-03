@@ -9,6 +9,8 @@ namespace AnimalFarm.Model.Events
     /// </summary>
     public abstract class AnimalEvent
     {
+        public abstract string EventType { get; }
+
         /// <summary>
         /// Gets or sets the event's unique identifier.
         /// </summary>

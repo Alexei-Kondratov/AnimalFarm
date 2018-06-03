@@ -1,29 +1,94 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
+using AnimalFarm.Service.Utils;
+using AnimalFarm.Service.Utils.Communication;
+using AnimalFarm.Utils.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace AnimalFarm.GatewayService
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly JwtManager _jwtManager;
+        private readonly IServiceHttpClientFactory _httpClientFactory;
+
+        public Startup(JwtManager jwtManager, IServiceHttpClientFactory httpClientFactory)
         {
-            Configuration = configuration;
+            _jwtManager = jwtManager;
+            _httpClientFactory = httpClientFactory;
         }
 
-        public IConfiguration Configuration { get; }
+        private string GetUserId(HttpRequest request)
+        {
+            string userToken = request.Headers["User-Token"];
+
+            if (String.IsNullOrEmpty(userToken))
+                return null;
+
+            return _jwtManager.ValidateToken(userToken);
+        }
+
+        private string FillRouteValues(string path, RouteValueDictionary routeValues)
+        {
+            var regex = @"{(.*?)}";
+            var result = path;
+            foreach (Match match in Regex.Matches(path, regex))
+            {
+                string parameterName = match.Value.Substring(1, match.Value.Length - 2);
+                string parameterValue = routeValues.ContainsKey(parameterName) ? routeValues[parameterName].ToString() : String.Empty;
+                result = result.Replace(match.Value, parameterValue);
+            }
+
+            return result;
+        }
+
+        // TODO: Extract the forwarding out of Startup. 
+        private async Task ForwardToAsync(HttpContext context, ServiceType serviceType, string path)
+        {
+            string userId = GetUserId(context.Request);
+            var client = await _httpClientFactory.CreateAsync(serviceType, userId, CancellationToken.None);
+
+            path = FillRouteValues(path, context.GetRouteData().Values);
+
+            var fwRequest = new HttpRequestMessage
+            {
+                RequestUri = new Uri(path, UriKind.Relative),
+                Method = new HttpMethod(context.Request.Method),
+                Content = new StreamContent(context.Request.Body)
+            };
+
+            if (context.Request.ContentType != null)
+                fwRequest.Content.Headers.ContentType = new MediaTypeHeaderValue(context.Request.ContentType.Split(';')[0]);
+
+            HttpResponseMessage response = await client.SendAsync(fwRequest, CancellationToken.None);
+
+            context.Response.StatusCode = (int)response.StatusCode;
+            if (response.Content != null)
+                await context.Response.WriteAsync(await response.Content.ReadAsStringAsync());
+        }
+
+        private void BuildRoutes(IRouteBuilder builder)
+        {
+            builder
+               .MapPost("admin/ClearCache", (context) => ForwardToAsync(context, ServiceType.Admin, "ClearCache"))
+               .MapGet("animal/{id:guid}", (context) => ForwardToAsync(context, ServiceType.Animal, "{id}"))
+               .MapPut("animal/event", (context) => ForwardToAsync(context, ServiceType.Animal, "event"))
+               .MapPost("login", (context) => ForwardToAsync(context, ServiceType.Authentication, "login"))
+               .MapGet("ruleset/{id:guid?}", (context) => ForwardToAsync(context, ServiceType.Ruleset, "ruleset/{id}"));
+        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,7 +99,7 @@ namespace AnimalFarm.GatewayService
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseRouter(BuildRoutes);
         }
     }
 }

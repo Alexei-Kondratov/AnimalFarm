@@ -37,7 +37,7 @@ namespace AnimalFarm.Logic.RulesetManagement.Tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(3, result.Count);
+            Assert.Equal(2, result.Count);
         }
     }
 }

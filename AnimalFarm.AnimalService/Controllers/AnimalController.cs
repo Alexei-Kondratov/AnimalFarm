@@ -27,19 +27,24 @@ namespace AnimalFarm.AnimalService.Controllers
             _scheduleProvider = scheduleProvider;
         }
 
+        private async Task<IEnumerable<AnimalEvent>> GetRulesetChangeEventsAsync(ITransaction tx, Animal animal)
+        {
+            var rulesetChanges = await _scheduleProvider.GetActiveRulesetRecordsAsync(tx, animal.LastCalculated, DateTime.UtcNow);
+            return rulesetChanges.Select(r => new AnimalRulesetChangeEvent { Time = r.Key, NewVersionId = r.Value, AnimalId = animal.Id, OwnerUserId = animal.UserId }).ToArray();
+        }
+
         private async Task<bool> RunEventsAsync(ITransaction tx, Animal animal, IEnumerable<AnimalEvent> userEvents)
         {
             var animalBox = new AnimalBox(_rulesets, _animals, _scheduleProvider);
-            await animalBox.SetAnimalAsync(tx, animal.UserId, animal.Id);
-            var rulesetChanges = await _scheduleProvider.GetActiveRulesetRecordsAsync(tx, animal.LastCalculated, DateTime.UtcNow);
-            var rulesetChangeEvents =
-                rulesetChanges.Select(r => new AnimalRulesetChangeEvent { Time = r.Key, NewVersionId = r.Value, AnimalId = animal.Id, OwnerUserId = animal.UserId });
+            await animalBox.SetAnimalAsync(tx, animal);
+            IEnumerable<AnimalEvent> events = userEvents;
 
-            bool isSuccess = await animalBox.RunEventsAsync(rulesetChangeEvents.Concat(userEvents));
+            if (animal != null)
+                events = events.Concat(await GetRulesetChangeEventsAsync(tx, animal));
+
+            bool isSuccess = await animalBox.RunEventsAsync(events);
             if (isSuccess)
-            {
                 await animalBox.CommitAsync();
-            }
 
             return isSuccess;
         }

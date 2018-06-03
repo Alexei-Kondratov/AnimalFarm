@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace AnimalFarm.Model.Events
 {
     /// <summary>
@@ -18,5 +15,7 @@ namespace AnimalFarm.Model.Events
         /// Gets or sets the id of the new animal's type.
         /// </summary>
         public string AnimalTypeId { get; set; }
+
+        public override string EventType => "Create";
     }
 }

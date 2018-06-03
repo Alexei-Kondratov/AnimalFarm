@@ -39,6 +39,21 @@ namespace AnimalFarm.AnimalService.Tests
             return server.CreateClient();
         }
 
+        public AnimalServiceWebHostTests()
+        {
+            var rulesetSchedule = new VersionSchedule
+            {
+                BranchId = "Default",
+                Records = new[]
+                {
+                    new VersionScheduleRecord { VersionId = "1", RulesetId = "BaseRuleset", Start = new DateTime(2000, 1, 1) }
+                }
+            };
+
+            _transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(_transactionMock.Object);
+            _scheduleRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, rulesetSchedule.BranchId, rulesetSchedule.BranchId)).ReturnsAsync(rulesetSchedule);
+        }
+
         [Fact]
         public void Get_animal_returns_an_animal_with_the_given_id()
         {
@@ -48,14 +63,20 @@ namespace AnimalFarm.AnimalService.Tests
                 Id = "AnimalId",
                 Name = "Snowball",
                 UserId = "UserId",
+                TypeId = "PigId",
+                LastCalculated = new DateTime(2018, 1, 1),
                 Attributes = new Dictionary<string, decimal>
                 {
                     { "AttributeId", 10 }
                 }
             };
 
-            _transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(_transactionMock.Object);
+            var ruleset = Build.Ruleset("BaseRuleset")
+                .WithAnimalType("PigId")
+                .And.Finish;
+
             _animalRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, animal.UserId, animal.Id)).ReturnsAsync(animal);
+            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, ruleset.Id, ruleset.Id)).ReturnsAsync(ruleset);
 
             var client = CreateTestClient();
 
@@ -114,7 +135,6 @@ namespace AnimalFarm.AnimalService.Tests
                 }
             };
 
-            _transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(_transactionMock.Object);
             _animalRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, animal.UserId, animal.Id)).ReturnsAsync(animal);
             _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, oldRuleset.Id, oldRuleset.Id)).ReturnsAsync(oldRuleset);
             _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, newRuleset.Id, newRuleset.Id)).ReturnsAsync(newRuleset);
@@ -164,8 +184,7 @@ namespace AnimalFarm.AnimalService.Tests
                 .Returns(Task.CompletedTask);
 
             var client = CreateTestClient();
-            var stringContent = new StringContent(JsonConvert.SerializeObject(e, typeof(AnimalEvent), Formatting.None,
-                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }), Encoding.UTF8, "application/json");
+            var stringContent = new StringContent(JsonConvert.SerializeObject(e), Encoding.UTF8, "application/json");
 
             // Act
             HttpResponseMessage response = client.PutAsync($"event", stringContent).GetAwaiter().GetResult();
@@ -225,8 +244,7 @@ namespace AnimalFarm.AnimalService.Tests
                 .Returns(Task.CompletedTask);
 
             var client = CreateTestClient();
-            var stringContent = new StringContent(JsonConvert.SerializeObject(e, typeof(AnimalEvent), Formatting.None,
-                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }), Encoding.UTF8, "application/json");
+            var stringContent = new StringContent(JsonConvert.SerializeObject(e), Encoding.UTF8, "application/json");
 
             // Act
             HttpResponseMessage response = client.PutAsync($"event", stringContent).GetAwaiter().GetResult();

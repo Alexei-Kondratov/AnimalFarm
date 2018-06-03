@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AnimalFarm.AnimalService
 {
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -17,7 +18,7 @@ namespace AnimalFarm.AnimalService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().AddJsonOptions(opts => opts.SerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto);
+            services.AddMvc().AddJsonOptions(opts => opts.SerializerSettings.Converters.Add(new AnimalEventJsonConverter()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

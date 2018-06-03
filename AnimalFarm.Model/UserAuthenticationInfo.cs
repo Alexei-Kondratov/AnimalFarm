@@ -7,6 +7,7 @@ namespace AnimalFarm.Model
     {
         private string _login;
 
+        [JsonProperty(PropertyName = "id")]
         public string Login
         {
             get => _login;
@@ -18,7 +19,6 @@ namespace AnimalFarm.Model
             }
         }
 
-        [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
         public string PasswordSalt { get; set; }
         public string PasswordHash { get; set; }

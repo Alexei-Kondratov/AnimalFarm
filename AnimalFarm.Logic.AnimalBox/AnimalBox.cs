@@ -51,11 +51,12 @@ namespace AnimalFarm.Logic.AnimalBox
             };
         }
 
-        public async Task SetAnimalAsync(ITransaction transaction, string ownerId, string animalId)
+        public async Task SetAnimalAsync(ITransaction transaction, Animal animal)
         {
             _transaction = transaction;
-            Animal = await _animals.ByIdAsync(_transaction, ownerId, animalId);
-            VersionScheduleRecord activeRulesetRecord = await _scheduleProvider.GetActiveRulesetRecordAsync(_transaction, Animal.LastCalculated);
+            Animal = animal;
+            var activeDate = Animal?.LastCalculated ?? DateTime.UtcNow;
+            VersionScheduleRecord activeRulesetRecord = await _scheduleProvider.GetActiveRulesetRecordAsync(_transaction, activeDate);
             ActiveRuleset = await _rulesets.ByIdAsync(_transaction, activeRulesetRecord.RulesetId, activeRulesetRecord.RulesetId);
         }
 

@@ -1,4 +1,5 @@
-﻿using AnimalFarm.Utils.Security;
+﻿using AnimalFarm.Service.Utils.Communication;
+using AnimalFarm.Utils.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
@@ -37,7 +38,10 @@ namespace AnimalFarm.GatewayService
                                     .ConfigureServices(
                                         services => services
                                             .AddSingleton<StatelessServiceContext>(serviceContext)
-                                            .AddSingleton<JwtManager>(new JwtManager()))
+                                            .AddSingleton<JwtManager>()
+                                            .AddSingleton<IServiceHttpClientFactory, ServiceHttpClientFactory>()
+                                            .AddSingleton<ServiceLocator>()
+                                            .AddRouting())
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)

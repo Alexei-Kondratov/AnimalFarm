@@ -14,24 +14,22 @@ using System.Threading.Tasks;
 
 namespace AnimalFarm.Service.Utils
 {
-    public enum ServiceType
-    {
-        Animal,
-        Ruleset,
-        Authentication,
-        Admin
-    }
-
+    [Obsolete]
     public class ServiceHttpClient
     {
         const string _appTypeName = "AnimalFarm.Server";
         private readonly ServiceType _serviceType;
-        private readonly long _partitionKeyHash;
+        private readonly ServicePartitionKey _partitionKey;
 
         public ServiceHttpClient(ServiceType serviceType, string partitionKey)
         {
             _serviceType = serviceType;
-            _partitionKeyHash = partitionKey.GetHashCode();
+            _partitionKey = partitionKey != null ?
+                new ServicePartitionKey(partitionKey.GetHashCode())
+                : new ServicePartitionKey();
+
+            if (_serviceType == ServiceType.Admin || _serviceType == ServiceType.Authentication)
+                _partitionKey = new ServicePartitionKey();
         }
 
         private static string GetServiceName(ServiceType serviceType)
@@ -55,14 +53,10 @@ namespace AnimalFarm.Service.Utils
         private async Task<string> GetEndpointAsync()
         {
             string serviceTypeName = GetServiceName(_serviceType);
-            var partitionKey = new ServicePartitionKey(_partitionKeyHash);
-
-            if (_serviceType == ServiceType.Admin || _serviceType == ServiceType.Authentication)
-                partitionKey = new ServicePartitionKey();
 
             var fabricUri = $"fabric:/{_appTypeName}/{serviceTypeName}";
             var resolver = ServicePartitionResolver.GetDefault();
-            var p = await resolver.ResolveAsync(new Uri(fabricUri), partitionKey, new System.Threading.CancellationToken());
+            var p = await resolver.ResolveAsync(new Uri(fabricUri), _partitionKey, new System.Threading.CancellationToken());
 
             JObject addresses = JObject.Parse(p.GetEndpoint().Address);
             return (string)addresses["Endpoints"].First();
@@ -108,21 +102,6 @@ namespace AnimalFarm.Service.Utils
             var serializer = new JsonSerializer();
             TResult result = JsonConvert.DeserializeObject<TResult>(await response.Content.ReadAsStringAsync());
             return result;
-        }
-
-        public async Task<HttpResponseMessage> ForwardAsync(string path, HttpRequestMessage request)
-        {
-            var uri = await GetUriAsync(_serviceType, path);
-            var client = new HttpClient();
-
-            var fwRequest = new HttpRequestMessage
-            {
-                RequestUri = uri,
-                Method = request.Method,
-                Content = request.Content
-            };
-
-            return await client.SendAsync(fwRequest);
         }
 
         public async Task<HttpResponseMessage> ForwardAsync(HttpRequest request, string path)

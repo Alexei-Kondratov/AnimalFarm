@@ -15,8 +15,8 @@ namespace AnimalFarm.Tools.ResetData
         private const string _happinessAttributeId = "Happiness";
 
         private const string _firstVersionId = "0.1";
-        private const string _firstRulesetVersionId = "BaseRuleset";
-        private const string _secondRulesetVersionId = "TigerUpdate";
+        private const string _firstRulesetVersionId = "4d46fc8100634609af0e2017cae592d9";
+        private const string _secondRulesetVersionId = "be602401b81d4aecb53cf62d70d1817f";
 
         public IEnumerable<UserAuthenticationInfo> GetUserAuthenticationInfos()
         {
