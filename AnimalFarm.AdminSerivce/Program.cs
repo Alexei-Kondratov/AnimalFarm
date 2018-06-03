@@ -15,13 +15,6 @@ namespace AnimalFarm.AdminService
         {
             try
             {
-                ServiceEventSource.SetName("AnimalFarm.Server-AnimalFarm.AdminServiceType");
-
-                // The ServiceManifest.XML file defines one or more service type names.
-                // Registering a service maps a service type name to a .NET type.
-                // When Service Fabric creates an instance of this service type,
-                // an instance of the class is created in this host process.
-
                 ServiceRuntime.RegisterServiceAsync("AnimalFarm.AdminServiceType",
                     context => new AdminService(context)).GetAwaiter().GetResult();
 

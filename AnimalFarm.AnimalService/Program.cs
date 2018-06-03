@@ -22,8 +22,6 @@ namespace AnimalFarm.AnimalService
                 // When Service Fabric creates an instance of this service type,
                 // an instance of the class is created in this host process.
 
-                ServiceEventSource.SetName("AnimalFarm.Server-AnimalFarm.AnimalServiceType");
-
                 ServiceRuntime.RegisterServiceAsync("AnimalFarm.AnimalServiceType",
                     context => new AnimalService(context)).GetAwaiter().GetResult();
 

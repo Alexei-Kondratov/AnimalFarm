@@ -15,8 +15,6 @@ namespace AnimalFarm.AuthenticationService
         {
             try
             {
-                ServiceEventSource.SetName("AnimalFarm.Server-AnimalFarm.AuthenticationServiceType");
-
                 ServiceRuntime.RegisterServiceAsync("AnimalFarm.AuthenticationServiceType",
                     context => new AuthenticationService(context)).GetAwaiter().GetResult();
 

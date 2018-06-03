@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace AnimalFarm.Service.Utils.Tracing
 {
-    public class ServiceEventSource : EventSource
+    [EventSource(Name = "AnimalFarm")]
+    public sealed class ServiceEventSource : EventSource
     {
         static ServiceEventSource()
         {
@@ -14,18 +15,11 @@ namespace AnimalFarm.Service.Utils.Tracing
             Task.Run(() => { });
         }
 
-        private static string _name;
-
-        public static void SetName(string name)
-        {
-            _name = name;
-        }
-
         private static readonly Lazy<ServiceEventSource> _current = new Lazy<ServiceEventSource>(() => new ServiceEventSource(), true);
 
         public static ServiceEventSource Current => _current.Value;
 
-        private ServiceEventSource() : base(_name ?? "Unknown") { }
+        private ServiceEventSource() : base() { }
 
         #region Keywords
         // Event keywords can be used to categorize events. 

@@ -15,8 +15,6 @@ namespace AnimalFarm.RulesetService
         {
             try
             {
-                ServiceEventSource.SetName("AnimalFarm.Server-AnimalFarm.RulesetServiceType");
-
                 ServiceRuntime.RegisterServiceAsync("AnimalFarm.RulesetServiceType",
                     context => new RulesetService(context)).GetAwaiter().GetResult();
 

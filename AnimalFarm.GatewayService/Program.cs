@@ -15,8 +15,6 @@ namespace AnimalFarm.GatewayService
         {
             try
             {
-                ServiceEventSource.SetName("AnimalFarm.Server-AnimalFarm.GatewayServiceType");
-
                 ServiceRuntime.RegisterServiceAsync("AnimalFarm.GatewayServiceType",
                     context => new GatewayService(context)).GetAwaiter().GetResult();
 
