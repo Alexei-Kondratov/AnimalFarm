@@ -7,6 +7,7 @@ using AnimalFarm.Service.Utils.Configuration;
 using AnimalFarm.Service.Utils.Tracing;
 using AnimalFarm.Utils.Configuration;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
@@ -71,6 +72,7 @@ namespace AnimalFarm.Service
         protected virtual void RegisterServices(IServiceCollection serviceCollection)
         {
             serviceCollection
+                .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
                 .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
                 .AddSingleton<ServiceContext>(Context)
                 .AddSingleton<IReliableStateManager>(StateManager)

@@ -5,8 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AnimalFarm.Data;
+using AnimalFarm.Data.Transactions;
+using AnimalFarm.Service.Utils.Communication;
+using AnimalFarm.Service.Utils.Operations;
 using AnimalFarm.Service.Utils.Tracing;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -40,7 +45,12 @@ namespace AnimalFarm.AdminService
                                     .UseKestrel()
                                     .ConfigureServices(
                                         services => services
+                                            .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
                                             .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
+                                            .AddSingleton<ITransactionManager, TransactionManager>()
+                                            .AddSingleton<ServiceLocator>()
+                                            .AddSingleton<IServiceHttpClientFactory, ServiceHttpClientFactory>()
+                                            .AddSingleton<OperationRunner>()
                                             .AddSingleton<StatelessServiceContext>(serviceContext))
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()

@@ -55,8 +55,13 @@ namespace AnimalFarm.AnimalService.Controllers
         {
             using (var tx = _transactionManager.CreateTransaction())
             {
-                Animal animal = await _animals.ByIdAsync(tx, userId, animalId);
-                VersionScheduleRecord currentRulesetRecord = await _scheduleProvider.GetActiveRulesetRecordAsync(tx, DateTime.UtcNow);
+                Task<Animal> animalTask = _animals.ByIdAsync(tx, userId, animalId);
+                Task<VersionScheduleRecord> currentRulesetRecordTask = _scheduleProvider.GetActiveRulesetRecordAsync(tx, DateTime.UtcNow);
+
+                Task.WaitAll(animalTask, currentRulesetRecordTask);
+                Animal animal = await animalTask;
+                VersionScheduleRecord currentRulesetRecord = await currentRulesetRecordTask;
+
                 if (currentRulesetRecord.Start > animal.LastCalculated)
                 {
                     await RunEventsAsync(tx, animal, Enumerable.Empty<AnimalEvent>());

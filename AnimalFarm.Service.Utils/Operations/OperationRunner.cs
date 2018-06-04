@@ -38,6 +38,7 @@ namespace AnimalFarm.Service.Utils.Operations
                 {
                     await operation.Delegate(operation.Context);
                     operation.Context.EventSource.Message("Ending operation {0}", operationRunId);
+                    await operation.Context.Transaction.CommitAsync();
                     return;
                 }
                 catch (Exception ex)
@@ -58,11 +59,17 @@ namespace AnimalFarm.Service.Utils.Operations
             }
         }
 
-        public async Task RunAsync<TType1, TType2>(Func<OperationContext, TType1, TType2, Task> operationMethod, CancellationToken cancellationToken)
+        public Task RunAsync<TType1, TType2>(Func<OperationContext, TType1, TType2, Task> operationMethod, CancellationToken cancellationToken)
+        {
+            return RunAsync((context) => operationMethod.Invoke(context, _serviceProvider.GetService<TType1>(), _serviceProvider.GetService<TType2>()),
+                cancellationToken);
+        }
+
+        public async Task RunAsync(Func<OperationContext, Task> operationMethod, CancellationToken cancellationToken)
         {
             var operation = new Operation
             {
-                Delegate = (context) => operationMethod.Invoke(context, _serviceProvider.GetService<TType1>(), _serviceProvider.GetService<TType2>()),
+                Delegate = operationMethod,
                 Context = GetNewContext(),
                 Retries = 4,
                 IsCritical = false
