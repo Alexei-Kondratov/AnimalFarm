@@ -4,9 +4,8 @@ using AnimalFarm.Data.Repositories.Configuration;
 using AnimalFarm.Logic.RulesetManagement;
 using AnimalFarm.Model;
 using AnimalFarm.Service;
-using AnimalFarm.Service.Utils.Tracing;
+using AnimalFarm.Service.Utils.Operations;
 using AnimalFarm.Services.Utils.DependencyInjection;
-using AnimalFarm.Utils.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -59,6 +58,7 @@ namespace AnimalFarm.RulesetService
             base.RegisterServices(serviceCollection);
 
             serviceCollection
+                .AddSingleton<OperationRunner>()
                 .AddSingleton<RulesetScheduleProvider>()
                 .AddSingleton<RulesetUnpacker>()
                 .AddSingleton<RulesetUnpackingDecorator>()
@@ -66,27 +66,17 @@ namespace AnimalFarm.RulesetService
                 .AddRepository<VersionSchedule>();
         }
 
-        /// <summary>
-        /// Optional override to create listeners (like tcp, http) for this service instance.
-        /// </summary>
-        /// <returns>The collection of listeners.</returns>
-        private async Task PreloadRulesets()
+        private async Task PreloadCurrentRuleset(OperationContext context, RulesetScheduleProvider scheduleProvider, IRepository<Ruleset> rulesets)
         {
-            var transactionManager = ServiceProvider.GetRequiredService<ITransactionManager>();
-            var scheduleProvider = ServiceProvider.GetRequiredService<RulesetScheduleProvider>();
-            var rulesetRepository = ServiceProvider.GetRequiredService<IRepository<Ruleset>>();
-
-            using (var tx = transactionManager.CreateTransaction())
-            {
-                var rulesetId = (await scheduleProvider.GetActiveRulesetRecordAsync(tx, DateTime.UtcNow)).RulesetId;
-                var ruleset = await rulesetRepository.ByIdAsync(tx, rulesetId, rulesetId);
-                ServiceEventSource.Current.ServiceMessage(Context, $"Preloaded {ruleset.Id}");
-            }
+            var rulesetId = (await scheduleProvider.GetActiveRulesetRecordAsync(context.Transaction, DateTime.UtcNow)).RulesetId;
+            var ruleset = await rulesets.ByIdAsync(context.Transaction, rulesetId, rulesetId);
+            context.EventSource.ServiceMessage(Context, $"Preloaded {ruleset.Id}");
         }
 
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            await RunTask.WithRetries(PreloadRulesets, 4, cancellationToken);
+            var operationRunner = ServiceProvider.GetRequiredService<OperationRunner>();
+            await operationRunner.RunAsync<RulesetScheduleProvider, IRepository<Ruleset>>(PreloadCurrentRuleset, cancellationToken);
             cancellationToken.WaitHandle.WaitOne();
         }
     }
