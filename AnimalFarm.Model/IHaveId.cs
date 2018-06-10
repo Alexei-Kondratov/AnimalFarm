@@ -9,6 +9,6 @@ namespace AnimalFarm.Model
         /// <summary>
         /// Gets or sets the objects unique identifier.
         /// </summary>
-        TId Id { get; set; }
+        TId Id { get; }
     }
 }

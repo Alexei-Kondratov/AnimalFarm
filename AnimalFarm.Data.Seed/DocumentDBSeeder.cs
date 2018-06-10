@@ -33,7 +33,7 @@ namespace AnimalFarm.Data.Seed
                     disableAutomaticIdGeneration: true);
         }
 
-        public async Task SeedAsync(SeedData seedData)
+        public async Task SeedAsync(ISeedData seedData)
         {
             var client = new DocumentClient(new Uri("https://localhost:8081"), "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==", new ConnectionPolicy { EnableEndpointDiscovery = false });
             var database = new Database { Id = "AnimalFarm" };

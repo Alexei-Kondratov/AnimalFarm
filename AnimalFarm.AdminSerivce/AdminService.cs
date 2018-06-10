@@ -1,11 +1,7 @@
-﻿using AnimalFarm.Data;
-using AnimalFarm.Data.Seed;
-using AnimalFarm.Data.Transactions;
-using AnimalFarm.Service.Utils.Communication;
-using AnimalFarm.Service.Utils.Operations;
+﻿using AnimalFarm.Data.Seed;
+using AnimalFarm.Service;
 using AnimalFarm.Service.Utils.Tracing;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -42,14 +38,9 @@ namespace AnimalFarm.AdminService
                                     .UseKestrel()
                                     .ConfigureServices(
                                         services => services
-                                            .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
-                                            .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
-                                            .AddSingleton<ITransactionManager, TransactionManager>()
+                                            .AddAnimalFarmCommonServices()
                                             .AddTransient<SeedData>()
                                             .AddSingleton<IDataSeeder, DocumentDBSeeder>()
-                                            .AddSingleton<ServiceLocator>()
-                                            .AddSingleton<IServiceHttpClientFactory, ServiceHttpClientFactory>()
-                                            .AddSingleton<OperationRunner>()
                                             .AddSingleton<StatelessServiceContext>(serviceContext))
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()

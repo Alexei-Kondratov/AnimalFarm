@@ -67,7 +67,7 @@ namespace AnimalFarm.GatewayService.Tests
             server.CreateRequest("ruleset/db5e60ce-f7d9-47d8-9c74-0231190ba3df").GetAsync().GetAwaiter().GetResult();
 
             serviceHttpClientMock.Verify(_ => _.SendAsync(It.Is<HttpRequestMessage>((message) =>
-                message.RequestUri.ToString() == "ruleset/db5e60ce-f7d9-47d8-9c74-0231190ba3df"), It.IsAny<CancellationToken>()));
+                message.RequestUri.ToString() == "db5e60ce-f7d9-47d8-9c74-0231190ba3df"), It.IsAny<CancellationToken>()));
         }
 
         [Fact]
@@ -91,7 +91,7 @@ namespace AnimalFarm.GatewayService.Tests
             server.CreateRequest("ruleset").GetAsync().GetAwaiter().GetResult();
 
             serviceHttpClientMock.Verify(_ => _.SendAsync(It.Is<HttpRequestMessage>((message) =>
-                message.RequestUri.ToString() == "ruleset/"), It.IsAny<CancellationToken>()));
+                message.RequestUri.ToString() == ""), It.IsAny<CancellationToken>()));
         }
     }
 }

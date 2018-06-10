@@ -12,8 +12,9 @@ namespace AnimalFarm.Tools.ResetData
 
         private static async Task MainAsync(string[] args)
         {
-            var seedData = new SeedData();
-            await new DocumentDBSeeder().SeedAsync(seedData);
+            var seeder = new DocumentDBSeeder();
+            await seeder.SeedAsync(new SeedData());
+            await seeder.SeedAsync(new SeedConfiguraiton());
         }
     }
 }

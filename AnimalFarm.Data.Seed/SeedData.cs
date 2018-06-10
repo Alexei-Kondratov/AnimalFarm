@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AnimalFarm.Data.Seed
 {
-    public class SeedData
+    public class SeedData : ISeedData
     {
         public IEnumerable<SeedCollection> Collections { get; private set; }
 
@@ -50,7 +50,7 @@ namespace AnimalFarm.Data.Seed
         private const string _secondRulesetVersionId = "be602401b81d4aecb53cf62d70d1817f";
         private const string _thirdRulesetVersionId = "d5062a4ceca5495f9c783ee394265a59";
 
-        private const string _defaultBranchId = "30cd45c4860f481ea13bf0ea4284ea8a";
+        internal const string DefaultBranchId = "30cd45c4860f481ea13bf0ea4284ea8a";
 
         private IEnumerable<UserAuthenticationInfo> GetUserAuthenticationInfos()
         {

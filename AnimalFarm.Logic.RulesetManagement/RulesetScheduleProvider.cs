@@ -14,7 +14,7 @@ namespace AnimalFarm.Logic.RulesetManagement
         private readonly IRepository<VersionSchedule> _scheduleRepository;
 
         public RulesetScheduleProvider(IConfigurationProvider configurationProvider, IRepository<VersionSchedule> scheduleRepository)
-            : this(configurationProvider.GetConfiguration<BranchConfiguration>().ActiveBranchId, scheduleRepository)
+            : this(configurationProvider.GetConfigurationAsync<BranchConfiguration>().GetAwaiter().GetResult().ActiveBranchId, scheduleRepository)
         {
         }
 

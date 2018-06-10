@@ -3,12 +3,10 @@ using AnimalFarm.Data.DataSources;
 using AnimalFarm.Data.Repositories;
 using AnimalFarm.Data.Transactions;
 using AnimalFarm.Model;
-using AnimalFarm.Service.Utils;
-using AnimalFarm.Service.Utils.Configuration;
+using AnimalFarm.Service;
 using AnimalFarm.Service.Utils.Tracing;
 using AnimalFarm.Utils.Security;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -31,7 +29,6 @@ namespace AnimalFarm.AuthenticationService
             : base(context)
         {
             _transactionManager = new TransactionManager();
-            var configProvider = new ServiceConfigurationProvider(context);
             var dbDataSource = new DocumentDbDataSource("Database");
             _userRepository = new DataSourceRepository<UserAuthenticationInfo>
                 (dbDataSource, "UserAuthenticationInfos");
@@ -40,10 +37,8 @@ namespace AnimalFarm.AuthenticationService
         private void ConfigureServices(StatelessServiceContext context, IServiceCollection services)
         {
             services
-                .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
-                .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
+                .AddAnimalFarmCommonServices()
                 .AddSingleton<StatelessServiceContext>(context)
-                .AddSingleton<ITransactionManager>(_transactionManager)
                 .AddSingleton<IRepository<UserAuthenticationInfo>>(_userRepository)
                 .AddSingleton<PasswordHasher>(new PasswordHasher())
                 .AddSingleton<JwtManager>(new JwtManager());

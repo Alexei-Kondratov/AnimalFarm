@@ -72,12 +72,9 @@ namespace AnimalFarm.Service
         protected virtual void RegisterServices(IServiceCollection serviceCollection)
         {
             serviceCollection
-                .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
-                .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
+                .AddAnimalFarmCommonServices()
                 .AddSingleton<ServiceContext>(Context)
                 .AddSingleton<IReliableStateManager>(StateManager)
-                .AddSingleton<IConfigurationProvider, ServiceConfigurationProvider>()
-                .AddSingleton<ITransactionManager, TransactionManager>()
                 .AddSingleton<DataSourceFactory>(CreateDataSourceFactory)
                 .AddSingleton<RepositoryFactory>(CreateRepositoryFactory)
                 .AddSingleton<CacheManager>();

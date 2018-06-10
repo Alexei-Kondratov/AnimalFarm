@@ -1,9 +1,9 @@
-﻿
+﻿using System.Threading.Tasks;
+
 namespace AnimalFarm.Utils.Configuration
 {
     public interface IConfigurationProvider
     {
-        string GetConnectionString(string connectionStringName = null);
-        TConfiguration GetConfiguration<TConfiguration>(string configurationName = null);
+        Task<TConfiguration> GetConfigurationAsync<TConfiguration>(string configurationName = null);
     }
 }
