@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AnimalFarm.Data.Seed\AnimalFarm.Data.Seed.csproj" />
     <ProjectReference Include="..\AnimalFarm.Data\AnimalFarm.Data.csproj" />
     <ProjectReference Include="..\AnimalFarm.Model\AnimalFarm.Model.csproj" />
     <ProjectReference Include="..\AnimalFarm.Service.Utils\AnimalFarm.Service.Utils.csproj" />

@@ -20,19 +20,19 @@ namespace AnimalFarm.Service.Utils.Operations
             _transactionManager = transactionManager;
         }
 
-        private OperationContext GetNewContext()
+        private OperationContext GetNewContext(CancellationToken cancellationToken)
         {
-            return new OperationContext(_eventSource, _transactionManager.CreateTransaction());
+            return new OperationContext(this, _eventSource, _transactionManager.CreateTransaction(), cancellationToken);
         }
 
-        public async Task RunAsync(Operation operation, CancellationToken cancellationToken)
+        public async Task RunAsync(Operation operation)
         {
             int retriesCount = 0;
 
             string operationRunId = Guid.NewGuid().ToString();
             operation.Context.EventSource.Message("Starting operation {0}", operationRunId);
 
-            while (true && !cancellationToken.IsCancellationRequested)
+            while (true && !operation.Context.CancellationToken.IsCancellationRequested)
             {
                 try
                 {
@@ -48,6 +48,7 @@ namespace AnimalFarm.Service.Utils.Operations
                     retriesCount++;
                     if (retriesCount >= operation.Retries)
                     {
+                        operation.Context.EventSource.Message("Ending operation {0}", operationRunId);
                         if (operation.IsCritical)
                             throw;
                         else
@@ -59,23 +60,41 @@ namespace AnimalFarm.Service.Utils.Operations
             }
         }
 
+        public Task RunAsync<TType1>(Func<OperationContext, TType1, Task> operationMethod, CancellationToken cancellationToken)
+        {
+            return RunAsync((context) => operationMethod.Invoke(context, _serviceProvider.GetService<TType1>()),
+                cancellationToken);
+        }
+
         public Task RunAsync<TType1, TType2>(Func<OperationContext, TType1, TType2, Task> operationMethod, CancellationToken cancellationToken)
         {
             return RunAsync((context) => operationMethod.Invoke(context, _serviceProvider.GetService<TType1>(), _serviceProvider.GetService<TType2>()),
                 cancellationToken);
         }
 
-        public async Task RunAsync(Func<OperationContext, Task> operationMethod, CancellationToken cancellationToken)
+        public Task RunAsync<TType1, TType2, TType3>(Func<OperationContext, TType1, TType2, TType3, Task> operationMethod, CancellationToken cancellationToken)
+        {
+            return RunAsync((context) => operationMethod.Invoke(context,
+                _serviceProvider.GetService<TType1>(), _serviceProvider.GetService<TType2>(), _serviceProvider.GetService<TType3>()),
+                cancellationToken);
+        }
+
+        public async Task RunAsync(Func<OperationContext, Task> operationMethod, OperationContext context)
         {
             var operation = new Operation
             {
                 Delegate = operationMethod,
-                Context = GetNewContext(),
+                Context = context,
                 Retries = 4,
-                IsCritical = false
+                IsCritical = true
             };
 
-            await RunAsync(operation, cancellationToken);
+            await RunAsync(operation);
+        }
+
+        public Task RunAsync(Func<OperationContext, Task> operationMethod, CancellationToken cancellationToken)
+        {
+            return RunAsync(operationMethod, GetNewContext(cancellationToken));
         }
     }
 }

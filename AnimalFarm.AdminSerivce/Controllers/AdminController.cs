@@ -1,4 +1,5 @@
-﻿using AnimalFarm.Service.Utils;
+﻿using AnimalFarm.Data.Seed;
+using AnimalFarm.Service.Utils;
 using AnimalFarm.Service.Utils.Communication;
 using AnimalFarm.Service.Utils.Operations;
 using Microsoft.AspNetCore.Mvc;
@@ -15,26 +16,41 @@ namespace AnimalFarm.GatewayService.Controllers
     public class AdminController : Controller
     {
         private OperationRunner _operationRunner;
-        private IServiceHttpClientFactory _serviceClientFactory;
 
         public AdminController(OperationRunner operationRunner, IServiceHttpClientFactory serviceClientFactory)
         {
             _operationRunner = operationRunner;
-            _serviceClientFactory = serviceClientFactory;
+        }
+
+        private static async Task ClearCacheAsync(OperationContext context, IServiceHttpClientFactory serviceClientFactory)
+        {
+            IEnumerable<IServiceHttpClient> clients
+                = await serviceClientFactory.CreateAsync(new[] { ServiceType.Animal, ServiceType.Ruleset }, context.CancellationToken);
+
+            Task sendClearCache(OperationContext ctx, IServiceHttpClient client)
+                => client.SendAsync(new HttpRequestMessage(HttpMethod.Post, new Uri("admin/ClearCache", UriKind.Relative)), ctx.CancellationToken);
+
+            IEnumerable<Task> runSendClearCacheTasks = clients.Select(c => context.RunSuboperationAync((ctx) => sendClearCache(ctx, c)));
+            await Task.WhenAll(runSendClearCacheTasks);
+        }
+
+        private static async Task ResetDataAsync(OperationContext context, IDataSeeder dataSeeder, SeedData seedData, IServiceHttpClientFactory serviceClientFactory)
+        {
+            await dataSeeder.SeedAsync(seedData);
+            await ClearCacheAsync(context, serviceClientFactory);
         }
 
         [HttpPost("ClearCache")]
         public async Task<IActionResult> ClearCache()
         {
-            CancellationToken cancellationToken = CancellationToken.None;
+            await _operationRunner.RunAsync<IServiceHttpClientFactory>(ClearCacheAsync, CancellationToken.None);
+            return Ok();
+        }
 
-            IEnumerable<IServiceHttpClient> clients =  await _serviceClientFactory.CreateAsync(new[] { ServiceType.Animal, ServiceType.Ruleset }, cancellationToken);
-
-            Task sendClearCache(IServiceHttpClient client) 
-                => client.SendAsync(new HttpRequestMessage(HttpMethod.Post, new Uri("admin/ClearCache", UriKind.Relative)), cancellationToken);
-
-            IEnumerable<Task> operations = clients.Select(client => _operationRunner.RunAsync((context) => sendClearCache(client), cancellationToken));
-            await Task.WhenAll(operations);
+        [HttpPost("ResetData")]
+        public async Task<IActionResult> ResetData()
+        {
+            await _operationRunner.RunAsync<IDataSeeder, SeedData, IServiceHttpClientFactory>(ResetDataAsync, CancellationToken.None);
             return Ok();
         }
     }

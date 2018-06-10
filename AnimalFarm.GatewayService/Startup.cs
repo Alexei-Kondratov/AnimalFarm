@@ -88,6 +88,7 @@ namespace AnimalFarm.GatewayService
         {
             builder
                .MapPost("admin/ClearCache", (context) => ForwardToAsync(context, ServiceType.Admin, "ClearCache"))
+               .MapPost("admin/ResetData", (context) => ForwardToAsync(context, ServiceType.Admin, "ResetData"))
                .MapGet("animal/{id:guid}", (context) => ForwardToAsync(context, ServiceType.Animal, "{id}"))
                .MapPut("animal/event", (context) => ForwardToAsync(context, ServiceType.Animal, "event"))
                .MapPost("login", (context) => ForwardToAsync(context, ServiceType.Authentication, "login"))

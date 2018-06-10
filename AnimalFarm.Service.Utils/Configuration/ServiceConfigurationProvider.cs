@@ -16,7 +16,7 @@ namespace AnimalFarm.Service.Utils.Configuration
         public TConfiguration GetConfiguration<TConfiguration>(string configurationName = null)
         {
             if (typeof(TConfiguration) == typeof(BranchConfiguration))
-                return (TConfiguration)(object)(new BranchConfiguration { ActiveBranchId = "Default" });
+                return (TConfiguration)(object)(new BranchConfiguration { ActiveBranchId = "30cd45c4860f481ea13bf0ea4284ea8a" });
 
             throw new System.NotImplementedException();
         }

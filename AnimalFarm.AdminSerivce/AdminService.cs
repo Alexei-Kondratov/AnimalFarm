@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AnimalFarm.Data;
+﻿using AnimalFarm.Data;
+using AnimalFarm.Data.Seed;
 using AnimalFarm.Data.Transactions;
 using AnimalFarm.Service.Utils.Communication;
 using AnimalFarm.Service.Utils.Operations;
@@ -16,6 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using System.Collections.Generic;
+using System.Fabric;
+using System.IO;
 
 namespace AnimalFarm.AdminService
 {
@@ -48,6 +45,8 @@ namespace AnimalFarm.AdminService
                                             .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
                                             .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
                                             .AddSingleton<ITransactionManager, TransactionManager>()
+                                            .AddTransient<SeedData>()
+                                            .AddSingleton<IDataSeeder, DocumentDBSeeder>()
                                             .AddSingleton<ServiceLocator>()
                                             .AddSingleton<IServiceHttpClientFactory, ServiceHttpClientFactory>()
                                             .AddSingleton<OperationRunner>()
