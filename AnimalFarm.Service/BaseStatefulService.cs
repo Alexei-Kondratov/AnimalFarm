@@ -2,12 +2,10 @@
 using AnimalFarm.Data.Cache;
 using AnimalFarm.Data.DataSources.Configuration;
 using AnimalFarm.Data.Repositories.Configuration;
-using AnimalFarm.Data.Transactions;
 using AnimalFarm.Service.Utils.Configuration;
 using AnimalFarm.Service.Utils.Tracing;
 using AnimalFarm.Utils.Configuration;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
@@ -17,7 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
-using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AnimalFarm.Service
 {
@@ -35,37 +33,32 @@ namespace AnimalFarm.Service
         {
         }
 
-        protected virtual IEnumerable<DataSourceConfiguration> GetDataSourceConfigurations()
-        {
-            return Enumerable.Empty<DataSourceConfiguration>();
-        }
-
-        protected virtual IEnumerable<RepositoryConfiguration> GetRepositoryConfigurations()
-        {
-            return Enumerable.Empty<RepositoryConfiguration>();
-        }
-
         protected virtual void SetupWebHost(IWebHostBuilder builder)
         {
         }
 
         private DataSourceFactory CreateDataSourceFactory(IServiceProvider serviceProvider)
         {
-            var result = new DataSourceFactory(ServiceProvider, new IConfigurableComponentBuilder<IDataSource, string>[]
+            var result = new DataSourceFactory(serviceProvider, new IConfigurableComponentBuilder<IDataSource, string>[]
                 {
                     new ReliableStateDataSourceBuilder(),
                     new DocumentDbDataSourceBuilder(),
                     new ServiceProxyDataSourceBuilder()
                 });
-            result.SetConfigurations(GetDataSourceConfigurations());
+
+            var configurationProvider = serviceProvider.GetRequiredService<IConfigurationProvider>();
+            var configurations = configurationProvider.GetConfigurationAsync<DataSourceConfigurations>(GetType().Name).GetAwaiter().GetResult();
+            result.SetConfigurations(configurations.Configurations);
             return result;
         }
 
         private RepositoryFactory CreateRepositoryFactory(IServiceProvider serviceProvider)
         {
-            var result = new RepositoryFactory(ServiceProvider, new IConfigurableComponentBuilder<object, Type>[] { new DataSourceRepositoryBuilder() });
+            var result = new RepositoryFactory(serviceProvider, new IConfigurableComponentBuilder<object, Type>[] { new DataSourceRepositoryBuilder() });
 
-            result.SetConfigurations(GetRepositoryConfigurations());
+            var configurationProvider = serviceProvider.GetRequiredService<IConfigurationProvider>();
+            var configurations = configurationProvider.GetConfigurationAsync<RepositoryConfigurations>(GetType().Name).GetAwaiter().GetResult();
+            result.SetConfigurations(configurations.Configurations);
             return result;
         }
 

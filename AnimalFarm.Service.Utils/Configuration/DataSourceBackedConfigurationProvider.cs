@@ -30,7 +30,7 @@ namespace AnimalFarm.Service.Utils.Configuration
                 record = await _dataSource.ByIdAsync<ConfigurationRecord>(transaction, "Configuration", configurationName, configurationName);
             }
 
-            return JsonConvert.DeserializeObject<TConfiguration>(record.SerializedConfiguration);
+            return JsonConvert.DeserializeObject<TConfiguration>(record.SerializedConfiguration, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
         }
     }
 }

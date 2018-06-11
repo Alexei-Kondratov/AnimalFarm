@@ -1,6 +1,4 @@
 ﻿using AnimalFarm.Data;
-using AnimalFarm.Data.DataSources.Configuration;
-using AnimalFarm.Data.Repositories.Configuration;
 using AnimalFarm.Logic.RulesetManagement;
 using AnimalFarm.Model;
 using AnimalFarm.Service;
@@ -9,7 +7,6 @@ using AnimalFarm.Services.Utils.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,27 +21,6 @@ namespace AnimalFarm.RulesetService
         public RulesetService(StatefulServiceContext context)
             : base(context)
         {
-        }
-
-        protected override IEnumerable<DataSourceConfiguration> GetDataSourceConfigurations()
-        {
-            return new DataSourceConfiguration[]
-            {
-                new ReliableStateDataSourceConfiguration { Key = "ReliableStateDataSource" },
-                new DocumentDbDataSourceConfiguration
-                    { Key = "DatabaseDataSource", Decorators = new [] { typeof(RulesetUnpackingDecorator) } }
-            };
-        }
-
-        protected override IEnumerable<RepositoryConfiguration> GetRepositoryConfigurations()
-        {
-            return new RepositoryConfiguration[]
-            {
-                new DataSourceRepositoryConfiguration
-                    { Key = typeof(VersionSchedule), StoreName = "VersionSchedules", DataSourceName = "DatabaseDataSource", CacheDataSourceName = "ReliableStateDataSource" },
-                new DataSourceRepositoryConfiguration
-                    { Key = typeof(Ruleset), StoreName = "Rulesets", DataSourceName = "DatabaseDataSource", CacheDataSourceName = "ReliableStateDataSource" }
-            };
         }
 
         protected override void SetupWebHost(IWebHostBuilder builder)

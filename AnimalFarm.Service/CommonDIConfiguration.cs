@@ -1,5 +1,6 @@
 ﻿using AnimalFarm.Data;
 using AnimalFarm.Data.DataSources;
+using AnimalFarm.Data.DataSources.Configuration;
 using AnimalFarm.Data.Transactions;
 using AnimalFarm.Service.Utils.Communication;
 using AnimalFarm.Service.Utils.Configuration;
@@ -9,6 +10,7 @@ using AnimalFarm.Utils.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Fabric;
 
 namespace AnimalFarm.Service
 {
@@ -16,7 +18,16 @@ namespace AnimalFarm.Service
     {
         private static IConfigurationProvider CreateConfigurationProvider(IServiceProvider services)
         {
-            DocumentDbDataSource dataSource = new DocumentDbDataSource("ConfigurationDataSource");
+            var serviceContext = services.GetRequiredService<ServiceContext>();
+            var configSection = serviceContext.CodePackageActivationContext.GetConfigurationPackageObject("Config").Settings.Sections["ConfigurationConnection"];
+            var connectionInfo = new DocumentDbConnectionInfo
+            {
+                DatabaseName = configSection.Parameters["DatabaseName"].Value,
+                Key = configSection.Parameters["Key"].Value,
+                Uri = new Uri(configSection.Parameters["Uri"].Value)
+            };
+
+            var dataSource = new DocumentDbDataSource("ConfigurationDataSource", connectionInfo);
             return new DataSourceBackedConfigurationProvider(dataSource, services.GetRequiredService<ITransactionManager>());
         }
 

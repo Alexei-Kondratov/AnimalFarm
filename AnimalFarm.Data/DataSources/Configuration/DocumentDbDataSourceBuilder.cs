@@ -2,6 +2,7 @@
 using AnimalFarm.Utils.DependencyInjection;
 using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AnimalFarm.Data.DataSources.Configuration
 {
@@ -32,7 +33,10 @@ namespace AnimalFarm.Data.DataSources.Configuration
     {
         protected override IDataSource BuildBase(DocumentDbDataSourceConfiguration configuration, IServiceProvider serviceContainer)
         {
-            return new DocumentDbDataSource(configuration.Key);
+            var configProvier = serviceContainer.GetService<IConfigurationProvider>();
+            var connectionInfo = configProvier.GetConfigurationAsync<DocumentDbConnectionInfo>(configuration.ConnectionInfoName).GetAwaiter().GetResult();
+
+            return new DocumentDbDataSource(configuration.Key, connectionInfo);
         }
     }
 }

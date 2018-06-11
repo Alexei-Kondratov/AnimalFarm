@@ -16,5 +16,6 @@ namespace AnimalFarm.Data.DataSources.Configuration
 
     public class DocumentDbDataSourceConfiguration : DataSourceConfiguration
     {
+        public string ConnectionInfoName { get; set; }
     }
 }

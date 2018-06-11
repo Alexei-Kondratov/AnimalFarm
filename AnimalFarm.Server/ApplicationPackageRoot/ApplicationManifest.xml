@@ -10,22 +10,36 @@
     <Parameter Name="AnimalFarm.RulesetService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="AnimalFarm.RulesetService_PartitionCount" DefaultValue="1" />
     <Parameter Name="AnimalFarm.RulesetService_TargetReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="DefaultConnectionString" DefaultValue="DefaultEndpointsProtocol=https;AccountName=animalfarm;AccountKey=7Lrjq5wId8TCpSx5o7vFI4nxVugkhjZcOh25RCSp318HIeXDE4o8SkaoVgeb5vKnNtrGXkJapS+Mmuf0Tnp7GA==;EndpointSuffix=core.windows.net" />
+    <Parameter Name="ConfigurationConnectionDatabaseName" DefaultValue="AnimalFarm" />
+    <Parameter Name="ConfigurationConnectionKey" DefaultValue="C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==" />
+    <Parameter Name="ConfigurationConnectionUri" DefaultValue="https://localhost:8081" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
        should match the Name and Version attributes of the ServiceManifest element defined in the 
        ServiceManifest.xml file. -->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="AnimalFarm.AdminServicePkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="ConfigurationConnection">
+            <Parameter Name="DatabaseName" Value="[ConfigurationConnectionDatabaseName]" />
+            <Parameter Name="Key" Value="[ConfigurationConnectionKey]" />
+            <Parameter Name="Uri" Value="[ConfigurationConnectionUri]" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
   </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="AnimalFarm.AuthenticationServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides>
       <ConfigOverride Name="Config">
         <Settings>
-          <Section Name="ConnectionStrings">
-            <Parameter Name="Default" Value="[DefaultConnectionString]" />
+          <Section Name="ConfigurationConnection">
+            <Parameter Name="DatabaseName" Value="[ConfigurationConnectionDatabaseName]" />
+            <Parameter Name="Key" Value="[ConfigurationConnectionKey]" />
+            <Parameter Name="Uri" Value="[ConfigurationConnectionUri]" />
           </Section>
         </Settings>
       </ConfigOverride>
@@ -36,8 +50,10 @@
     <ConfigOverrides>
       <ConfigOverride Name="Config">
         <Settings>
-          <Section Name="ConnectionStrings">
-            <Parameter Name="Default" Value="[DefaultConnectionString]" />
+          <Section Name="ConfigurationConnection">
+            <Parameter Name="DatabaseName" Value="[ConfigurationConnectionDatabaseName]" />
+            <Parameter Name="Key" Value="[ConfigurationConnectionKey]" />
+            <Parameter Name="Uri" Value="[ConfigurationConnectionUri]" />
           </Section>
         </Settings>
       </ConfigOverride>
@@ -48,8 +64,10 @@
     <ConfigOverrides>
       <ConfigOverride Name="Config">
         <Settings>
-          <Section Name="ConnectionStrings">
-            <Parameter Name="Default" Value="[DefaultConnectionString]" />
+          <Section Name="ConfigurationConnection">
+            <Parameter Name="DatabaseName" Value="[ConfigurationConnectionDatabaseName]" />
+            <Parameter Name="Key" Value="[ConfigurationConnectionKey]" />
+            <Parameter Name="Uri" Value="[ConfigurationConnectionUri]" />
           </Section>
         </Settings>
       </ConfigOverride>
@@ -60,8 +78,10 @@
     <ConfigOverrides>
       <ConfigOverride Name="Config">
         <Settings>
-          <Section Name="ConnectionStrings">
-            <Parameter Name="Default" Value="[DefaultConnectionString]" />
+          <Section Name="ConfigurationConnection">
+            <Parameter Name="DatabaseName" Value="[ConfigurationConnectionDatabaseName]" />
+            <Parameter Name="Key" Value="[ConfigurationConnectionKey]" />
+            <Parameter Name="Uri" Value="[ConfigurationConnectionUri]" />
           </Section>
         </Settings>
       </ConfigOverride>

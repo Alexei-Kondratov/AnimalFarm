@@ -1,4 +1,5 @@
-﻿using AnimalFarm.Data.Transactions;
+﻿using AnimalFarm.Data.DataSources.Configuration;
+using AnimalFarm.Data.Transactions;
 using AnimalFarm.Model;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
@@ -11,22 +12,21 @@ namespace AnimalFarm.Data.DataSources
     {
         private readonly string _databaseId;
         private readonly string _key;
-        private readonly string _uriString;
+        private readonly Uri _uri;
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
-        public DocumentDbDataSource(string name)
+        public DocumentDbDataSource(string name, DocumentDbConnectionInfo connectionInfo)
         {
-            _databaseId = "AnimalFarm";
-            _key = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
-            _uriString = "https://localhost:8081";
-
             Name = name;
+            _databaseId = connectionInfo.DatabaseName;
+            _key = connectionInfo.Key;
+            _uri = connectionInfo.Uri;
         }
 
         private DocumentClient CreateClient()
         {
-            return new DocumentClient(new Uri(_uriString), _key, new ConnectionPolicy { EnableEndpointDiscovery = false });
+            return new DocumentClient(_uri, _key, new ConnectionPolicy { EnableEndpointDiscovery = false });
         }
 
         public TransactionContext CreateTransactionContext()

@@ -1,7 +1,7 @@
 ﻿using AnimalFarm.Data;
 using AnimalFarm.Data.DataSources;
+using AnimalFarm.Data.DataSources.Configuration;
 using AnimalFarm.Data.Repositories;
-using AnimalFarm.Data.Transactions;
 using AnimalFarm.Model;
 using AnimalFarm.Service;
 using AnimalFarm.Service.Utils.Tracing;
@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
@@ -22,14 +23,20 @@ namespace AnimalFarm.AuthenticationService
     /// </summary>
     internal sealed class AuthenticationService : StatelessService
     {
-        private ITransactionManager _transactionManager;
         private IRepository<UserAuthenticationInfo> _userRepository;
 
         public AuthenticationService(StatelessServiceContext context)
             : base(context)
         {
-            _transactionManager = new TransactionManager();
-            var dbDataSource = new DocumentDbDataSource("Database");
+            var configSection = context.CodePackageActivationContext.GetConfigurationPackageObject("Config").Settings.Sections["ConfigurationConnection"];
+            var connectionInfo = new DocumentDbConnectionInfo
+            {
+                DatabaseName = configSection.Parameters["DatabaseName"].Value,
+                Key = configSection.Parameters["Key"].Value,
+                Uri = new Uri(configSection.Parameters["Uri"].Value)
+            };
+
+            var dbDataSource = new DocumentDbDataSource("Database", connectionInfo);
             _userRepository = new DataSourceRepository<UserAuthenticationInfo>
                 (dbDataSource, "UserAuthenticationInfos");
         }
