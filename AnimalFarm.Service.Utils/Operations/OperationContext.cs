@@ -8,23 +8,33 @@ namespace AnimalFarm.Service.Utils.Operations
 {
     public class OperationContext
     {
-        private OperationRunner _runner; 
+        private OperationRunner _runner;
+        private CancellationTokenSource _cancellationTokenSource;
 
         public ITransaction Transaction { get; }
         public ServiceEventSource EventSource { get; }
         public CancellationToken CancellationToken { get; }
 
-        internal OperationContext(OperationRunner runner, ServiceEventSource eventSource, ITransaction transaction, CancellationToken cancellationToken)
+        internal OperationContext(OperationRunner runner, ServiceEventSource eventSource, ITransaction transaction, CancellationToken? cancellationToken = null)
         {
             _runner = runner;
             EventSource = eventSource;
             Transaction = transaction;
-            CancellationToken = cancellationToken;
+
+            _cancellationTokenSource = cancellationToken.HasValue ?
+                CancellationTokenSource.CreateLinkedTokenSource(cancellationToken.Value)
+                : new CancellationTokenSource();
+            CancellationToken = _cancellationTokenSource.Token;
         }
 
-        public async Task RunSuboperationAync(Func<OperationContext, Task> subOperation)
+        public void Cancel()
         {
-            _runner.RunAsync(subOperation, this);
+            _cancellationTokenSource.Cancel();
+        }
+
+        public Task RunSuboperationAync(Func<OperationContext, Task> subOperation)
+        {
+            return _runner.RunAsync(subOperation, this);
         }
     }
 }
