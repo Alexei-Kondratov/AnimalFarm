@@ -39,17 +39,24 @@ namespace AnimalFarm.Service.Utils.Operations
 
                 try
                 {
+                    var operationTask = operation.Delegate(operation.Context);
                     var timeoutTask = Task.Delay(TimeSpan.FromMilliseconds(operation.Timeout), operation.Context.CancellationToken);
-                    await Task.WhenAny(timeoutTask, operation.Delegate(operation.Context));
+                    await Task.WhenAny(timeoutTask, operationTask);
+
                     if (timeoutTask.IsCompleted)
                     {
                         context.EventSource.Message("Operation {0} timed out", operationRunId);
                         context.Cancel();
                         continue;
                     }
+                    else
+                    {
+                        await operationTask;
+                    }
 
                     context.EventSource.Message("Ending operation {0}", operationRunId);
                     await context.Transaction.CommitAsync();
+                    return;
                 }
                 catch (Exception ex)
                 {
