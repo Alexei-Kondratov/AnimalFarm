@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AnimalFarm.Service.Utils.Communication;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
 
@@ -17,10 +18,10 @@ namespace AnimalFarm.Service.Utils.AspNet
         {
             var headers = context.Request.Headers;
 
-            if (headers.ContainsKey("Request-Id"))
-                headers.Remove("Request-Id");
+            if (headers.ContainsKey(HeaderName.RequestId))
+                headers.Remove(HeaderName.RequestId);
 
-            headers.Add("Request-Id", Guid.NewGuid().ToString());
+            headers.Add(HeaderName.RequestId, Guid.NewGuid().ToString());
         }
 
         public async Task InvokeAsync(HttpContext context)

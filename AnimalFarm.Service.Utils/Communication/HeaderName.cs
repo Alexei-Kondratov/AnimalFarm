@@ -5,6 +5,7 @@ namespace AnimalFarm.Service.Utils.Communication
     {
         public const string RequestId = "Request-Id";
         public const string UserId = "User-Id";
+        public const string UserToken = "User-Token";
         public const string IsExternal = "External";
     }
 }

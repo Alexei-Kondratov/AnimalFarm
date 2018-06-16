@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AnimalFarm.Service
 {

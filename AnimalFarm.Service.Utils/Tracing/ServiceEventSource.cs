@@ -146,9 +146,9 @@ namespace AnimalFarm.Service.Utils.Tracing
 
         private const int ServiceRequestStopEventId = 6;
         [Event(ServiceRequestStopEventId, Level = EventLevel.Informational, Message = "Service request '{0}' finished", Keywords = Keywords.Requests)]
-        public void ServiceRequestStop(string requestTypeName, string exception = "")
+        public void ServiceRequestStop(string requestTypeName, string exception = "", string stackTrace = "")
         {
-            WriteEvent(ServiceRequestStopEventId, requestTypeName, exception);
+            WriteEvent(ServiceRequestStopEventId, requestTypeName, exception, stackTrace);
         }
         #endregion
 
