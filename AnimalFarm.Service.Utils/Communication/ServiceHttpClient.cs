@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +8,7 @@ namespace AnimalFarm.Service.Utils.Communication
     public class ServiceHttpClient : IServiceHttpClient
     {
         private readonly HttpClient _client;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IRequestContextAccessor _requestContextAccessor;
 
         public ServiceHttpClient(Uri serviceAddress)
         {
@@ -18,32 +16,21 @@ namespace AnimalFarm.Service.Utils.Communication
             _client.BaseAddress = serviceAddress;
         }
 
-        public ServiceHttpClient(Uri serviceAddress, IHttpContextAccessor httpContextAccessor)
+        public ServiceHttpClient(Uri serviceAddress, IRequestContextAccessor requestContextAccessor)
         {
             _client = new HttpClient(new HttpClientHandler(), true);
             _client.BaseAddress = serviceAddress;
-            _httpContextAccessor = httpContextAccessor;
+            _requestContextAccessor = requestContextAccessor;
         }
-        //public async Task<HttpResponseMessage> SendAsync(HttpMethod method, string path, HttpContent content, CancellationToken cancellationToken)
-        //{
-        //    var request = new HttpRequestMessage
-        //    {
-        //        RequestUri = new Uri(path),
-        //        Method = method,
-        //        Content = content
-        //    };
-
-        //    return await _client.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
-        //}
 
         private void PropagateRequestId(HttpRequestMessage message)
         {
-            if (message.Headers.Contains(Headers.RequestId) || _httpContextAccessor == null)
+            if (message.Headers.Contains(HeaderName.RequestId) || _requestContextAccessor == null)
                 return;
 
-            if (_httpContextAccessor.HttpContext.Request.Headers.TryGetValue(Headers.RequestId, out StringValues requestIds))
+            if (_requestContextAccessor.Context.RequestId != null)
             {
-                message.Headers.Add(Headers.RequestId, requestIds[0]);
+                message.Headers.Add(HeaderName.RequestId, _requestContextAccessor.Context.RequestId);
             }
         }
 
@@ -57,7 +44,5 @@ namespace AnimalFarm.Service.Utils.Communication
         {
             _client.Dispose();
         }
-
-
     }
 }

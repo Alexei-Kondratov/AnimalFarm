@@ -1,8 +1,6 @@
-﻿using AnimalFarm.Service.Utils.Communication;
-using AnimalFarm.Service.Utils.Tracing;
-using AnimalFarm.Utils.Security;
+﻿using AnimalFarm.Service.Utils.Tracing;
+using AnimalFarm.Service;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -39,12 +37,8 @@ namespace AnimalFarm.GatewayService
                                     .UseKestrel()
                                     .ConfigureServices(
                                         services => services
-                                            .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
-                                            .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
+                                            .AddAnimalFarmCommonServices()
                                             .AddSingleton<StatelessServiceContext>(serviceContext)
-                                            .AddSingleton<JwtManager>()
-                                            .AddSingleton<IServiceHttpClientFactory, ServiceHttpClientFactory>()
-                                            .AddSingleton<ServiceLocator>()
                                             .AddRouting())
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()

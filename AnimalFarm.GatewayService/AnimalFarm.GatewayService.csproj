@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AnimalFarm.Model\AnimalFarm.Model.csproj" />
     <ProjectReference Include="..\AnimalFarm.Service.Utils\AnimalFarm.Service.Utils.csproj" />
+    <ProjectReference Include="..\AnimalFarm.Service\AnimalFarm.Service.csproj" />
     <ProjectReference Include="..\AnimalFarm.Utils\AnimalFarm.Utils.csproj" />
   </ItemGroup>
 

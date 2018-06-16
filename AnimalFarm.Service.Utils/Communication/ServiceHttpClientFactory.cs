@@ -9,19 +9,19 @@ namespace AnimalFarm.Service.Utils.Communication
 {
     public class ServiceHttpClientFactory : IServiceHttpClientFactory
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IRequestContextAccessor _requestContextAccessor;
         private readonly ServiceLocator _serviceLocator;
 
-        public ServiceHttpClientFactory(ServiceLocator serviceLocator, IHttpContextAccessor httpContextAccessor)
+        public ServiceHttpClientFactory(ServiceLocator serviceLocator, IRequestContextAccessor requestContextAccessor)
         {
             _serviceLocator = serviceLocator;
-            _httpContextAccessor = httpContextAccessor;
+            _requestContextAccessor = requestContextAccessor;
         }
 
         public async Task<IServiceHttpClient> CreateAsync(ServiceType serviceType, string partitionKey, CancellationToken cancellationToken)
         {
             Uri serviceUri = await _serviceLocator.LocateServiceAsync(serviceType, partitionKey, cancellationToken);
-            return new ServiceHttpClient(serviceUri, _httpContextAccessor);
+            return new ServiceHttpClient(serviceUri, _requestContextAccessor);
         }
 
         public Task<IServiceHttpClient> CreateAsync(ServiceType service, CancellationToken cancellationToken)
@@ -32,7 +32,7 @@ namespace AnimalFarm.Service.Utils.Communication
         public async Task<IEnumerable<IServiceHttpClient>> CreateAsync(IEnumerable<ServiceType> serviceTypes, CancellationToken cancellationToken)
         {
             IEnumerable<Uri> serviceUris = await _serviceLocator.LocateServicesAsync(serviceTypes, cancellationToken);
-            return serviceUris.Select(uri => new ServiceHttpClient(uri, _httpContextAccessor)).ToArray();
+            return serviceUris.Select(uri => new ServiceHttpClient(uri, _requestContextAccessor)).ToArray();
         }
     }
 }

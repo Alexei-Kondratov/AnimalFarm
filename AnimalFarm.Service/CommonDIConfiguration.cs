@@ -2,11 +2,14 @@
 using AnimalFarm.Data.DataSources;
 using AnimalFarm.Data.DataSources.Configuration;
 using AnimalFarm.Data.Transactions;
+using AnimalFarm.Service.Utils;
+using AnimalFarm.Service.Utils.AspNet;
 using AnimalFarm.Service.Utils.Communication;
 using AnimalFarm.Service.Utils.Configuration;
 using AnimalFarm.Service.Utils.Operations;
 using AnimalFarm.Service.Utils.Tracing;
 using AnimalFarm.Utils.Configuration;
+using AnimalFarm.Utils.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -34,13 +37,15 @@ namespace AnimalFarm.Service
         public static IServiceCollection AddAnimalFarmCommonServices(this IServiceCollection serviceCollection)
         {
             return serviceCollection
-                .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
+                .AddSingleton<IRequestContextAccessor, AspNetRequestContextAccessor>()
                 .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
                 .AddSingleton<IConfigurationProvider>(CreateConfigurationProvider)
                 .AddSingleton<ITransactionManager, TransactionManager>()
                 .AddSingleton<ServiceLocator>()
                 .AddSingleton<IServiceHttpClientFactory, ServiceHttpClientFactory>()
-                .AddSingleton<OperationRunner>();
+                .AddSingleton<OperationRunner>()
+                .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
+                .AddSingleton<JwtManager>();
         }
     }
 }
