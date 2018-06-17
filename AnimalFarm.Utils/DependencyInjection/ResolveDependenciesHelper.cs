@@ -4,8 +4,13 @@ using System.Reflection;
 
 namespace AnimalFarm.Utils.DependencyInjection
 {
+    /// <summary>
+    /// Contains helper methods for resolving dependencies.
+    /// </summary>
     public static class ResolveDependenciesHelper
     {
+        #region Private methods
+
         private static Lazy<TType> LazyInitializer<TType>(IServiceProvider services)
         {
             return new Lazy<TType>(() => (TType)services.GetService(typeof(TType)), true);
@@ -44,6 +49,8 @@ namespace AnimalFarm.Utils.DependencyInjection
 
             return result;
         }
+
+        #endregion Private methods
 
         public static TType Instantiate<TType>(IServiceProvider services, params object[] additionalServices)
         {

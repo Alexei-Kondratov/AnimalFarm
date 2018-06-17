@@ -5,13 +5,17 @@ using System.Security.Claims;
 
 namespace AnimalFarm.Utils.Security
 {
+    /// <summary>
+    /// Responsible for creation and verification of Jwt tokens.
+    /// </summary>
     public class JwtManager
     {
-        private const string keyString = "bG9uZ2VycGxhY2Vob2RsZXJrZXk=";
+        // TODO: Extract the key to the configuraiton.
+        private const string _keyString = "bG9uZ2VycGxhY2Vob2RsZXJrZXk=";
 
         public string GenerateToken(string userId)
         {
-            byte[] key = Convert.FromBase64String(keyString);
+            byte[] key = Convert.FromBase64String(_keyString);
             var securityKey = new SymmetricSecurityKey(key);
             var descriptor = new SecurityTokenDescriptor
             {
@@ -33,7 +37,7 @@ namespace AnimalFarm.Utils.Security
                 var jwtToken = (JwtSecurityToken)tokenHandler.ReadToken(token);
                 if (jwtToken == null)
                     return null;
-                byte[] key = Convert.FromBase64String(keyString);
+                byte[] key = Convert.FromBase64String(_keyString);
                 var parameters = new TokenValidationParameters
                 {
                     RequireExpirationTime = true,

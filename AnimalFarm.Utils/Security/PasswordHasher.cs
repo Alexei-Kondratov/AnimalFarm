@@ -4,6 +4,9 @@ using System.Text;
 
 namespace AnimalFarm.Utils.Security
 {
+    /// <summary>
+    /// Encapsulates logic for hashing user passwords.
+    /// </summary>
     public class PasswordHasher
     {
         public string GetHash(string salt, string password)

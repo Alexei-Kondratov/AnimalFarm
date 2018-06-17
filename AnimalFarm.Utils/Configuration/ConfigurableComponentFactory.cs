@@ -4,36 +4,41 @@ using System.Linq;
 
 namespace AnimalFarm.Utils.Configuration
 {
-    public class ConfigurableComponentFactory<TComponent, TKey>
+    /// <summary>
+    /// Responsbile for providing components based on app configuration.
+    /// </summary>
+    /// <typeparam name="TComponent">The type of the components built by the factory.</typeparam>
+    /// <typeparam name="TConfigurationKey">The type of keys identifying configuration records.</typeparam>
+    public class ConfigurableComponentFactory<TComponent, TConfigurationKey>
     {
         protected readonly object _syncObj = new object();
         protected readonly IServiceProvider _serviceProvider;
-        protected readonly IEnumerable<IConfigurableComponentBuilder<TComponent, TKey>> _builders;
-        protected readonly Dictionary<TKey, TComponent> _dataSources = new Dictionary<TKey, TComponent>();
-        protected IEnumerable<IComponentConfiguration<TKey>> _configurations;
+        protected readonly IEnumerable<IConfigurableComponentBuilder<TComponent, TConfigurationKey>> _builders;
+        protected readonly Dictionary<TConfigurationKey, TComponent> _dataSources = new Dictionary<TConfigurationKey, TComponent>();
+        protected IEnumerable<IComponentConfiguration<TConfigurationKey>> _configurations;
 
-        public ConfigurableComponentFactory(IServiceProvider serviceProvider, IEnumerable<IConfigurableComponentBuilder<TComponent, TKey>> builders)
+        public ConfigurableComponentFactory(IServiceProvider serviceProvider, IEnumerable<IConfigurableComponentBuilder<TComponent, TConfigurationKey>> builders)
         {
             _serviceProvider = serviceProvider;
             _builders = builders;
         }
 
-        public void SetConfigurations(IEnumerable<IComponentConfiguration<TKey>> configurations)
+        public void SetConfigurations(IEnumerable<IComponentConfiguration<TConfigurationKey>> configurations)
         {
             _configurations = configurations;
         }
 
-        public IEnumerable<IComponentConfiguration<TKey>> Configurations => _configurations;
+        public IEnumerable<IComponentConfiguration<TConfigurationKey>> Configurations => _configurations;
 
-        public TComponent Get(TKey key)
+        public TComponent Get(TConfigurationKey key)
         {
             lock (_syncObj)
             {
                 if (_dataSources.TryGetValue(key, out TComponent existingComponent))
                     return existingComponent;
 
-                IComponentConfiguration<TKey> configuration = _configurations.First(c => c.Key.Equals(key));
-                IConfigurableComponentBuilder<TComponent, TKey> builder = _builders.First(b => b.CanBuild(configuration));
+                IComponentConfiguration<TConfigurationKey> configuration = _configurations.First(c => c.Key.Equals(key));
+                IConfigurableComponentBuilder<TComponent, TConfigurationKey> builder = _builders.First(b => b.CanBuild(configuration));
                 var dataSource = builder.Build(configuration, _serviceProvider);
                 _dataSources.Add(key, dataSource);
                 return dataSource;
