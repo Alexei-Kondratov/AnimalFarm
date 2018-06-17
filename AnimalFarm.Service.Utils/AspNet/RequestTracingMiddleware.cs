@@ -17,19 +17,20 @@ namespace AnimalFarm.Service.Utils.AspNet
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, ServiceEventSource eventTrace)
+        public async Task InvokeAsync(HttpContext context, ServiceLogger logger)
         {
-            string requestName = null;
+            string requestName = "<Undefined>";
+            string requestId = "<Undefined>";
 
             try
             {
                 if (context.Request.Headers.TryGetValue(HeaderName.RequestId, out StringValues requestIds))
                 {
-                    string requestId = requestIds[0];
+                    requestId = requestIds[0];
                     EventSource.SetCurrentThreadActivityId(Guid.Parse(requestId));
-                    requestName = $"{context.Request.Path} - {requestId}";
-                    eventTrace.ServiceRequestStart(requestName);
                 }
+
+                logger.LogRequestStart(context.Request.Path, requestId);
             }
             catch (Exception)
             { }
@@ -40,12 +41,12 @@ namespace AnimalFarm.Service.Utils.AspNet
             }
             catch (Exception e)
             {
-                ServiceEventSource.Current.ServiceRequestStop(requestName, e.Message, e.StackTrace);
+                logger.LogRequestStop(context.Request.Path, requestId, e);
                 throw;
             }
 
             if (requestName != null)
-                ServiceEventSource.Current.ServiceRequestStop(requestName);
+                logger.LogRequestStop(context.Request.Path, requestId);
         }
     }
 }

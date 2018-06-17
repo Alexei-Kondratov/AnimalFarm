@@ -29,6 +29,7 @@ namespace AnimalFarm.Service.Utils.Tracing
         {
             public const EventKeywords Requests = (EventKeywords)0x1L;
             public const EventKeywords ServiceInitialization = (EventKeywords)0x2L;
+            public const EventKeywords Exception = (EventKeywords)0x4L;
         }
         #endregion
 
@@ -134,21 +135,57 @@ namespace AnimalFarm.Service.Utils.Tracing
             WriteEvent(ServiceHostInitializationFailedEventId, exception);
         }
 
-        // A pair of events sharing the same name prefix with a "Start"/"Stop" suffix implicitly marks boundaries of an event tracing activity.
-        // These activities can be automatically picked up by debugging and profiling tools, which can compute their execution time, child activities,
-        // and other statistics.
         private const int ServiceRequestStartEventId = 5;
-        [Event(ServiceRequestStartEventId, Level = EventLevel.Informational, Message = "Service request '{0}' started", Keywords = Keywords.Requests)]
-        public void ServiceRequestStart(string requestTypeName)
+        [Event(ServiceRequestStartEventId, Level = EventLevel.Informational, Message = "Service request '{8}' to '{0}'/'{7}' started", Keywords = Keywords.Requests)]
+        public void ServiceRequestStart(
+            string serviceName,
+            string serviceTypeName,
+            long replicaOrInstanceId,
+            Guid partitionId,
+            string applicationName,
+            string applicationTypeName,
+            string nodeName,
+            string requestPath,
+            string requestId)
         {
-            WriteEvent(ServiceRequestStartEventId, requestTypeName);
+            WriteEvent(ServiceRequestStartEventId, serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName,
+                applicationTypeName, nodeName, requestPath, requestId);
         }
 
         private const int ServiceRequestStopEventId = 6;
-        [Event(ServiceRequestStopEventId, Level = EventLevel.Informational, Message = "Service request '{0}' finished", Keywords = Keywords.Requests)]
-        public void ServiceRequestStop(string requestTypeName, string exception = "", string stackTrace = "")
+        [Event(ServiceRequestStopEventId, Level = EventLevel.Informational, Message = "Service request '{8}' to '{0}'/'{7}' finished", Keywords = Keywords.Requests)]
+        public void ServiceRequestStop(
+            string serviceName,
+            string serviceTypeName,
+            long replicaOrInstanceId,
+            Guid partitionId,
+            string applicationName,
+            string applicationTypeName,
+            string nodeName,
+            string requestPath,
+            string requestId)
         {
-            WriteEvent(ServiceRequestStopEventId, requestTypeName, exception, stackTrace);
+            WriteEvent(ServiceRequestStopEventId, serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName,
+                applicationTypeName, nodeName, requestPath, requestId);
+        }
+
+        private const int ServiceRequestStopEventDueToExceptionId = 7;
+        [Event(ServiceRequestStopEventDueToExceptionId, Level = EventLevel.Informational, Message = "Service request '{8}' to '{0}'/'{7}' aborted with exception '{9}'", Keywords = Keywords.Requests | Keywords.Exception)]
+        public void ServiceRequestStopDueToException(
+            string serviceName,
+            string serviceTypeName,
+            long replicaOrInstanceId,
+            Guid partitionId,
+            string applicationName,
+            string applicationTypeName,
+            string nodeName,
+            string requestPath,
+            string requestId,
+            string exceptionMessage,
+            string stackTrace)
+        {
+            WriteEvent(ServiceRequestStopEventDueToExceptionId, serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName,
+                applicationTypeName, nodeName, requestPath, requestId, exceptionMessage, stackTrace);
         }
         #endregion
 

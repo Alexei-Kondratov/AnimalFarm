@@ -38,7 +38,7 @@ namespace AnimalFarm.GatewayService
                                     .ConfigureServices(
                                         services => services
                                             .AddAnimalFarmCommonServices()
-                                            .AddSingleton<StatelessServiceContext>(serviceContext)
+                                            .AddSingleton<ServiceContext>(serviceContext)
                                             .AddSingleton<RequestForwarder>()
                                             .AddRouting())
                                     .UseContentRoot(Directory.GetCurrentDirectory())

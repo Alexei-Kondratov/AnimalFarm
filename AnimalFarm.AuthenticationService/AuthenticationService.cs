@@ -45,7 +45,7 @@ namespace AnimalFarm.AuthenticationService
         {
             services
                 .AddAnimalFarmCommonServices()
-                .AddSingleton<StatelessServiceContext>(context)
+                .AddSingleton<ServiceContext>(context)
                 .AddSingleton<IRepository<UserAuthenticationInfo>>(_userRepository)
                 .AddSingleton<PasswordHasher>(new PasswordHasher())
                 .AddSingleton<JwtManager>(new JwtManager());

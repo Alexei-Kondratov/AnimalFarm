@@ -37,15 +37,16 @@ namespace AnimalFarm.Service
         public static IServiceCollection AddAnimalFarmCommonServices(this IServiceCollection serviceCollection)
         {
             return serviceCollection
-                .AddSingleton<IRequestContextAccessor, AspNetRequestContextAccessor>()
-                .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
                 .AddSingleton<IConfigurationProvider>(CreateConfigurationProvider)
                 .AddSingleton<ITransactionManager, TransactionManager>()
+                .AddSingleton<IRequestContextAccessor, AspNetRequestContextAccessor>()
                 .AddSingleton<ServiceLocator>()
                 .AddSingleton<IServiceHttpClientFactory, ServiceHttpClientFactory>()
                 .AddSingleton<OperationRunner>()
                 .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
-                .AddSingleton<JwtManager>();
+                .AddSingleton<JwtManager>()
+                .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
+                .AddSingleton<ServiceLogger>();
         }
     }
 }

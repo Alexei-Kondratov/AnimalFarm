@@ -41,7 +41,7 @@ namespace AnimalFarm.AdminService
                                             .AddAnimalFarmCommonServices()
                                             .AddTransient<SeedData>()
                                             .AddSingleton<IDataSeeder, DocumentDBSeeder>()
-                                            .AddSingleton<StatelessServiceContext>(serviceContext))
+                                            .AddSingleton<ServiceContext>(serviceContext))
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)
