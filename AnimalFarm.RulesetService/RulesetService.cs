@@ -46,7 +46,7 @@ namespace AnimalFarm.RulesetService
         {
             var rulesetId = (await scheduleProvider.GetActiveRulesetRecordAsync(context.Transaction, DateTime.UtcNow)).RulesetId;
             var ruleset = await rulesets.ByIdAsync(context.Transaction, rulesetId, rulesetId);
-            context.EventSource.ServiceMessage(Context, $"Preloaded {ruleset.Id}");
+            context.Logger.Log($"Preloaded ruleset '{ruleset.Id}'");
         }
 
         protected override async Task RunAsync(CancellationToken cancellationToken)

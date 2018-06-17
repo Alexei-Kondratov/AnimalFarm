@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 
 namespace AnimalFarm.Service.Utils.Tracing
 {
-    [EventSource(Name = "AnimalFarm")]
-    public sealed class ServiceEventSource : EventSource
+    public sealed partial class ServiceEventSource : EventSource
     {
         static ServiceEventSource()
         {
@@ -15,23 +14,7 @@ namespace AnimalFarm.Service.Utils.Tracing
             Task.Run(() => { });
         }
 
-        private static readonly Lazy<ServiceEventSource> _current = new Lazy<ServiceEventSource>(() => new ServiceEventSource(), true);
-
-        public static ServiceEventSource Current => _current.Value;
-
         private ServiceEventSource() : base() { }
-
-        #region Keywords
-        // Event keywords can be used to categorize events. 
-        // Each keyword is a bit flag. A single event can be associated with multiple keywords (via EventAttribute.Keywords property).
-        // Keywords must be defined as a public class named 'Keywords' inside EventSource that uses them.
-        public static class Keywords
-        {
-            public const EventKeywords Requests = (EventKeywords)0x1L;
-            public const EventKeywords ServiceInitialization = (EventKeywords)0x2L;
-            public const EventKeywords Exception = (EventKeywords)0x4L;
-        }
-        #endregion
 
         #region Events
         // Define an instance method for each event you want to record and apply an [Event] attribute to it.
@@ -134,60 +117,11 @@ namespace AnimalFarm.Service.Utils.Tracing
         {
             WriteEvent(ServiceHostInitializationFailedEventId, exception);
         }
-
-        private const int ServiceRequestStartEventId = 5;
-        [Event(ServiceRequestStartEventId, Level = EventLevel.Informational, Message = "Service request '{8}' to '{0}'/'{7}' started", Keywords = Keywords.Requests)]
-        public void ServiceRequestStart(
-            string serviceName,
-            string serviceTypeName,
-            long replicaOrInstanceId,
-            Guid partitionId,
-            string applicationName,
-            string applicationTypeName,
-            string nodeName,
-            string requestPath,
-            string requestId)
-        {
-            WriteEvent(ServiceRequestStartEventId, serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName,
-                applicationTypeName, nodeName, requestPath, requestId);
-        }
-
-        private const int ServiceRequestStopEventId = 6;
-        [Event(ServiceRequestStopEventId, Level = EventLevel.Informational, Message = "Service request '{8}' to '{0}'/'{7}' finished", Keywords = Keywords.Requests)]
-        public void ServiceRequestStop(
-            string serviceName,
-            string serviceTypeName,
-            long replicaOrInstanceId,
-            Guid partitionId,
-            string applicationName,
-            string applicationTypeName,
-            string nodeName,
-            string requestPath,
-            string requestId)
-        {
-            WriteEvent(ServiceRequestStopEventId, serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName,
-                applicationTypeName, nodeName, requestPath, requestId);
-        }
-
-        private const int ServiceRequestStopEventDueToExceptionId = 7;
-        [Event(ServiceRequestStopEventDueToExceptionId, Level = EventLevel.Informational, Message = "Service request '{8}' to '{0}'/'{7}' aborted with exception '{9}'", Keywords = Keywords.Requests | Keywords.Exception)]
-        public void ServiceRequestStopDueToException(
-            string serviceName,
-            string serviceTypeName,
-            long replicaOrInstanceId,
-            Guid partitionId,
-            string applicationName,
-            string applicationTypeName,
-            string nodeName,
-            string requestPath,
-            string requestId,
-            string exceptionMessage,
-            string stackTrace)
-        {
-            WriteEvent(ServiceRequestStopEventDueToExceptionId, serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName,
-                applicationTypeName, nodeName, requestPath, requestId, exceptionMessage, stackTrace);
-        }
+           
         #endregion
+
+
+
 
         #region Private methods
         private static long GetReplicaOrInstanceId(ServiceContext context)

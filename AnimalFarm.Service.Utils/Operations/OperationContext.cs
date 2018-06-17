@@ -12,13 +12,13 @@ namespace AnimalFarm.Service.Utils.Operations
         private CancellationTokenSource _cancellationTokenSource;
 
         public ITransaction Transaction { get; }
-        public ServiceEventSource EventSource { get; }
+        public ILogger Logger { get; }
         public CancellationToken CancellationToken { get; }
 
-        internal OperationContext(OperationRunner runner, ServiceEventSource eventSource, ITransaction transaction, CancellationToken? cancellationToken = null)
+        internal OperationContext(OperationRunner runner, ILogger logger, ITransaction transaction, CancellationToken? cancellationToken = null)
         {
             _runner = runner;
-            EventSource = eventSource;
+            Logger = logger;
             Transaction = transaction;
 
             _cancellationTokenSource = cancellationToken.HasValue ?

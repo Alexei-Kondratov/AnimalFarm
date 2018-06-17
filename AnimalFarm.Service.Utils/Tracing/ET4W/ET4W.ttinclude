@@ -88,7 +88,7 @@ namespace <#= nameSpace #>
 		public void <#= eventDef.Name #>(<#= String.Join(", ", 
 		Util.GetCombinedParameters(eventDef, eventDefinitions, EventCombinedParams.NonGenerated).Select(cp => Util.GetParamSignature(cp.Type, cp.Name))) #>)
 		{
-			<#= eventSourceClassName #>.Log.<#= eventDef.Name #>(<#= String.Join(", ", 
+			<#= eventSourceClassName #>.Current.<#= eventDef.Name #>(<#= String.Join(", ", 
 					Util.GetCombinedParameters(eventDef, eventDefinitions, EventCombinedParams.Both).Select(Util.GetEtwParamCall)) #>);
 		}
 <#+ } #>
@@ -96,10 +96,11 @@ namespace <#= nameSpace #>
 
 	//event source
 	[EventSource(Name = "<#= eventDefinitions.SourceName #>")]
-	public sealed class <#= eventSourceClassName #> : <#= baseTypeFullyQualifiedName #>
+	public sealed partial class <#= eventSourceClassName #> : <#= baseTypeFullyQualifiedName #>
 	{
-		//static log property for easy access
-		public static readonly <#= eventSourceClassName #> Log = new <#= eventSourceClassName #>();
+	    private static readonly Lazy<ServiceEventSource> _current = new Lazy<ServiceEventSource>(() => new ServiceEventSource(), true);
+
+        public static ServiceEventSource Current => _current.Value;
 
 		//event keywords
 		public sealed class Keywords

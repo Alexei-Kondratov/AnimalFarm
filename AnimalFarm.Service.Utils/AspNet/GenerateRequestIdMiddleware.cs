@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace AnimalFarm.Service.Utils.AspNet
 {
+    /// <summary>
+    /// ASP NET middleware responsible for generating ids for incoming requests.
+    /// </summary>
     public class GenerateRequestIdMiddleware
     {
         private readonly RequestDelegate _next;

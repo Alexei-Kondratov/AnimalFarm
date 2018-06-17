@@ -9,20 +9,20 @@ namespace AnimalFarm.Service.Utils.Operations
 {
     public class OperationRunner
     {
-        private readonly ServiceEventSource _eventSource;
+        private readonly ILogger _logger;
         private readonly IServiceProvider _serviceProvider;
         private readonly ITransactionManager _transactionManager;
 
-        public OperationRunner(ServiceEventSource eventSource, IServiceProvider serviceProvider, ITransactionManager transactionManager)
+        public OperationRunner(ILogger logger, IServiceProvider serviceProvider, ITransactionManager transactionManager)
         {
-            _eventSource = eventSource;
+            _logger = logger;
             _serviceProvider = serviceProvider;
             _transactionManager = transactionManager;
         }
 
         private OperationContext GetNewContext(CancellationToken? cancellationToken)
         {
-            return new OperationContext(this, _eventSource, _transactionManager.CreateTransaction(), cancellationToken);
+            return new OperationContext(this, _logger, _transactionManager.CreateTransaction(), cancellationToken);
         }
 
         private async Task RunAsync(Operation operation)
@@ -31,7 +31,7 @@ namespace AnimalFarm.Service.Utils.Operations
             var context = operation.Context;
 
             string operationRunId = Guid.NewGuid().ToString();
-            context.EventSource.Message("Starting operation {0}", operationRunId);
+            _logger.LogOperationStart(operationRunId);
 
             while (true)
             {
@@ -45,7 +45,7 @@ namespace AnimalFarm.Service.Utils.Operations
 
                     if (timeoutTask.IsCompleted)
                     {
-                        context.EventSource.Message("Operation {0} timed out", operationRunId);
+                        _logger.LogOperationTimeout(operationRunId);
                         context.Cancel();
                         continue;
                     }
@@ -54,7 +54,7 @@ namespace AnimalFarm.Service.Utils.Operations
                         await operationTask;
                     }
 
-                    context.EventSource.Message("Ending operation {0}", operationRunId);
+                    _logger.LogOperationStop(operationRunId);
                     await context.Transaction.CommitAsync();
                     return;
                 }
@@ -63,16 +63,16 @@ namespace AnimalFarm.Service.Utils.Operations
                     if (ex is OperationCanceledException)
                         throw;
 
-                    context.EventSource.Message("Operation {0} failed: {1}", operationRunId, ex.Message);
+                    _logger.LogOperationException(operationRunId, ex);
 
                     retriesCount++;
                     if (retriesCount < operation.Retries)
                     {
-                        operation.Context.EventSource.Message("Retrying operation {0}", operationRunId);
+                        _logger.LogOperationRetry(operationRunId, retriesCount, operation.Retries);
                         continue;
                     }
 
-                    context.EventSource.Message("Ending operation {0}", operationRunId);
+                    _logger.LogOperationStop(operationRunId);
                     if (operation.IsCritical)
                         throw;
                     else

@@ -46,7 +46,7 @@ namespace AnimalFarm.Service
                 .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
                 .AddSingleton<JwtManager>()
                 .AddSingleton<ServiceEventSource>(ServiceEventSource.Current)
-                .AddSingleton<ServiceLogger>();
+                .AddSingleton<ILogger, ServiceLogger>();
         }
     }
 }

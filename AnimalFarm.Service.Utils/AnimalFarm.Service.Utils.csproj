@@ -18,4 +18,32 @@
     <ProjectReference Include="..\AnimalFarm.Utils\AnimalFarm.Utils.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Tracing\ET4W\ET4W.ttinclude">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ET4W.cs</LastGenOutput>
+    </None>
+    <None Update="Tracing\ServiceEventSource_Events.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ServiceEventSource_Events.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Tracing\ET4W\ET4W.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ET4W.ttinclude</DependentUpon>
+    </Compile>
+    <Compile Update="Tracing\ServiceEventSource_Events.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ServiceEventSource_Events.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>

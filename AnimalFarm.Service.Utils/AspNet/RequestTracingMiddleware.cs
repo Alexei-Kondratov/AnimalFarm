@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace AnimalFarm.Service.Utils.AspNet
 {
+    /// <summary>
+    /// ASP NET middleware responsible for tracing incoming service requests.
+    /// </summary>
     public class RequestTracingMiddleware
     {
         private readonly RequestDelegate _next;
@@ -17,7 +20,7 @@ namespace AnimalFarm.Service.Utils.AspNet
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, ServiceLogger logger)
+        public async Task InvokeAsync(HttpContext context, ILogger logger)
         {
             string requestName = "<Undefined>";
             string requestId = "<Undefined>";

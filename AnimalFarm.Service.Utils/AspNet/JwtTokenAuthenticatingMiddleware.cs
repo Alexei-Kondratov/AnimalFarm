@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace AnimalFarm.Service.Utils.AspNet
 {
+    /// <summary>
+    /// ASP NET middleware responsible for authenticating incoming based on JWT tokens.
+    /// </summary>
     public class JwtTokenAuthenticatingMiddleware
     {
         private readonly RequestDelegate _next;

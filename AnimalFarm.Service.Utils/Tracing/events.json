@@ -1,0 +1,175 @@
+﻿{
+  "$schema": "ET4W/events-schema.json",
+  "class": "Service",
+  "sourceName": "AnimalFarm",
+  "keywords": [ "Exception", "ServiceInitialization", "Request", "Operation" ],
+  "commonParameters": [
+    {
+      "name": "serviceName",
+      "type": "String"
+    },
+    {
+      "name": "serviceTypeName",
+      "type": "String"
+    },
+    {
+      "name": "replicaOrInstanceId",
+      "type": "Int64"
+    },
+    {
+      "name": "partitionId",
+      "type": "GUID"
+    },
+    {
+      "name": "applicationName",
+      "type": "String"
+    },
+    {
+      "name": "applicationTypeName",
+      "type": "String"
+    },
+    {
+      "name": "nodeName",
+      "type": "String"
+    },
+    {
+      "name": "requestId",
+      "type": "String"
+    },
+    {
+      "name": "userId",
+      "type": "String"
+    }
+  ],
+  "events": [
+    {
+      "id": 5,
+      "name": "ServiceRequestStarted",
+      "level": "Informational",
+      "keywords": [ "Request" ],
+      "message": "Service request '{7}' by user '{8}' to '{0}'/'{9}' started",
+      "parameters": [
+        {
+          "name": "requestPath",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "ServiceRequestStopped",
+      "level": "Informational",
+      "keywords": [ "Request" ],
+      "message": "Service request '{7}' by user '{8}' to '{0}'/'{9}' stoped",
+      "parameters": [
+        {
+          "name": "requestPath",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "ServiceRequestFailed",
+      "level": "Error",
+      "keywords": [ "Request" ],
+      "message": "Service request '{7}' by user '{8}' to '{0}'/'{9}' failed with exception '{10}'",
+      "parameters": [
+        {
+          "name": "requestPath",
+          "type": "String"
+        },
+        {
+          "name": "exceptionMessage",
+          "type": "String"
+        },
+        {
+          "name": "stackTrace",
+          "type": "String"
+        }
+      ]
+    },
+
+    {
+      "id": 8,
+      "name": "OperationStarted",
+      "level": "Error",
+      "keywords": [ "Operation" ],
+      "message": "Operation '{9}' started in the scope of request '{7}'",
+      "parameters": [
+        {
+          "name": "operationRunId",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "OperationStopped",
+      "level": "Error",
+      "keywords": [ "Operation" ],
+      "message": "Operation '{9}' stopped in the scope of request '{7}'",
+      "parameters": [
+        {
+          "name": "operationRunId",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "OperationTimedOut",
+      "level": "Error",
+      "keywords": [ "Operation" ],
+      "message": "Operation '{9}' timed out",
+      "parameters": [
+        {
+          "name": "operationRunId",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "OperationFailed",
+      "level": "Error",
+      "keywords": [ "Operation" ],
+      "message": "Operation '{9}' failed with exception '{10}'",
+      "parameters": [
+        {
+          "name": "operationRunId",
+          "type": "String"
+        },
+        {
+          "name": "exceptionMessage",
+          "type": "String"
+        },
+        {
+          "name": "stackTrace",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "OperationRetried",
+      "level": "Error",
+      "keywords": [ "Operation" ],
+      "message": "Operation '{9}' is being retried (attempt {10} of {11})",
+      "parameters": [
+        {
+          "name": "operationRunId",
+          "type": "String"
+        },
+        {
+          "name": "retryAttempt",
+          "type": "Int32"
+        },
+        {
+          "name": "totalAttempts",
+          "type": "Int32"
+        }
+      ]
+    }
+  ]
+}
