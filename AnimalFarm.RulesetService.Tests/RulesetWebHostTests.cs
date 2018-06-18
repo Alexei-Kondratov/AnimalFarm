@@ -1,17 +1,19 @@
+using AnimalFarm.Data;
+using AnimalFarm.Logic.RulesetManagement;
+using AnimalFarm.Model;
+using AnimalFarm.Model.Tests.Builders;
+using AnimalFarm.Service;
+using AnimalFarm.Service.Utils.Tracing;
+using AnimalFarm.Utils.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using System.Net.Http;
-using Xunit;
-using AnimalFarm.Data;
-using AnimalFarm.Model;
 using Newtonsoft.Json;
-using AnimalFarm.Model.Tests.Builders;
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
-using AnimalFarm.Logic.RulesetManagement;
-using AnimalFarm.Service.Utils.Tracing;
+using Xunit;
 
 namespace AnimalFarm.RulesetService.Tests
 {
@@ -51,7 +53,8 @@ namespace AnimalFarm.RulesetService.Tests
 
             var server = new TestServer(new WebHostBuilder()
                 .ConfigureServices(services => services
-                    .AddSingleton(ServiceEventSource.Current)
+                    .AddAnimalFarmCommonServices()
+                    .ReplaceSingleton<ILogger>(new Mock<ILogger>().Object)
                     .AddSingleton(transactionManagerMock.Object)
                     .AddSingleton(rulesetRepositoryMock.Object)
                     .AddSingleton(scheduleRepositoryMock.Object)

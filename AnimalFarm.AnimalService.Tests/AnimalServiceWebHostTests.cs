@@ -3,7 +3,9 @@ using AnimalFarm.Logic.RulesetManagement;
 using AnimalFarm.Model;
 using AnimalFarm.Model.Events;
 using AnimalFarm.Model.Tests.Builders;
+using AnimalFarm.Service;
 using AnimalFarm.Service.Utils.Tracing;
+using AnimalFarm.Utils.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,8 +23,6 @@ namespace AnimalFarm.AnimalService.Tests
 {
     public class AnimalServiceWebHostTests
     {
-        private Mock<ITransaction> _transactionMock = new Mock<ITransaction>();
-        private Mock<ITransactionManager> _transactionManagerMock = new Mock<ITransactionManager>();
         private Mock<IRepository<Animal>> _animalRepositoryMock = new Mock<IRepository<Animal>>();
         private Mock<IRepository<Ruleset>> _rulesetRepositoryMock = new Mock<IRepository<Ruleset>>();
         private Mock<IRepository<VersionSchedule>> _scheduleRepositoryMock = new Mock<IRepository<VersionSchedule>>();
@@ -31,8 +31,9 @@ namespace AnimalFarm.AnimalService.Tests
         {
             var server = new TestServer(new WebHostBuilder()
                 .ConfigureServices(services => services
+                    .AddAnimalFarmCommonServices()
+                    .ReplaceSingleton<ILogger>(new Mock<ILogger>().Object)
                     .AddSingleton(ServiceEventSource.Current)
-                    .AddSingleton(_transactionManagerMock.Object)
                     .AddSingleton(_animalRepositoryMock.Object)
                     .AddSingleton(_rulesetRepositoryMock.Object)
                     .AddSingleton(_scheduleRepositoryMock)
@@ -52,8 +53,7 @@ namespace AnimalFarm.AnimalService.Tests
                 }
             };
 
-            _transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(_transactionMock.Object);
-            _scheduleRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, rulesetSchedule.BranchId, rulesetSchedule.BranchId)).ReturnsAsync(rulesetSchedule);
+            _scheduleRepositoryMock.Setup(_ => _.ByIdAsync(It.IsAny<ITransaction>(), rulesetSchedule.BranchId, rulesetSchedule.BranchId)).ReturnsAsync(rulesetSchedule);
         }
 
         [Fact]
@@ -77,8 +77,8 @@ namespace AnimalFarm.AnimalService.Tests
                 .WithAnimalType("PigId")
                 .And.Finish;
 
-            _animalRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, animal.UserId, animal.Id)).ReturnsAsync(animal);
-            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, ruleset.Id, ruleset.Id)).ReturnsAsync(ruleset);
+            _animalRepositoryMock.Setup(_ => _.ByIdAsync(It.IsAny<ITransaction>(), animal.UserId, animal.Id)).ReturnsAsync(animal);
+            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(It.IsAny<ITransaction>(), ruleset.Id, ruleset.Id)).ReturnsAsync(ruleset);
 
             var client = CreateTestClient();
 
@@ -137,10 +137,10 @@ namespace AnimalFarm.AnimalService.Tests
                 }
             };
 
-            _animalRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, animal.UserId, animal.Id)).ReturnsAsync(animal);
-            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, oldRuleset.Id, oldRuleset.Id)).ReturnsAsync(oldRuleset);
-            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, newRuleset.Id, newRuleset.Id)).ReturnsAsync(newRuleset);
-            _scheduleRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, rulesetSchedule.BranchId, rulesetSchedule.BranchId)).ReturnsAsync(rulesetSchedule);
+            _animalRepositoryMock.Setup(_ => _.ByIdAsync(It.IsAny<ITransaction>(), animal.UserId, animal.Id)).ReturnsAsync(animal);
+            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(It.IsAny<ITransaction>(), oldRuleset.Id, oldRuleset.Id)).ReturnsAsync(oldRuleset);
+            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(It.IsAny<ITransaction>(), newRuleset.Id, newRuleset.Id)).ReturnsAsync(newRuleset);
+            _scheduleRepositoryMock.Setup(_ => _.ByIdAsync(It.IsAny<ITransaction>(), rulesetSchedule.BranchId, rulesetSchedule.BranchId)).ReturnsAsync(rulesetSchedule);
             
             var client = CreateTestClient();
 
@@ -179,10 +179,9 @@ namespace AnimalFarm.AnimalService.Tests
 
             Animal newAnimal = null;
             Action<ITransaction, Animal> setNewAnimal = (tx, a) => newAnimal = a;
-            _transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(_transactionMock.Object);
-            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, ruleset.Id, ruleset.Id)).ReturnsAsync(ruleset);
-            _animalRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, e.OwnerUserId, e.AnimalId)).ReturnsAsync((Animal)null);
-            _animalRepositoryMock.Setup(_ => _.UpsertAsync(_transactionMock.Object, It.IsAny<Animal>())).Callback(setNewAnimal)
+            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(It.IsAny<ITransaction>(), ruleset.Id, ruleset.Id)).ReturnsAsync(ruleset);
+            _animalRepositoryMock.Setup(_ => _.ByIdAsync(It.IsAny<ITransaction>(), e.OwnerUserId, e.AnimalId)).ReturnsAsync((Animal)null);
+            _animalRepositoryMock.Setup(_ => _.UpsertAsync(It.IsAny<ITransaction>(), It.IsAny<Animal>())).Callback(setNewAnimal)
                 .Returns(Task.CompletedTask);
 
             var client = CreateTestClient();
@@ -239,10 +238,9 @@ namespace AnimalFarm.AnimalService.Tests
 
             Animal updatedAnimal = null;
             Action<ITransaction, Animal> setNewAnimal = (tx, a) => updatedAnimal = a;
-            _transactionManagerMock.Setup(_ => _.CreateTransaction()).Returns(_transactionMock.Object);
-            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, ruleset.Id, ruleset.Id)).ReturnsAsync(ruleset);
-            _animalRepositoryMock.Setup(_ => _.ByIdAsync(_transactionMock.Object, e.OwnerUserId, e.AnimalId)).ReturnsAsync(animal);
-            _animalRepositoryMock.Setup(_ => _.UpsertAsync(_transactionMock.Object, It.IsAny<Animal>())).Callback(setNewAnimal)
+            _rulesetRepositoryMock.Setup(_ => _.ByIdAsync(It.IsAny<ITransaction>(), ruleset.Id, ruleset.Id)).ReturnsAsync(ruleset);
+            _animalRepositoryMock.Setup(_ => _.ByIdAsync(It.IsAny<ITransaction>(), e.OwnerUserId, e.AnimalId)).ReturnsAsync(animal);
+            _animalRepositoryMock.Setup(_ => _.UpsertAsync(It.IsAny<ITransaction>(), It.IsAny<Animal>())).Callback(setNewAnimal)
                 .Returns(Task.CompletedTask);
 
             var client = CreateTestClient();

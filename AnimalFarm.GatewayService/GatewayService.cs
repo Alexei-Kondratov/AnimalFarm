@@ -8,6 +8,7 @@ using Microsoft.ServiceFabric.Services.Runtime;
 using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 
 namespace AnimalFarm.GatewayService
 {
@@ -40,7 +41,13 @@ namespace AnimalFarm.GatewayService
                                             .AddAnimalFarmCommonServices()
                                             .AddSingleton<ServiceContext>(serviceContext)
                                             .AddSingleton<RequestForwarder>()
-                                            .AddRouting())
+                                            .AddSingleton<CorsPolicy>(
+                                                new CorsPolicyBuilder().AllowAnyOrigin()
+                                                       .AllowAnyMethod()
+                                                       .AllowAnyHeader().Build()
+                                            )
+                                            .AddRouting()
+                                            .AddCors())
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)

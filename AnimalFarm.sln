@@ -59,7 +59,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimalFarm.AdminService", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimalFarm.GatewayService.Tests", "AnimalFarm.GatewayService.Tests\AnimalFarm.GatewayService.Tests.csproj", "{4EA8B08F-5B77-4992-802E-E5A123799323}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalFarm.Data.Seed", "AnimalFarm.Data.Seed\AnimalFarm.Data.Seed.csproj", "{0E398C49-A31D-4320-8A04-3BBEFBDC5BDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimalFarm.Data.Seed", "AnimalFarm.Data.Seed\AnimalFarm.Data.Seed.csproj", "{0E398C49-A31D-4320-8A04-3BBEFBDC5BDD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalFarm.WebUI", "AnimalFarm.WebUI\AnimalFarm.WebUI.csproj", "{F5B09BE1-4D73-4B42-ADF8-785A7F5E2C31}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -263,6 +265,14 @@ Global
 		{0E398C49-A31D-4320-8A04-3BBEFBDC5BDD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0E398C49-A31D-4320-8A04-3BBEFBDC5BDD}.Release|x64.ActiveCfg = Release|Any CPU
 		{0E398C49-A31D-4320-8A04-3BBEFBDC5BDD}.Release|x64.Build.0 = Release|Any CPU
+		{F5B09BE1-4D73-4B42-ADF8-785A7F5E2C31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5B09BE1-4D73-4B42-ADF8-785A7F5E2C31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5B09BE1-4D73-4B42-ADF8-785A7F5E2C31}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F5B09BE1-4D73-4B42-ADF8-785A7F5E2C31}.Debug|x64.Build.0 = Debug|Any CPU
+		{F5B09BE1-4D73-4B42-ADF8-785A7F5E2C31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5B09BE1-4D73-4B42-ADF8-785A7F5E2C31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5B09BE1-4D73-4B42-ADF8-785A7F5E2C31}.Release|x64.ActiveCfg = Release|Any CPU
+		{F5B09BE1-4D73-4B42-ADF8-785A7F5E2C31}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

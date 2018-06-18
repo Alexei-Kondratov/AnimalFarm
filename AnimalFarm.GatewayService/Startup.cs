@@ -41,7 +41,8 @@ namespace AnimalFarm.GatewayService
 
             app.UseMiddleware<GenerateRequestIdMiddleware>()
                 .UseMiddleware<JwtTokenAuthenticatingMiddleware>()
-                .UseMiddleware<RequestTracingMiddleware>();
+                .UseMiddleware<RequestTracingMiddleware>()
+                .UseMiddleware<CorsApplyingMiddleware>();
 
             app.UseRouter(BuildRoutes);
         }

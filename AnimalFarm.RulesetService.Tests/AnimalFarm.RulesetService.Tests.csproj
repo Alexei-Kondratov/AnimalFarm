@@ -20,6 +20,8 @@
     <ProjectReference Include="..\AnimalFarm.Model.Tests.Builders\AnimalFarm.Model.Tests.Builders.csproj" />
     <ProjectReference Include="..\AnimalFarm.Model\AnimalFarm.Model.csproj" />
     <ProjectReference Include="..\AnimalFarm.RulesetService\AnimalFarm.RulesetService.csproj" />
+    <ProjectReference Include="..\AnimalFarm.Service\AnimalFarm.Service.csproj" />
+    <ProjectReference Include="..\AnimalFarm.Utils\AnimalFarm.Utils.csproj" />
   </ItemGroup>
 
 </Project>

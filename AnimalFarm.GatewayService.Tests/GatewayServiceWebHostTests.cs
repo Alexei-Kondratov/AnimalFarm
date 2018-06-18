@@ -11,11 +11,25 @@ using Moq;
 using AnimalFarm.Service.Utils;
 using System.Threading;
 using AnimalFarm.Service.Utils.Tracing;
+using AnimalFarm.Service;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using AnimalFarm.Utils.DependencyInjection;
 
 namespace AnimalFarm.GatewayService.Tests
 {
     public class GatewayServiceWebHostTests
     {
+        private void ConfigureTestServices(IServiceCollection services)
+        {
+            services
+                .AddAnimalFarmCommonServices()
+                .AddCors()
+                .AddRouting()
+                .ReplaceSingleton<ILogger>(new Mock<ILogger>().Object)
+                .AddSingleton<RequestForwarder>()
+                .AddSingleton<CorsPolicy>(new CorsPolicy());
+        }
+
         [Fact]
         public void ForwardsLogin()
         {
@@ -26,13 +40,12 @@ namespace AnimalFarm.GatewayService.Tests
             serviceHttpClientFactoryMock.Setup(_ => _.CreateAsync(ServiceType.Authentication, null, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(serviceHttpClientMock.Object);
 
-
             var server = new TestServer(new WebHostBuilder()
-                .ConfigureServices(services => services
-                    .AddSingleton<JwtManager>()
-                    .AddSingleton(ServiceEventSource.Current)
-                    .AddSingleton<IServiceHttpClientFactory>(serviceHttpClientFactoryMock.Object)
-                    .AddRouting())
+                .ConfigureServices(services =>
+                {
+                    ConfigureTestServices(services);
+                    services.AddSingleton<IServiceHttpClientFactory>(serviceHttpClientFactoryMock.Object);
+                })
                .UseStartup<Startup>());
             var loginData = new { Login = "Login", Password = "Password" };
 
@@ -57,11 +70,11 @@ namespace AnimalFarm.GatewayService.Tests
 
 
             var server = new TestServer(new WebHostBuilder()
-                .ConfigureServices(services => services
-                    .AddSingleton(ServiceEventSource.Current)
-                    .AddSingleton<JwtManager>()
-                    .AddSingleton<IServiceHttpClientFactory>(serviceHttpClientFactoryMock.Object)
-                    .AddRouting())
+                .ConfigureServices(services =>
+                {
+                    ConfigureTestServices(services);
+                    services.AddSingleton<IServiceHttpClientFactory>(serviceHttpClientFactoryMock.Object);
+                })
                .UseStartup<Startup>());
 
             server.CreateRequest("ruleset/db5e60ce-f7d9-47d8-9c74-0231190ba3df").GetAsync().GetAwaiter().GetResult();
@@ -81,11 +94,11 @@ namespace AnimalFarm.GatewayService.Tests
                 .ReturnsAsync(serviceHttpClientMock.Object);
 
             var server = new TestServer(new WebHostBuilder()
-                .ConfigureServices(services => services
-                    .AddSingleton(ServiceEventSource.Current)
-                    .AddSingleton<JwtManager>()
-                    .AddSingleton<IServiceHttpClientFactory>(serviceHttpClientFactoryMock.Object)
-                    .AddRouting())
+                .ConfigureServices(services => 
+                {
+                    ConfigureTestServices(services);
+                    services.AddSingleton<IServiceHttpClientFactory>(serviceHttpClientFactoryMock.Object);
+                })
                .UseStartup<Startup>());
 
             server.CreateRequest("ruleset").GetAsync().GetAwaiter().GetResult();
