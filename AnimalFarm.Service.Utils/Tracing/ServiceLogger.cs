@@ -80,7 +80,7 @@ namespace AnimalFarm.Service.Utils.Tracing
 
         #region Public methods: Log operation
         
-        public void LogOperationStart(string operationRunId)
+        public void LogOperationStart(string operationRunId, string operationName)
         {
             RequestContext requestContext = _requestContextAccessor?.Context;
             string requestId = requestContext?.RequestId ?? String.Empty;
@@ -96,7 +96,8 @@ namespace AnimalFarm.Service.Utils.Tracing
                 _serviceContext.NodeContext.NodeName,
                 requestId,
                 userId,
-                operationRunId);
+                operationRunId,
+                operationName);
         }
 
         public void LogOperationStop(string operationRunId)

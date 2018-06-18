@@ -7,7 +7,7 @@ namespace AnimalFarm.Service.Utils.Tracing
         void Log(string message, params object[] args);
         void LogOperationException(string operationRunId, Exception ex);
         void LogOperationRetry(string operationRunId, int retryAttempt, int totalRetries);
-        void LogOperationStart(string operationRunId);
+        void LogOperationStart(string operationRunId, string operationName);
         void LogOperationStop(string operationRunId);
         void LogOperationTimeout(string operationRunId);
         void LogRequestStart(string requestPath, string requestId);

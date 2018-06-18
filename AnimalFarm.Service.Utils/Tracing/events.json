@@ -95,10 +95,14 @@
       "name": "OperationStarted",
       "level": "Error",
       "keywords": [ "Operation" ],
-      "message": "Operation '{9}' started in the scope of request '{7}'",
+      "message": "Operation '{9}' ('{10}') started in the scope of request '{7}'",
       "parameters": [
         {
           "name": "operationRunId",
+          "type": "String"
+        },
+        {
+          "name": "operationName",
           "type": "String"
         }
       ]

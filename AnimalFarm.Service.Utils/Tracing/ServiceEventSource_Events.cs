@@ -6,7 +6,7 @@
 // If you wish to customize the code below, please extend the generated partial events class in a separate file.
 //
 // Generated from:			C:\Users\alexe\onedrive\documents\visual studio 2017\Projects\AnimalFarm\AnimalFarm.Service.Utils\Tracing\events.json
-// Generation time:			Sun, 17 Jun 2018 16:55:28 GMT
+// Generation time:			Mon, 18 Jun 2018 20:14:27 GMT
 //
 // </auto-generated> 
 //--------------------------------------------------------------------------------------------------------------
@@ -45,9 +45,9 @@ namespace AnimalFarm.Service.Utils.Tracing
 		{
 			ServiceEventSource.Current.ServiceRequestFailed(serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName, applicationTypeName, nodeName, requestId, userId, requestPath, exceptionMessage, stackTrace);
 		}
-		public void OperationStarted(string serviceName, string serviceTypeName, long replicaOrInstanceId, Guid partitionId, string applicationName, string applicationTypeName, string nodeName, string requestId, string userId, string operationRunId)
+		public void OperationStarted(string serviceName, string serviceTypeName, long replicaOrInstanceId, Guid partitionId, string applicationName, string applicationTypeName, string nodeName, string requestId, string userId, string operationRunId, string operationName)
 		{
-			ServiceEventSource.Current.OperationStarted(serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName, applicationTypeName, nodeName, requestId, userId, operationRunId);
+			ServiceEventSource.Current.OperationStarted(serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName, applicationTypeName, nodeName, requestId, userId, operationRunId, operationName);
 		}
 		public void OperationStopped(string serviceName, string serviceTypeName, long replicaOrInstanceId, Guid partitionId, string applicationName, string applicationTypeName, string nodeName, string requestId, string userId, string operationRunId)
 		{
@@ -123,11 +123,11 @@ namespace AnimalFarm.Service.Utils.Tracing
 		[Event(8
 			,Keywords=Keywords.Operation
 			,Level=EventLevel.Error
-			,Message="Operation '{9}' started in the scope of request '{7}'"
+			,Message="Operation '{9}' ('{10}') started in the scope of request '{7}'"
 		)]
-		public void OperationStarted(string serviceName, string serviceTypeName, long replicaOrInstanceId, Guid partitionId, string applicationName, string applicationTypeName, string nodeName, string requestId, string userId, string operationRunId)
+		public void OperationStarted(string serviceName, string serviceTypeName, long replicaOrInstanceId, Guid partitionId, string applicationName, string applicationTypeName, string nodeName, string requestId, string userId, string operationRunId, string operationName)
 		{
-			WriteEvent(8, serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName, applicationTypeName, nodeName, requestId, userId, operationRunId);
+			WriteEvent(8, serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName, applicationTypeName, nodeName, requestId, userId, operationRunId, operationName);
 		}
 		[Event(9
 			,Keywords=Keywords.Operation

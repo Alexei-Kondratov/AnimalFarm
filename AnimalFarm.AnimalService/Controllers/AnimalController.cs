@@ -3,6 +3,7 @@ using AnimalFarm.Logic.AnimalBox;
 using AnimalFarm.Logic.RulesetManagement;
 using AnimalFarm.Model;
 using AnimalFarm.Model.Events;
+using AnimalFarm.Service.Utils.Operations;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -18,13 +19,15 @@ namespace AnimalFarm.AnimalService.Controllers
         private IRepository<Animal> _animals;
         private IRepository<Ruleset> _rulesets;
         private RulesetScheduleProvider _scheduleProvider;
+        private OperationRunner _operationRunner;
 
-        public AnimalController(ITransactionManager transactionManager, IRepository<Animal> animals, IRepository<Ruleset> rulesets, RulesetScheduleProvider scheduleProvider)
+        public AnimalController(ITransactionManager transactionManager, IRepository<Animal> animals, IRepository<Ruleset> rulesets, RulesetScheduleProvider scheduleProvider, OperationRunner operationRunner)
         {
             _transactionManager = transactionManager;
             _animals = animals;
             _rulesets = rulesets;
             _scheduleProvider = scheduleProvider;
+            _operationRunner = operationRunner;
         }
 
         private async Task<IEnumerable<AnimalEvent>> GetRulesetChangeEventsAsync(ITransaction tx, Animal animal)
@@ -72,23 +75,28 @@ namespace AnimalFarm.AnimalService.Controllers
             }
         }
 
+        public async Task ProcessEvent(OperationContext operationContext, AnimalEvent e)
+        {
+            Animal animal = await _animals.ByIdAsync(operationContext.Transaction, e.OwnerUserId, e.AnimalId);
+            bool isSuccess = await RunEventsAsync(operationContext.Transaction, animal, new[] { e });
+            if (!isSuccess)
+                throw new Exception();
+        }
+
         [Route("event")]
         [HttpPut()]
         public async Task<IActionResult> PushEvent([FromBody]AnimalEvent e)
         {
-            using (var tx = _transactionManager.CreateTransaction())
+            // TODO: Validate the event.
+
+            try
             {
-                Animal animal = await _animals.ByIdAsync(tx, e.OwnerUserId, e.AnimalId);
-                bool isSuccess = await RunEventsAsync(tx, animal, new[] { e });
-                if (isSuccess)
-                {
-                    await tx.CommitAsync();
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
+                await _operationRunner.RunAsync((context) => ProcessEvent(context, e));
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
             }
         }
     }

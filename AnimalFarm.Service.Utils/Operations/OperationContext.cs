@@ -15,15 +15,13 @@ namespace AnimalFarm.Service.Utils.Operations
         public ILogger Logger { get; }
         public CancellationToken CancellationToken { get; }
 
-        internal OperationContext(OperationRunner runner, ILogger logger, ITransaction transaction, CancellationToken? cancellationToken = null)
+        internal OperationContext(OperationRunner runner, ILogger logger, ITransaction transaction, CancellationToken cancellationToken = default(CancellationToken))
         {
             _runner = runner;
             Logger = logger;
             Transaction = transaction;
 
-            _cancellationTokenSource = cancellationToken.HasValue ?
-                CancellationTokenSource.CreateLinkedTokenSource(cancellationToken.Value)
-                : new CancellationTokenSource();
+            _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             CancellationToken = _cancellationTokenSource.Token;
         }
 

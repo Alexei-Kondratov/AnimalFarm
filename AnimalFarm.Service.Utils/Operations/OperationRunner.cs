@@ -20,7 +20,7 @@ namespace AnimalFarm.Service.Utils.Operations
             _transactionManager = transactionManager;
         }
 
-        private OperationContext GetNewContext(CancellationToken? cancellationToken)
+        private OperationContext GetNewContext(CancellationToken cancellationToken)
         {
             return new OperationContext(this, _logger, _transactionManager.CreateTransaction(), cancellationToken);
         }
@@ -31,7 +31,8 @@ namespace AnimalFarm.Service.Utils.Operations
             var context = operation.Context;
 
             string operationRunId = Guid.NewGuid().ToString();
-            _logger.LogOperationStart(operationRunId);
+            string operationName = $"{operation.Delegate.Method.DeclaringType.Name}.{operation.Delegate.Method.Name}";
+            _logger.LogOperationStart(operationRunId, operationName);
 
             while (true)
             {
@@ -82,29 +83,29 @@ namespace AnimalFarm.Service.Utils.Operations
         }
 
         public Task RunAsync<TType1>(Func<OperationContext, TType1, Task> operationMethod,
-            CancellationToken? cancellationToken = null, int? timeout = null, int? retries = null)
+            CancellationToken cancellationToken = default(CancellationToken), int? timeout = null, int? retries = null)
         {
             return RunAsync((context) => operationMethod.Invoke(context, _serviceProvider.GetService<TType1>()),
-                cancellationToken);
+                cancellationToken, timeout, retries);
         }
 
         public Task RunAsync<TType1, TType2>(Func<OperationContext, TType1, TType2, Task> operationMethod,
-            CancellationToken? cancellationToken = null, int? timeout = null, int? retries = null)
+            CancellationToken cancellationToken = default(CancellationToken), int? timeout = null, int? retries = null)
         {
             return RunAsync((context) => operationMethod.Invoke(context, _serviceProvider.GetService<TType1>(), _serviceProvider.GetService<TType2>()),
-                cancellationToken);
+                cancellationToken, timeout, retries);
         }
 
         public Task RunAsync<TType1, TType2, TType3>(Func<OperationContext, TType1, TType2, TType3, Task> operationMethod,
-            CancellationToken? cancellationToken = null, int? timeout = null, int? retries = null)
+            CancellationToken cancellationToken = default(CancellationToken), int? timeout = null, int? retries = null)
         {
             return RunAsync((context) => operationMethod.Invoke(context,
                 _serviceProvider.GetService<TType1>(), _serviceProvider.GetService<TType2>(), _serviceProvider.GetService<TType3>()),
-                cancellationToken);
+                cancellationToken, timeout, retries);
         }
 
         public Task RunAsync(Func<OperationContext, Task> operationMethod,
-            CancellationToken? cancellationToken = null, int? timeout = null, int? retries = null)
+            CancellationToken cancellationToken = default(CancellationToken), int? timeout = null, int? retries = null)
         {
             return RunAsync(operationMethod, GetNewContext(cancellationToken), timeout, retries);
         }
