@@ -82,6 +82,7 @@ namespace AnimalFarm.Data.Seed
                 new Ruleset
                 {
                     Id = _firstRulesetVersionId,
+                    Name = "Base Ruleset",
                     AnimalActions = new []
                     {
                         new AnimalAction
@@ -166,6 +167,7 @@ namespace AnimalFarm.Data.Seed
                 new Ruleset
                 {
                     Id = _secondRulesetVersionId,
+                    Name = "Tiger Update",
                     InheritedRulesetId = _firstRulesetVersionId,
                     AnimalTypes = new []
                     {
@@ -203,8 +205,27 @@ namespace AnimalFarm.Data.Seed
                 new Ruleset
                 {
                     Id = _thirdRulesetVersionId,
+                    Name = "Thirst Update",
                     AnimalActions = new []
                     {
+                         new AnimalAction
+                        {
+                            Id = "Feed",
+                            Name = "Feed",
+                            AttributeEffects = new Dictionary<string, decimal>
+                            {
+                                { _hungerAttributeId, -20 }
+                            }
+                        },
+                        new AnimalAction
+                        {
+                            Id = "Pet",
+                            Name = "Pet",
+                            AttributeEffects = new Dictionary<string, decimal>
+                            {
+                                { _happinessAttributeId, 15 }
+                            }
+                        },
                         new AnimalAction
                         {
                             Id = "Water",
