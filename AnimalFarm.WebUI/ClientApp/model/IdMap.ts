@@ -1,3 +1,3 @@
 export default interface IdMap<T> {
-    [email: string]: T;
+    [key: string]: T;
 }

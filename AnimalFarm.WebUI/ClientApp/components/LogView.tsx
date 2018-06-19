@@ -3,6 +3,7 @@ import { RouteComponentProps } from 'react-router';
 import 'isomorphic-fetch';
 
 import LogRecord from '../model/LogRecord';
+import Urls from '../Urls';
 
 interface LogViewState {
     records: LogRecord[];
@@ -28,7 +29,7 @@ export class LogView extends React.Component<RouteComponentProps<{}>, LogViewSta
             const logRows = this.state.records.map(l => (
                 <tr key={l.rowKey}>
                     <td> {l.eventMessage} </td>
-                    <td> {l.preciseTimeStamp} </td>
+                    <td> {l.preciseTimeStamp.toLocaleString()} </td>
                 </tr>
             ));
 
