@@ -6,7 +6,7 @@
 // If you wish to customize the code below, please extend the generated partial events class in a separate file.
 //
 // Generated from:			C:\Users\alexe\onedrive\documents\visual studio 2017\Projects\AnimalFarm\AnimalFarm.Service.Utils\Tracing\events.json
-// Generation time:			Mon, 18 Jun 2018 20:14:27 GMT
+// Generation time:			Tue, 19 Jun 2018 09:06:52 GMT
 //
 // </auto-generated> 
 //--------------------------------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ namespace AnimalFarm.Service.Utils.Tracing
 		[Event(5
 			,Keywords=Keywords.Request
 			,Level=EventLevel.Informational
-			,Message="Service request '{7}' by user '{8}' to '{0}'/'{9}' started"
+			,Message="Service request '{7}' by user '{8}' to '{0}''{9}' started"
 		)]
 		public void ServiceRequestStarted(string serviceName, string serviceTypeName, long replicaOrInstanceId, Guid partitionId, string applicationName, string applicationTypeName, string nodeName, string requestId, string userId, string requestPath)
 		{
@@ -105,7 +105,7 @@ namespace AnimalFarm.Service.Utils.Tracing
 		[Event(6
 			,Keywords=Keywords.Request
 			,Level=EventLevel.Informational
-			,Message="Service request '{7}' by user '{8}' to '{0}'/'{9}' stoped"
+			,Message="Service request '{7}' by user '{8}' to '{0}''{9}' stoped"
 		)]
 		public void ServiceRequestStopped(string serviceName, string serviceTypeName, long replicaOrInstanceId, Guid partitionId, string applicationName, string applicationTypeName, string nodeName, string requestId, string userId, string requestPath)
 		{
@@ -114,7 +114,7 @@ namespace AnimalFarm.Service.Utils.Tracing
 		[Event(7
 			,Keywords=Keywords.Request
 			,Level=EventLevel.Error
-			,Message="Service request '{7}' by user '{8}' to '{0}'/'{9}' failed with exception '{10}'"
+			,Message="Service request '{7}' by user '{8}' to '{0}''{9}' failed with exception '{10}'"
 		)]
 		public void ServiceRequestFailed(string serviceName, string serviceTypeName, long replicaOrInstanceId, Guid partitionId, string applicationName, string applicationTypeName, string nodeName, string requestId, string userId, string requestPath, string exceptionMessage, string stackTrace)
 		{

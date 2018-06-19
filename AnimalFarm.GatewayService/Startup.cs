@@ -18,13 +18,16 @@ namespace AnimalFarm.GatewayService
        
         private void BuildRoutes(IRouteBuilder builder)
         {
+            // TODO: Move to configuration
+
             builder
                .MapPost("admin/ClearCache", (context) => ForwardToAsync(ServiceType.Admin, "ClearCache", true))
                .MapPost("admin/ResetData", (context) => ForwardToAsync(ServiceType.Admin, "ResetData", true))
                .MapGet("animal/{id:guid}", (context) => ForwardToAsync(ServiceType.Animal, "{id}"))
                .MapPut("animal/event", (context) => ForwardToAsync(ServiceType.Animal, "event"))
                .MapPost("login", (context) => ForwardToAsync(ServiceType.Authentication, "login", true))
-               .MapGet("ruleset/{id:guid?}", (context) => ForwardToAsync(ServiceType.Ruleset, "{id}", true));
+               .MapGet("ruleset/{id:guid?}", (context) => ForwardToAsync(ServiceType.Ruleset, "{id}", true))
+               .MapGet("updatesPlan", (context) => ForwardToAsync(ServiceType.Ruleset, "UpdatesPlan", true));
         }
 
         private Task ForwardToAsync(ServiceType service, string path, bool allowAnonymous = false)

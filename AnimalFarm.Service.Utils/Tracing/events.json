@@ -47,7 +47,7 @@
       "name": "ServiceRequestStarted",
       "level": "Informational",
       "keywords": [ "Request" ],
-      "message": "Service request '{7}' by user '{8}' to '{0}'/'{9}' started",
+      "message": "Service request '{7}' by user '{8}' to '{0}''{9}' started",
       "parameters": [
         {
           "name": "requestPath",
@@ -60,7 +60,7 @@
       "name": "ServiceRequestStopped",
       "level": "Informational",
       "keywords": [ "Request" ],
-      "message": "Service request '{7}' by user '{8}' to '{0}'/'{9}' stoped",
+      "message": "Service request '{7}' by user '{8}' to '{0}''{9}' stoped",
       "parameters": [
         {
           "name": "requestPath",
@@ -73,7 +73,7 @@
       "name": "ServiceRequestFailed",
       "level": "Error",
       "keywords": [ "Request" ],
-      "message": "Service request '{7}' by user '{8}' to '{0}'/'{9}' failed with exception '{10}'",
+      "message": "Service request '{7}' by user '{8}' to '{0}''{9}' failed with exception '{10}'",
       "parameters": [
         {
           "name": "requestPath",
