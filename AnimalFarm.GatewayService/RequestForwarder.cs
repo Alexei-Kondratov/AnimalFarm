@@ -68,14 +68,20 @@ namespace AnimalFarm.GatewayService
                 await externalResponse.WriteAsync(await response.Content.ReadAsStringAsync());
         }
 
-        public async Task ForwardToAsync(ServiceType serviceType, string path)
+        public async Task ForwardToAsync(ServiceType serviceType, string path, bool allowAnonymous = false)
         {
             HttpContext context = _httpContextAccessor.HttpContext;
+
+            string userId = _requestContextAccessor.Context.UserId;
+            if (!allowAnonymous && userId == null)
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return;
+            }            
 
             path = FillRouteValues(path, context.GetRouteData().Values);
             HttpRequestMessage fwRequest = BuildRequest(context.Request, path);
 
-            string userId = _requestContextAccessor.Context.UserId;
             HttpResponseMessage response;
             using (IServiceHttpClient client = await _httpClientFactory.CreateAsync(serviceType, userId, CancellationToken.None))
             {
