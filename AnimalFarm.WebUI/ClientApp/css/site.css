@@ -64,3 +64,22 @@
         text-overflow: ellipsis;
     }
 }
+
+.list-row {
+    margin-top: 20px;
+}
+
+.list-row .header {
+    font-weight: bold;
+    border-bottom: 1px solid gray;
+}
+
+.loading {
+    position: absolute;
+    top: calc(50% - 5px);
+    left: calc(50% - 20px);
+}
+
+.content-container {
+    min-height: 300px;
+}

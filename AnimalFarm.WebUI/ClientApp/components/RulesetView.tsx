@@ -63,7 +63,7 @@ export class RulesetView extends React.Component<RouteComponentProps<{}>, Rulese
 
     public render() {
         if (this.state.loading)
-            return <p><em>Loading...</em></p>
+            return <p className='loading'><em>Loading...</em></p>
         else {
             const ruleset = this.state.currentRuleset;
             const animalActionIds = Object.keys(ruleset.animalActions);
