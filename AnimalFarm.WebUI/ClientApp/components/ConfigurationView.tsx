@@ -5,6 +5,7 @@ import 'isomorphic-fetch';
 import Ruleset from '../model/Ruleset';
 import IdMap from '../model/IdMap';
 import Urls from '../Urls';
+import Overlay from './Overlay';
 
 interface ConfigurationRecord {
     id: string
@@ -37,7 +38,7 @@ export class ConfigurationView extends React.Component<RouteComponentProps<{}>, 
 
     public render() {
         if (this.state.loading)
-            return <p className='loading'><em>Loading...</em></p>
+            return <Overlay caption="Loading..." />
         else {
             const configurationRows = this.state.configurations.map(c => (
                 <div key={c.id} className='list-row'>

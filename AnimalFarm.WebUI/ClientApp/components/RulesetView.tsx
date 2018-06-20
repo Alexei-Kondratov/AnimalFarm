@@ -5,6 +5,7 @@ import 'isomorphic-fetch';
 import Ruleset from '../model/Ruleset';
 import IdMap from '../model/IdMap';
 import Urls from '../Urls';
+import Overlay from './Overlay';
 
 interface RulesetState {
     currentRuleset: Ruleset;
@@ -63,7 +64,7 @@ export class RulesetView extends React.Component<RouteComponentProps<{}>, Rulese
 
     public render() {
         if (this.state.loading)
-            return <p className='loading'><em>Loading...</em></p>
+            return <Overlay caption="Loading..." />
         else {
             const ruleset = this.state.currentRuleset;
             const animalActionIds = Object.keys(ruleset.animalActions);

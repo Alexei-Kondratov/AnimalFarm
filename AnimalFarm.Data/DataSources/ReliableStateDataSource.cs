@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AnimalFarm.Data.Cache;
@@ -30,7 +31,7 @@ namespace AnimalFarm.Data.DataSources
         {
             var typedContext = (ReliableStateTransactionContext)transaction.GetContext(this);
             IReliableDictionary<string, TEntity> reliableDictionary = await GetDictionaryAsync<TEntity>(storeName);
-            ConditionalValue<TEntity> result = await reliableDictionary.TryGetValueAsync(typedContext.ReliableTransaction, entityId);
+            ConditionalValue<TEntity> result = await reliableDictionary.TryGetValueAsync(typedContext.ReliableTransaction, entityId, LockMode.Update);
             return result.HasValue ? result.Value : default(TEntity);
         }
 

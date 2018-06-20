@@ -4,6 +4,7 @@ import 'isomorphic-fetch';
 
 import LogRecord from '../model/LogRecord';
 import Urls from '../Urls';
+import Overlay from './Overlay';
 
 interface LogViewState {
     records: LogRecord[];
@@ -24,7 +25,7 @@ export class LogView extends React.Component<RouteComponentProps<{}>, LogViewSta
 
     public render() {
         if (this.state.loading)
-            return <p className='loading'><em>Loading...</em></p>
+            return <Overlay caption="Loading..." />
         else {
             const logRows = this.state.records.map(l => (
                 <tr key={l.rowKey}>
