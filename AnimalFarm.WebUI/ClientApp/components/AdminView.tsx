@@ -2,7 +2,6 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import 'isomorphic-fetch';
 
-import LogRecord from '../model/LogRecord';
 import Urls from '../Urls';
 import Overlay from './Overlay';
 

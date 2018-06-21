@@ -31,7 +31,7 @@ namespace AnimalFarm.Data.DataSources
         {
             var typedContext = (ReliableStateTransactionContext)transaction.GetContext(this);
             IReliableDictionary<string, TEntity> reliableDictionary = await GetDictionaryAsync<TEntity>(storeName);
-            ConditionalValue<TEntity> result = await reliableDictionary.TryGetValueAsync(typedContext.ReliableTransaction, entityId, LockMode.Update);
+            ConditionalValue<TEntity> result = await reliableDictionary.TryGetValueAsync(typedContext.ReliableTransaction, entityId, LockMode.Update, TimeSpan.FromMinutes(1), default(CancellationToken));
             return result.HasValue ? result.Value : default(TEntity);
         }
 

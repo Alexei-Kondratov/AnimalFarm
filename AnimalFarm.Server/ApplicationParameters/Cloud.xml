@@ -5,10 +5,10 @@
     <Parameter Name="AnimalFarm.AuthenticationService_InstanceCount" Value="-1" />
     <Parameter Name="AnimalFarm.GatewayService_InstanceCount" Value="-1" />
     <Parameter Name="AnimalFarm.AnimalService_PartitionCount" Value="1" />
-    <Parameter Name="AnimalFarm.AnimalService_MinReplicaSetSize" Value="3" />
+    <Parameter Name="AnimalFarm.AnimalService_MinReplicaSetSize" Value="1" />
     <Parameter Name="AnimalFarm.AnimalService_TargetReplicaSetSize" Value="3" />
-    <Parameter Name="AnimalFarm.AnimalService_PartitionCount" Value="1" />
-    <Parameter Name="AnimalFarm.AnimalService_MinReplicaSetSize" Value="3" />
-    <Parameter Name="AnimalFarm.AnimalService_TargetReplicaSetSize" Value="3" />
+    <Parameter Name="AnimalFarm.RulesetService_PartitionCount" Value="1" />
+    <Parameter Name="AnimalFarm.RulesetService_MinReplicaSetSize" Value="1" />
+    <Parameter Name="AnimalFarm.RulesetService_TargetReplicaSetSize" Value="3" />
   </Parameters>
 </Application>

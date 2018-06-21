@@ -23,23 +23,33 @@ export class NavMenu extends React.Component<{}, {}> {
                             </NavLink>
                         </li>
                         <li>
+                            <NavLink to={'/login'} activeClassName='active'>
+                                <span className='glyphicon glyphicon-user'></span> Log in
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink to={'/animals'} activeClassName='active'>
+                                <span className='glyphicon glyphicon-tree-deciduous'></span> My Animals
+                            </NavLink>
+                        </li>
+                        <li>
                             <NavLink to={ '/ruleset' } activeClassName='active'>
-                                <span className='glyphicon glyphicon-education'></span> Ruleset
+                                <span className='glyphicon glyphicon-tasks'></span> Ruleset
                             </NavLink>
                         </li>
                         <li>
                             <NavLink to={ '/logs' } activeClassName='active'>
-                                <span className='glyphicon glyphicon-th-list'></span> Logs
+                                <span className='glyphicon glyphicon-wrench'></span> Logs
                             </NavLink>
                         </li>
                         <li>
                             <NavLink to={'/admin'} activeClassName='active'>
-                                <span className='glyphicon glyphicon-th-list'></span> Administration
+                                <span className='glyphicon glyphicon-wrench'></span> Administration
                             </NavLink>
                         </li>
                         <li>
                             <NavLink to={'/configuration'} activeClassName='active'>
-                                <span className='glyphicon glyphicon-th-list'></span> Configuration
+                                <span className='glyphicon glyphicon-tasks'></span> Configuration
                             </NavLink>
                         </li>
                     </ul>

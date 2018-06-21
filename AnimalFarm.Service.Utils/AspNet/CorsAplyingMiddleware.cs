@@ -22,6 +22,10 @@ namespace AnimalFarm.Service.Utils.AspNet
         {
             CorsResult evaluationResult = _corsService.EvaluatePolicy(context, corsPolicy);
             _corsService.ApplyResult(evaluationResult, context.Response);
+
+            if (context.Request.Method == "OPTIONS")
+                return;
+
             await _next.Invoke(context);
         }
     }

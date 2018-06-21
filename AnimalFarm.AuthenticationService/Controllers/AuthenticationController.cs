@@ -1,5 +1,4 @@
-﻿
-using AnimalFarm.AuthenticationService.Messages;
+﻿using AnimalFarm.AuthenticationService.Messages;
 using AnimalFarm.Data;
 using AnimalFarm.Model;
 using AnimalFarm.Utils.Security;
@@ -48,7 +47,7 @@ namespace AnimalFarm.AuthenticationService.Controllers
                 return invalidLoginOrPasswordResult;
 
             string token = _jwtManager.GenerateToken(userAuthenticationInfo.Id);
-            return Ok(token);
+            return Ok(new { id = userAuthenticationInfo.Id, token = token });
         }
     }
 }

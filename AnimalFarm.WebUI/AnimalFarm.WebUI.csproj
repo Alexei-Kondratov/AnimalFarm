@@ -8,8 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.8" />
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.0.0-preview" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,10 +23,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\GuidGenerator.ts" />
     <None Remove="ClientApp\Urls.ts" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AnimalFarm.Utils\AnimalFarm.Utils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\GuidGenerator.ts" />
     <TypeScriptCompile Include="ClientApp\Urls.ts" />
   </ItemGroup>
 
