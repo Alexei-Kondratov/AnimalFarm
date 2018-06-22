@@ -11,7 +11,7 @@ namespace AnimalFarm.Service.Utils.Operations
         private OperationRunner _runner;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public ITransaction Transaction { get; }
+        public ITransaction Transaction { get; set; }
         public ILogger Logger { get; }
         public CancellationToken CancellationToken { get; }
 

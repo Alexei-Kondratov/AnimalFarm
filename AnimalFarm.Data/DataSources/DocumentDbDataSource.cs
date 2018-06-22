@@ -4,6 +4,7 @@ using AnimalFarm.Model;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace AnimalFarm.Data.DataSources
@@ -39,8 +40,23 @@ namespace AnimalFarm.Data.DataSources
             var typedContext = (DocumentDbTransactionContext)transaction.GetContext(this);
             Uri documentUri = GetDocumentUri(storeName, entityId);
             var partitionKeyObj = new PartitionKey(partitionKey);
-            var result = await typedContext.Client.ReadDocumentAsync<TEntity>(documentUri, new RequestOptions { PartitionKey = partitionKeyObj });
-            return result.Document;
+
+            try
+            {
+                var result = await typedContext.Client.ReadDocumentAsync<TEntity>(documentUri, new RequestOptions { PartitionKey = partitionKeyObj });
+                return result.Document;
+            }
+            catch (DocumentClientException e)
+            {
+                if (e.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return default(TEntity);
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         private async Task ApplyOperationAsync(DocumentClient client, DataOperation operation)

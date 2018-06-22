@@ -22,7 +22,7 @@ namespace AnimalFarm.Service.Utils.Operations
 
         private OperationContext GetNewContext(CancellationToken cancellationToken)
         {
-            return new OperationContext(this, _logger, _transactionManager.CreateTransaction(), cancellationToken);
+            return new OperationContext(this, _logger, null, cancellationToken);
         }
 
         private async Task RunAsync(Operation operation)
@@ -38,46 +38,51 @@ namespace AnimalFarm.Service.Utils.Operations
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
 
-                try
+                using (var transaction = _transactionManager.CreateTransaction())
                 {
-                    var operationTask = operation.Delegate(operation.Context);
-                    var timeoutTask = Task.Delay(TimeSpan.FromMilliseconds(operation.Timeout), operation.Context.CancellationToken);
-                    await Task.WhenAny(timeoutTask, operationTask);
+                    context.Transaction = transaction;
 
-                    if (timeoutTask.IsCompleted)
+                    try
                     {
-                        _logger.LogOperationTimeout(operationRunId);
-                        context.Cancel();
-                        continue;
-                    }
-                    else
-                    {
-                        await operationTask;
-                    }
+                        var operationTask = operation.Delegate(operation.Context);
+                        var timeoutTask = Task.Delay(TimeSpan.FromMilliseconds(operation.Timeout), operation.Context.CancellationToken);
+                        await Task.WhenAny(timeoutTask, operationTask);
 
-                    _logger.LogOperationStop(operationRunId);
-                    await context.Transaction.CommitAsync();
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    if (ex is OperationCanceledException)
-                        throw;
+                        if (timeoutTask.IsCompleted)
+                        {
+                            _logger.LogOperationTimeout(operationRunId);
+                            context.Cancel();
+                            continue;
+                        }
+                        else
+                        {
+                            await operationTask;
+                        }
 
-                    _logger.LogOperationException(operationRunId, ex);
-
-                    retriesCount++;
-                    if (retriesCount < operation.Retries)
-                    {
-                        _logger.LogOperationRetry(operationRunId, retriesCount, operation.Retries);
-                        continue;
-                    }
-
-                    _logger.LogOperationStop(operationRunId);
-                    if (operation.IsCritical)
-                        throw;
-                    else
+                        _logger.LogOperationStop(operationRunId);
+                        await context.Transaction.CommitAsync();
                         return;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex is OperationCanceledException)
+                            throw;
+
+                        _logger.LogOperationException(operationRunId, ex);
+
+                        retriesCount++;
+                        if (retriesCount < operation.Retries)
+                        {
+                            _logger.LogOperationRetry(operationRunId, retriesCount, operation.Retries);
+                            continue;
+                        }
+
+                        _logger.LogOperationStop(operationRunId);
+                        if (operation.IsCritical)
+                            throw;
+                        else
+                            return;
+                    }
                 }
             }
         }
