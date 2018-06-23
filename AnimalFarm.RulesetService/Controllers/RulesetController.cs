@@ -25,6 +25,7 @@ namespace AnimalFarm.RulesetService.Controllers
 
         [HttpGet("")]
         [HttpGet("{rulesetId}")]
+        [HttpGet("Rulesets/{rulesetId}")]
         public async Task<IActionResult> GetRuleset(string rulesetId = null)
         {
             using (var tx = _transactionManager.CreateTransaction())

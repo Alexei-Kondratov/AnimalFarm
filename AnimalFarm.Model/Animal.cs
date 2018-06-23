@@ -1,5 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
@@ -23,14 +22,23 @@ namespace AnimalFarm.Model
             {
                 _id = value;
                 RowKey = Id;
-                PartitionKey = Id;
             }
         }
+
+        private string _userId;
 
         /// <summary>
         /// Gets or sets the animal's owner id.
         /// </summary>
-        public string UserId { get; set; }
+        public string UserId
+        {
+            get => _userId;
+            set
+            {
+                _userId = value;
+                PartitionKey = _userId;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the animal's name.

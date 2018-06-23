@@ -77,7 +77,10 @@ namespace AnimalFarm.GatewayService
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 return;
-            }            
+            }
+
+            if (userId != null)
+                context.GetRouteData().Values.Add(nameof(userId), userId);
 
             path = FillRouteValues(path, context.GetRouteData().Values);
             HttpRequestMessage fwRequest = BuildRequest(context.Request, path);
