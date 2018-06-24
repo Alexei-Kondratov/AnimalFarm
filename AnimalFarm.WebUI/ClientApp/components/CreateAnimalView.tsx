@@ -56,13 +56,16 @@ export class CreateAnimalView extends React.Component<RouteComponentProps<{}>, C
         });
 
         const createTask: Promise<Response> = fetch(Urls.Server + 'animal/event', {
-            method: 'post',
+            method: 'put',
             body: JSON.stringify({
                 eventType: 'create',
                 eventId: GuidGenerator.newGuid(),
+                animalId: GuidGenerator.newGuid(),
                 ownerUserId: this.state.userId,
+                actingUserId: this.state.userId,
                 name: this.state.name,
-                time: new Date().getTime(),
+                animalTypeId: this.state.animalTypeId,
+                time: new Date(new Date().getTime()).toISOString(),
             }),
             headers: {
                 'Content-Type': 'application/json',

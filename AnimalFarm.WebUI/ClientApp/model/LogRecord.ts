@@ -1,7 +1,7 @@
 
 export default interface LogRecord {
-    rowKey: string;
-    preciseTimeStamp: Date;
+    id: string;
+    timeStamp: Date;
     eventMessage: string;
-    message: string;
+    details: string;
 }

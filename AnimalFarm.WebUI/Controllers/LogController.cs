@@ -22,19 +22,21 @@ namespace AnimalFarm.WebUI.Controllers
           "DefaultEndpointsProtocol=https;AccountName=775y3kysur4as3;AccountKey=7+kOC+tXA4KgsHLctcbGqThBWbGEyFei46oTNeHhWWtpwAJijuVAXaGIzWf40wX/oW3/6l07Vt438q0q5Netqw==;EndpointSuffix=core.windows.net";
 
         [HttpGet]
-        public async Task<IEnumerable<LogRecord>> Get()
+        public async Task<IActionResult> Get()
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-            CloudTable table = tableClient.GetTableReference("WADServiceFabricSystemEventTable");
+            CloudTable table = tableClient.GetTableReference("WADDefaultdb3ba641747eb813502418838b19ad46");
 
             var query = new TableQuery<LogRecord>()
             .Where(
-                TableQuery.GenerateFilterConditionForDate("PreciseTimeStamp", QueryComparisons.GreaterThanOrEqual, new DateTimeOffset(new DateTime(2018, 06, 01)))
+                TableQuery.GenerateFilterConditionForDate("PreciseTimeStamp", QueryComparisons.GreaterThanOrEqual, new DateTimeOffset(DateTime.UtcNow.AddHours(-2)))
             );
 
-            TableQuerySegment<LogRecord> result = await table.ExecuteQuerySegmentedAsync(query, null);
-            return result.OrderByDescending(l => l.PreciseTimeStamp).Take(100);
+            TableQuerySegment<LogRecord> queryResult = await table.ExecuteQuerySegmentedAsync(query, null);
+            var result = queryResult.OrderByDescending(l => l.PreciseTimeStamp).Take(100).ToList()
+                .Select(l => new { Details = l.Message, EventMessage = l.EventMessage, TimeStamp = l.PreciseTimeStamp, Id = l.GetHashCode() });
+            return Json(result);
         }
     }
 }

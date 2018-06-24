@@ -18,13 +18,10 @@ namespace AnimalFarm.WebUI.Controllers
         private const string uri = "https://localhost:8081";
         private const string key = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
 
-        [HttpGet]
-        public IActionResult Animals()
+        [HttpGet("{userId}")]
+        public IActionResult Animals(string userId)
         {
-            string userId = new JwtManager().ValidateToken(Request.Headers["User-Token"]);
             var client = new DocumentClient(new Uri(uri), key);
-
-            var response1 = client.ReadDatabaseAsync(UriFactory.CreateDatabaseUri("AnimalFarm")).GetAwaiter().GetResult();
             var query = client.CreateDocumentQuery<Entity>(UriFactory.CreateDocumentCollectionUri("AnimalFarm", "Animals")).
                 Where(e => e.PartitionKey == userId).Select(e => e.id);
 
