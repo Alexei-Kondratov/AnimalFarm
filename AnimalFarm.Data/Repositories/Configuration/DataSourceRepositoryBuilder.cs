@@ -1,9 +1,9 @@
-﻿using AnimalFarm.Data.DataSources.Configuration;
-using AnimalFarm.Model;
+﻿using AnimalFarm.Model;
 using AnimalFarm.Utils.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using AnimalFarm.Utils.DependencyInjection;
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace AnimalFarm.Data.Repositories.Configuration
 {
@@ -11,22 +11,16 @@ namespace AnimalFarm.Data.Repositories.Configuration
     {
         private MethodInfo _buildMethodInfo;
 
-        private static IRepository<TEntity> BuildDataSourceRepository<TEntity>(string dataSourceName, string storeName, DataSourceFactory dataSourceFactory)
+        private static async Task<IRepository<TEntity>> BuildTypedResult<TEntity>(DataSourceRepositoryConfiguration configuration, IServiceProvider serviceContainer, INamedServiceProvider namedServiceProvider)
             where TEntity : IHavePartition<string, string>
         {
-            IDataSource dataSource = dataSourceFactory.Get(dataSourceName);
-            return new DataSourceRepository<TEntity>(dataSource, storeName);
-        }
-
-        private static IRepository<TEntity> BuildTypedResult<TEntity>(DataSourceRepositoryConfiguration configuration, IServiceProvider serviceContainer)
-            where TEntity : IHavePartition<string, string>
-        {
-            DataSourceFactory dataSourceFactory = serviceContainer.GetRequiredService<DataSourceFactory>();
-            IRepository<TEntity> result = BuildDataSourceRepository<TEntity>(configuration.DataSourceName, configuration.StoreName, dataSourceFactory);
+            var dataSource = namedServiceProvider.GetServiceAsync<IDataSource>(configuration.DataSourceName).GetAwaiter().GetResult();
+            IRepository<TEntity> result = new DataSourceRepository<TEntity>(dataSource, configuration.StoreName);
 
             if (configuration.CacheDataSourceName != null)
             {
-                IRepository<TEntity> cache = BuildDataSourceRepository<TEntity>(configuration.CacheDataSourceName, configuration.StoreName, dataSourceFactory);
+                var cacheDataSource = namedServiceProvider.GetServiceAsync<IDataSource>(configuration.CacheDataSourceName).GetAwaiter().GetResult();
+                IRepository<TEntity> cache = new DataSourceRepository<TEntity>(cacheDataSource, configuration.StoreName);
                 result = new CachedRepository<TEntity>(cache, result);
             }
 
@@ -40,7 +34,7 @@ namespace AnimalFarm.Data.Repositories.Configuration
 
         protected override object Build(DataSourceRepositoryConfiguration configuration, IServiceProvider serviceContainer)
         {
-            return _buildMethodInfo.MakeGenericMethod(configuration.Key).Invoke(null, new object[] { configuration, serviceContainer });
+            return _buildMethodInfo.MakeGenericMethod(configuration.Type).Invoke(null, new object[] { configuration, serviceContainer });
         }
     }
 }

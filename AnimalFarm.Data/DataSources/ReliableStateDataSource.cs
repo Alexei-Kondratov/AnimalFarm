@@ -16,6 +16,8 @@ namespace AnimalFarm.Data.DataSources
 
         public string Name { get; private set; }
 
+        public bool IsReadOnly => false;
+
         public ReliableStateDataSource(string name, IReliableStateManager stateManager)
         {
             _stateManager = stateManager;

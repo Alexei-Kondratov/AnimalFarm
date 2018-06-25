@@ -1,6 +1,7 @@
 ﻿using AnimalFarm.Data;
 using AnimalFarm.Utils.Configuration;
 using Newtonsoft.Json;
+using System;
 using System.Threading.Tasks;
 
 namespace AnimalFarm.Service.Utils.Configuration
@@ -18,7 +19,12 @@ namespace AnimalFarm.Service.Utils.Configuration
 
         public async Task<TConfiguration> GetConfigurationAsync<TConfiguration>(string configurationName = null)
         {
-            string typeName = typeof(TConfiguration).Name;
+            return (TConfiguration) await GetConfigurationAsync(typeof(TConfiguration), configurationName);
+        }
+
+        public async Task<object> GetConfigurationAsync(Type type, string configurationName = null)
+        {
+            string typeName = type.Name;
             if (!string.IsNullOrEmpty(configurationName))
                 configurationName = $"{typeName}-{configurationName}";
             else
@@ -26,11 +32,12 @@ namespace AnimalFarm.Service.Utils.Configuration
 
             ConfigurationRecord record;
 
-            using (ITransaction transaction = _transactionManager.CreateTransaction()) {
+            using (ITransaction transaction = _transactionManager.CreateTransaction())
+            {
                 record = await _dataSource.ByIdAsync<ConfigurationRecord>(transaction, "Configuration", configurationName, configurationName);
             }
 
-            return JsonConvert.DeserializeObject<TConfiguration>(record.SerializedConfiguration, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+            return JsonConvert.DeserializeObject(record.SerializedConfiguration, type, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
         }
     }
 }

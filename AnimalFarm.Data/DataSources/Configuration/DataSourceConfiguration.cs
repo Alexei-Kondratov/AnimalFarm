@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace AnimalFarm.Data.DataSources.Configuration
 {
-    public abstract class DataSourceConfiguration : IComponentConfiguration<string>
+    public abstract class DataSourceConfiguration : IComponentConfiguration
     {
         public string Key { get; set; }
         public IEnumerable<Type> Decorators { get; set; }

@@ -1,5 +1,5 @@
 ﻿using AnimalFarm.Data;
-using AnimalFarm.Data.Repositories.Configuration;
+using AnimalFarm.Utils.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AnimalFarm.Services.Utils.DependencyInjection
@@ -8,7 +8,9 @@ namespace AnimalFarm.Services.Utils.DependencyInjection
     {
         public static IServiceCollection AddRepository<TEntity>(this IServiceCollection services)
         {
-            services.AddTransient((provider) => (IRepository<TEntity>)provider.GetRequiredService<RepositoryFactory>().Get(typeof(TEntity)));
+            services.AddTransient((provider) =>
+                (IRepository<TEntity>)provider.GetRequiredService<INamedServiceProvider>().GetServiceAsync<IRepository<TEntity>>(typeof(TEntity).Name)
+            );
             return services;
         }
     }

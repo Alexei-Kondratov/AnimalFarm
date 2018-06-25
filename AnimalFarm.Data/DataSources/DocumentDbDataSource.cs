@@ -17,6 +17,8 @@ namespace AnimalFarm.Data.DataSources
 
         public string Name { get; }
 
+        public bool IsReadOnly => false;
+
         public DocumentDbDataSource(string name, DocumentDbConnectionInfo connectionInfo)
         {
             Name = name;

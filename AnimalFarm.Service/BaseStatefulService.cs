@@ -36,40 +36,12 @@ namespace AnimalFarm.Service
         {
         }
 
-        private DataSourceFactory CreateDataSourceFactory(IServiceProvider serviceProvider)
-        {
-            var result = new DataSourceFactory(serviceProvider, new IConfigurableComponentBuilder<IDataSource, string>[]
-                {
-                    new ReliableStateDataSourceBuilder(),
-                    new DocumentDbDataSourceBuilder(),
-                    new ServiceProxyDataSourceBuilder()
-                });
-
-            var configurationProvider = serviceProvider.GetRequiredService<IConfigurationProvider>();
-            var configurations = configurationProvider.GetConfigurationAsync<DataSourceConfigurations>(GetType().Name).GetAwaiter().GetResult();
-            result.SetConfigurations(configurations.Configurations);
-            return result;
-        }
-
-        private RepositoryFactory CreateRepositoryFactory(IServiceProvider serviceProvider)
-        {
-            var result = new RepositoryFactory(serviceProvider, new IConfigurableComponentBuilder<object, Type>[] { new DataSourceRepositoryBuilder() });
-
-            var configurationProvider = serviceProvider.GetRequiredService<IConfigurationProvider>();
-            var configurations = configurationProvider.GetConfigurationAsync<RepositoryConfigurations>(GetType().Name).GetAwaiter().GetResult();
-            result.SetConfigurations(configurations.Configurations);
-            return result;
-        }
-
         protected virtual void RegisterServices(IServiceCollection serviceCollection)
         {
             serviceCollection
                 .AddAnimalFarmCommonServices()
                 .AddSingleton<ServiceContext>(Context)
-                .AddSingleton<IReliableStateManager>(StateManager)
-                .AddSingleton<DataSourceFactory>(CreateDataSourceFactory)
-                .AddSingleton<RepositoryFactory>(CreateRepositoryFactory)
-                .AddSingleton<CacheManager>();
+                .AddSingleton<IReliableStateManager>(StateManager);
         }
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()

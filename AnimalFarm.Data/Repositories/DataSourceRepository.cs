@@ -19,6 +19,8 @@ namespace AnimalFarm.Data.Repositories
             _storeName = storeName;
         }
 
+        public bool IsReadOnly => _dataSource.IsReadOnly;
+
         async Task<TEntity> IRepository<TEntity>.ByIdAsync(ITransaction transaction, string partitionKey, string entityId)
         {
             return await _dataSource.ByIdAsync<TEntity>(transaction, _storeName, partitionKey, entityId);

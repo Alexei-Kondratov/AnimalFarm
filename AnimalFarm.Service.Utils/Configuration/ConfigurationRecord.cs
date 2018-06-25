@@ -1,6 +1,6 @@
 ﻿using AnimalFarm.Model;
+using AnimalFarm.Utils.Configuration;
 using Newtonsoft.Json;
-using System.Runtime.Serialization.Formatters;
 
 namespace AnimalFarm.Service.Utils.Configuration
 {
@@ -15,17 +15,21 @@ namespace AnimalFarm.Service.Utils.Configuration
         {
         }
 
-        public ConfigurationRecord(string name, object configurationObj)
+        public ConfigurationRecord(string fullName, object configurationObj)
         {
-            string typeName = configurationObj.GetType().Name;
-            if (!string.IsNullOrEmpty(name))
-                name = $"{typeName}-{name}";
-            else
-                name = $"{typeName}";
-
-            Id = name;
-            PartitionKey = name;
+            Id = fullName;
+            PartitionKey = fullName;
             SerializedConfiguration = JsonConvert.SerializeObject(configurationObj, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects, TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple });
+        }
+
+        public ConfigurationRecord(string @namespace, IComponentConfiguration componentConfiguration)
+            : this(@namespace, componentConfiguration.Key, componentConfiguration)
+        {
+        }
+
+        public ConfigurationRecord(string @namespace, string name, object configurationObj)
+             : this($"{@namespace}-{name}", configurationObj)
+        {
         }
     }
 }

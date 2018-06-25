@@ -15,6 +15,8 @@ namespace AnimalFarm.Data.DataSources
 
         public string Name => _internal.Name;
 
+        public bool IsReadOnly => _internal.IsReadOnly;
+
         public virtual Task AddOperationAsync<TEntity>(ITransaction transaction, DataOperationType operationType, string storeName, TEntity entity) where TEntity : IHavePartition<string, string>
         {
             return _internal.AddOperationAsync(transaction, operationType, storeName, entity);

@@ -12,6 +12,8 @@ namespace AnimalFarm.Service.Utils
 
         public string Name { get; private set; }
 
+        public bool IsReadOnly => true;
+
         public ServiceProxyDataSource(string name, ServiceType serviceType)
         {
             Name = name;

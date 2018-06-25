@@ -3,9 +3,23 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AnimalFarm.RulesetService
 {
+    public class MyServiceProviderFactory : IServiceProviderFactory<IServiceCollection>
+    {
+        public IServiceCollection CreateBuilder(IServiceCollection services)
+        {
+            return services;
+        }
+
+        public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -15,13 +29,6 @@ namespace AnimalFarm.RulesetService
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMvc();
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())

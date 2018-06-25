@@ -1,5 +1,4 @@
-﻿using AnimalFarm.Data.DataSources.Configuration;
-using AnimalFarm.Data.Repositories.Configuration;
+﻿using AnimalFarm.Utils.DependencyInjection;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,26 +6,19 @@ namespace AnimalFarm.Data.Cache
 {
     public class CacheManager
     {
-        private readonly DataSourceFactory _dataSources;
-        private readonly RepositoryFactory _repositories;
+        private readonly INamedServiceProvider _namedServiceProvider;
 
-        public CacheManager(DataSourceFactory dataSources, RepositoryFactory repositories)
+        public CacheManager(INamedServiceProvider namedServiceProvider)
         {
-            _dataSources = dataSources;
-            _repositories = repositories;
+            _namedServiceProvider = namedServiceProvider;
         }
 
         public async Task ClearAllAsync()
-        {
-            foreach (var repository in _repositories.Configurations.OfType<DataSourceRepositoryConfiguration>())
-            {
-                if (repository.CacheDataSourceName == null)
-                    continue;
-
-                IDataSource dataSource = _dataSources.Get(repository.CacheDataSourceName);
-                if (dataSource is IClearable clearableDataSource)
-                    await clearableDataSource.ClearAsync(repository.StoreName);
-            }
+        { 
+            // TODO: Implement for the new NamesServiceProvicder. 
+            //var clearableRepositories = _namedServiceProvider.GetAllServices(typeof(ReliableCacheRepository<>));
+            //var clearTasks = clearableRepositories.Select(r => r.ClearAsync());
+            //await Task.WhenAll(clearTasks);
         }
     }
 }

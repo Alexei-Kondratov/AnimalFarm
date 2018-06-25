@@ -8,6 +8,8 @@ namespace AnimalFarm.Data
     {
         string Name { get; }
 
+        bool IsReadOnly { get; }
+
         TransactionContext CreateTransactionContext();
 
         Task<TEntity> ByIdAsync<TEntity>(ITransaction transaction, string storeName, string partitionKey, string entityId);
