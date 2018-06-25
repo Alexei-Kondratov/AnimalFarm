@@ -1,7 +1,8 @@
-﻿
-using AnimalFarm.Utils.Configuration;
+﻿using AnimalFarm.Utils.Configuration;
 using System;
+using System.Linq;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AnimalFarm.Utils.DependencyInjection
@@ -35,6 +36,11 @@ namespace AnimalFarm.Utils.DependencyInjection
             var instances = _componentInstances.GetOrAdd(typeof(TService), new ConcurrentDictionary<string, object>());
             var instance = instances.GetOrAdd(name, await InstantiateComponentAsync(typeof(TService), name));
             return (TService)instance;
+        }
+
+        public IEnumerable<TType> GetAllServices<TType>()
+        {
+            return _componentInstances.Values.SelectMany(cs => cs.Values).OfType<TType>().ToList();
         }
     }
 }

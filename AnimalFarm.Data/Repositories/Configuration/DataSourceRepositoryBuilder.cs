@@ -1,4 +1,5 @@
-﻿using AnimalFarm.Model;
+﻿using AnimalFarm.Data.Cache;
+using AnimalFarm.Model;
 using AnimalFarm.Utils.Configuration;
 using AnimalFarm.Utils.DependencyInjection;
 using System;
@@ -21,7 +22,10 @@ namespace AnimalFarm.Data.Repositories.Configuration
             {
                 var cacheDataSource = namedServiceProvider.GetServiceAsync<IDataSource>(configuration.CacheDataSourceName).GetAwaiter().GetResult();
                 IRepository<TEntity> cache = new DataSourceRepository<TEntity>(cacheDataSource, configuration.StoreName);
-                result = new CachedRepository<TEntity>(cache, result);
+                Func<Task> clear = () => Task.CompletedTask;
+                if (cacheDataSource is IClearable clearableCache)
+                    clear = () => clearableCache.ClearAsync(configuration.StoreName);
+                result = new CachedRepository<TEntity>(cache, result, clear);
             }
 
             return result;

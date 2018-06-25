@@ -15,10 +15,9 @@ namespace AnimalFarm.Data.Cache
 
         public async Task ClearAllAsync()
         { 
-            // TODO: Implement for the new NamesServiceProvicder. 
-            //var clearableRepositories = _namedServiceProvider.GetAllServices(typeof(ReliableCacheRepository<>));
-            //var clearTasks = clearableRepositories.Select(r => r.ClearAsync());
-            //await Task.WhenAll(clearTasks);
+            var clearableRepositories = _namedServiceProvider.GetAllServices<ICachedRepository>();
+            var clearTasks = clearableRepositories.Select(r => r.ClearCacheAsync());
+            await Task.WhenAll(clearTasks);
         }
     }
 }

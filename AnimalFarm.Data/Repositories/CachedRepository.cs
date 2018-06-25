@@ -5,17 +5,19 @@ using System.Threading.Tasks;
 
 namespace AnimalFarm.Data.Repositories
 {
-    public class CachedRepository<TEntity> : IRepository<TEntity>
+    public class CachedRepository<TEntity> : IRepository<TEntity>, ICachedRepository
         where TEntity : IHavePartition<string, string>
     {
         private readonly IRepository<TEntity> _cacheRepository;
         private readonly IRepository<TEntity> _sourceRepository;
-        
+        private readonly Func<Task> _clear;
+
         public CachedRepository(IRepository<TEntity> cacheRepository,
-            IRepository<TEntity> sourceRepository)
+            IRepository<TEntity> sourceRepository, Func<Task> clear)
         {
             _cacheRepository = cacheRepository;
             _sourceRepository = sourceRepository;
+            _clear = clear;
         }
 
         public bool IsReadOnly => _sourceRepository.IsReadOnly;
@@ -32,6 +34,11 @@ namespace AnimalFarm.Data.Repositories
                 await _cacheRepository.UpsertAsync(transaction, value);
 
             return value;
+        }
+
+        public Task ClearCacheAsync()
+        {
+            return _clear();
         }
 
         public async Task UpsertAsync(ITransaction transaction, TEntity entity)

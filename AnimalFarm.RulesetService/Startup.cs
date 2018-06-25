@@ -29,6 +29,11 @@ namespace AnimalFarm.RulesetService
 
         public IConfiguration Configuration { get; }
 
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddMvc();
+        }
+
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
