@@ -12,15 +12,21 @@
 **ServiceTypes** - Contains definitions for Service Fabric services.
 
 -- **AnimalFarm.AdminService** - Stateless service that handles adminsitrative commands like clearing caching and data reset.
+
 -- **AnimalFarm.AnimalFarm** - Stateful service that maintains a cache for animals data and handles animal queries and events.
+
 -- **AnimalFarm.AuthenticationService** - Stateless service that handles user login/password authentication by isuuing JWT tokens.
+
 -- **AnimalFarm.Gateway** - Stateless service that handles all incoming requests and redirects them to other services.
+
 -- **AnimalFarm.Ruleset** - Stateful service that maintains a cache for rulesets and provides rulesets and rulesets schedule data to users and other services.
+
 -- **AnimalFarm.Service** - Contains common logic for services.
 
 **Tests** - Contains unit and integration tests for other projects.
 
 **Tools**
+
 -- **AnimalFarm.Tools.ResetData** - Console applciation for resetiing database structure, business data and configuration.
 
 **AnimalFarm.Data** - Contains base classes for data access: DataSources, Repositories and Transactions.
