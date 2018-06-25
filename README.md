@@ -1,5 +1,11 @@
 # AnimalFarm
 
+## Server strucure
+![Server structure](https://github.com/Alexei-Kondratov/AnimalFarm/blob/master/Server_structure.png)
+
+## Anatomy of a service
+![Service structure](https://github.com/Alexei-Kondratov/AnimalFarm/blob/master/Service_structure.png)
+
 ## Project structure
 **Logic** - Business logic projects
 
